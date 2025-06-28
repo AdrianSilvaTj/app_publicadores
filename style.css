@@ -1,0 +1,48 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+}
+main {
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+h2, h3 {
+  color: #0d6efd;
+}
+
+.active {
+  background-color: darkslategray !important;
+}
+
+.modal-body {
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-emoji {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+.badge {
+  color: black !important
+}
+
+.gridGrupos {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+

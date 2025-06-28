@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publicadores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">🏠 DigitCong</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="asignaciones.html">📖 Asignaciones</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="servicio.html">💼 Servicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="configuracion.html">⚙ Configuración</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="bannerEstado" class="alert text-center m-0 py-2 d-none" role="alert"
+    style="position: sticky; top: 0; z-index: 1055;"></div>
+
+  <!-- CONTENIDO DE LA SECCIÓN -->
+  <div class="container mt-3">
+    <!-- Botón Crear -->
+    <div class="d-flex justify-content-between mb-3">
+      <h3>👨‍👩‍👧‍👦 Publicadores</h3>
+      <div class="d-flex gap-1">
+        <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal"
+          data-bs-target="#modalPublicador" title="Crear nuevo publicador">
+          <span class="me-2 d-none d-sm-inline">➕ Crear</span>
+          <span class="d-inline d-sm-none">➕</span>
+        </button>
+        <button class="btn btn-primary d-flex align-items-center" onclick="actualizarColeccion('publicadores')"
+          title="Actualizar información">
+          <span class="me-2 d-none d-sm-inline">⏳ Actualizar</span>
+          <span class="d-inline d-sm-none">⏳</span>
+        </button>
+      </div>
+    </div>
+    <!-- Leyenda de colores -->
+    <div class="alert alert-light border d-flex flex-wrap gap-3 mb-3 p-2 small">
+      <div><span class="badge">🔶 Superintendente de grupo</span></div>
+      <div><span class="badge">🔷 Auxiliar de grupo</span></div>
+      <div><span class="badge">🔴 Precursor regular</span></div>
+      <div><span class="badge">🟠 Anciano</span></div>
+      <div><span class="badge">🔵 Siervo ministerial</span></div>
+      <div><span class="badge">⚫ Inactivo</span></div>
+      <div><span class="badge">🟣 No bautizado</span></div>
+    </div>
+
+
+    <div id="tablasGrupos" class="gridGrupos"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalPublicador" tabindex="-1" aria-labelledby="modalPublicadorLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <form id="formPublicador" data-edicion-id="">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalPublicadorLabel">➕ Crear nuevo publicador</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Datos básicos -->
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="nombre" required>
+                </div>
+                <div class="col-md-3">
+                  <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                  <input type="date" class="form-control" id="fechaNacimiento">
+                </div>
+                <div class="col-md-3">
+                  <label for="fechaBautismo" class="form-label">Fecha de bautismo</label>
+                  <input type="date" class="form-control" id="fechaBautismo">
+                </div>
+              </div>
+
+              <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                  <label for="sexo" class="form-label">Sexo <span class="text-danger">*</span></label>
+                  <select class="form-select" id="sexo" required>
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label d-block">Esperanza <span class="text-danger">*</span></label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="esperanza" id="ovejas" value="Otras ovejas"
+                      required>
+                    <label class="form-check-label" for="ovejas">Otras ovejas</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="esperanza" id="ungido" value="Ungido" required>
+                    <label class="form-check-label" for="ungido">Ungido</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="grupo" class="form-label">Grupo</label>
+                  <select class="form-select" id="grupo">
+                    <option value="">Selecciona grupo...</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Privilegios -->
+              <div class="mt-4">
+                <h5>Estado espiritual</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="noBautizado"
+                        value="No bautizado">
+                      <label class="form-check-label" for="noBautizado">No bautizado</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="anciano" value="Anciano">
+                      <label class="form-check-label" for="anciano">Anciano</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="siervo"
+                        value="Siervo ministerial">
+                      <label class="form-check-label" for="siervo">Siervo ministerial</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="prec-regular"
+                        value="Precursor regular">
+                      <label class="form-check-label" for="prec-regular">Precursor regular</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="prec-especial"
+                        value="Precursor especial">
+                      <label class="form-check-label" for="prec-especial">Precursor especial</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="misionero"
+                        value="Misionero-campo">
+                      <label class="form-check-label" for="misionero">Misionero que participa en el campo</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input estadoEspiritual" type="checkbox" id="inactivo" value="Inactivo">
+                      <label class="form-check-label" for="inactivo">Inactivo</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Privilegios de Congregación -->
+              <div class="mt-4">
+                <h5>Privilegios de congregación</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="asignaciones"><label
+                        class="form-check-label" for="asignaciones">Asignaciones estudiantiles</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="acomodador"><label
+                        class="form-check-label" for="acomodador">Acomodador y micrófonos</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="pdte-fds"><label
+                        class="form-check-label" for="pdte-fds">Pdte. fin de semana</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="oracion"><label
+                        class="form-check-label" for="oracion">Oración</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="lectura-libro"><label
+                        class="form-check-label" for="lectura-libro">Lectura del libro</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="lectura-atalaya"><label
+                        class="form-check-label" for="lectura-atalaya">Lectura Atalaya</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="pdte-vida"><label
+                        class="form-check-label" for="pdte-vida">Pdte. Vida y Ministerio</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="tesoros"><label
+                        class="form-check-label" for="tesoros">Tesoros de la Biblia</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="perlas"><label
+                        class="form-check-label" for="perlas">Busquemos perlas</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="nuestra-vida"><label
+                        class="form-check-label" for="nuestra-vida">Nuestra vida cristiana</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="estudio-libro"><label
+                        class="form-check-label" for="estudio-libro">Conducción estudio del libro</label></div>
+                    <div class="form-check"><input class="form-check-input privilegios" type="checkbox" id="capitan"><label
+                        class="form-check-label" for="capitan">Capitán grupo</label></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">💾 Guardar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="main.js"></script>
+  <script src="scripts/firebase-config.js"></script>
+  <script src="scripts/publicadores.js"></script>
+  <script>
+    const selectGrupo = document.getElementById('grupo');
+    const grupos = getConfig().cantidadGrupos
+    for (let i = 1; i <= grupos; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i;
+      selectGrupo.appendChild(opt);
+    }
+
+    renderPublicadoresPorGrupo(grupos)
+  </script>
+</body>
+
+</html>
