@@ -25,7 +25,7 @@ async function cargarAncianos() {
       publicadores = await actualizarColeccion("publicadores");
     }
 
-    publicadores = publicadores.filter(pub => (pub.privilegios || []).includes("Anciano"))
+    publicadores = publicadores.filter(pub => (pub.estadoEspiritual || []).includes("Anciano"))
     publicadores.forEach(doc => {
       const option = document.createElement("option");
       option.value = doc.id; // guardamos el ID del publicador

@@ -10,7 +10,7 @@ function mostrarBanner(mensaje, tipo = 'info', conSpinner = false, duracion = nu
   if (!banner) return;
 
   // Limpiar clases anteriores
-  banner.className = 'alert text-center m-0 py-2';
+  banner.className = 'alert text-center m-0 py-2 banner';
   banner.classList.add(`alert-${tipo}`);
 
   // Construir contenido
@@ -92,4 +92,32 @@ async function actualizarColeccion(coleccion) {
     mostrarBanner(`❌ Error al actualizar "${coleccion}"`, "danger");
     return [];
   }
+}
+
+
+function ordenarPublicadoresGrupo(pubs, grupo) {
+  return [...pubs].sort((a, b) => {
+    const prioridad = pub => {
+      const estado = pub.estadoEspiritual || [];
+
+      if (pub.superGrupo && Number(pub.grupo) === grupo) return 0;
+      if (pub.auxGrupo && Number(pub.grupo) === grupo) return 1;
+      if (estado.includes("Anciano")) return 2;
+      if (estado.includes("Siervo ministerial")) return 3;
+      if (estado.includes("Precursor regular")) return 4;
+      if (estado.includes("") || estado.length === 0) return 5;
+      if (estado.includes("No bautizado")) return 6;
+      if (estado.includes("Inactivo")) return 7;
+
+      return 8;
+    };
+
+    const pA = prioridad(a);
+    const pB = prioridad(b);
+
+    if (pA !== pB) return pA - pB;
+
+    // Mismo grupo de prioridad → ordenar por nombre
+    return (a.nombre || "").localeCompare(b.nombre || "");
+  });
 }

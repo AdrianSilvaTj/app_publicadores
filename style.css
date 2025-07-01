@@ -43,6 +43,36 @@ h2, h3 {
 .gridGrupos {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.marginBody {
+  margin: 2rem;
+}
+
+.banner {
+  position: fixed;
+  top: 56px;
+  z-index: 99999;
+  right: 0px;
+  width: 30%;
+}
+
+@media (max-width: 1200px) {
+  .gridGrupos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .marginBody {
+    margin: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .gridGrupos {
+    grid-template-columns: 1fr;
+  }
+  .banner {
+    width: 100%;
+  }
 }
 

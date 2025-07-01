@@ -1,7 +1,7 @@
 function getClaseFila(pub, grupo) {
   icons = ""
-  if (pub.superGrupo == grupo) icons += "🔶";
-  if (pub.auxGrupo == grupo) icons += "🔷";
+  if (pub.superGrupo == true) icons += "🔶";
+  if (pub.auxGrupo == true) icons += "🔷";
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
   if ((pub.estadoEspiritual || []).includes("Anciano")) icons += "🟠";
   if ((pub.estadoEspiritual || []).includes("Siervo ministerial")) icons += "🔵";
@@ -57,7 +57,10 @@ async function renderPublicadoresPorGrupo(grupos) {
   }
 
   for (let g = 1; g <= grupos; g++) {
-    const grupoPublicadores = publicadores.filter(p => Number(p.grupo) === g);
+    const grupoPublicadores = ordenarPublicadoresGrupo(
+      publicadores.filter(p => Number(p.grupo) === g),
+      g
+    );
     const tablaId = `tablaGrupo${g}`;
 
     const card = document.createElement("div");
@@ -103,6 +106,7 @@ async function actualizarYRecargar() {
 const form = document.getElementById('formPublicador');
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+  mostrarBanner("Guardando...", "info", true);
 
   const idEdicion = form.getAttribute("data-edicion-id");
 
@@ -267,5 +271,74 @@ async function eliminarPublicador(id, nombre = "el publicador") {
 }
 
 
+async function asignarSuperGrupo(id, grupo) {
+  const confirmado = confirm(`¿Asignar este publicador como 🧑‍🏫 Superintendente del grupo ${grupo}?`);
 
+  if (!confirmado) return;
+
+  try {
+    mostrarBanner("Asignando superintendente...", "info", true);
+
+    // 1. Buscar y remover anterior superintendente del grupo
+    const snapshot = await db.collection("publicadores")
+      .where("grupo", "==", grupo)
+      .where("superGrupo", "==", true)
+      .get();
+
+    const cambios = [];
+
+    snapshot.forEach(doc => {
+      if (doc.id !== id) {
+        cambios.push(
+          db.collection("publicadores").doc(doc.id).update({ superGrupo: firebase.firestore.FieldValue.delete() })
+        );
+      }
+    });
+
+    // 2. Asignar el nuevo
+    cambios.push(db.collection("publicadores").doc(id).update({ superGrupo: true }));
+
+    await Promise.all(cambios);
+    mostrarBanner("✅ Superintendente asignado correctamente", "success", false, 3000);
+    await actualizarYRecargar();
+  } catch (err) {
+    console.error("❌ Error asignando superGrupo:", err);
+    mostrarBanner("❌ Error al asignar superintendente", "danger");
+  }
+}
+
+
+async function asignarAuxGrupo(id, grupo) {
+  const confirmado = confirm(`¿Asignar este publicador como 🤝 Auxiliar del grupo ${grupo}?`);
+
+  if (!confirmado) return;
+
+  try {
+    mostrarBanner("Asignando auxiliar...", "info", true);
+
+    const snapshot = await db.collection("publicadores")
+      .where("grupo", "==", grupo)
+      .where("auxGrupo", "==", true)
+      .get();
+
+    const cambios = [];
+
+    snapshot.forEach(doc => {
+      if (doc.id !== id) {
+        cambios.push(
+          db.collection("publicadores").doc(doc.id).update({ auxGrupo: firebase.firestore.FieldValue.delete() })
+        );
+      }
+    });
+
+    cambios.push(db.collection("publicadores").doc(id).update({ auxGrupo: true }));
+
+    await Promise.all(cambios);
+    mostrarBanner("✅ Auxiliar asignado correctamente", "success", false, 3000);
+    await actualizarYRecargar();
+  } catch (err) {
+    console.error("❌ Error asignando auxGrupo:", err);
+    mostrarBanner("❌ Error al asignar auxiliar", "danger");
+  }
+}
 
