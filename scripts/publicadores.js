@@ -68,9 +68,9 @@ async function renderPublicadoresPorGrupo(grupos) {
 
     card.innerHTML = `
       <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center group-header-color">
           <strong>Grupo ${g}</strong>
-          <button class="btn btn-sm btn-outline-secondary" onclick="activarSeleccionGrupo(${g})">🧩 Cambiar publicadores</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="activarSeleccionGrupo(${g})">🔁Mover publicadores</button>
         </div>
         <div class="card-body p-0">
           <table class="table table-hover mb-0" id="${tablaId}">
@@ -342,3 +342,101 @@ async function asignarAuxGrupo(id, grupo) {
   }
 }
 
+
+function activarSeleccionGrupo(grupo) {
+  // Mostrar la columna de checkboxes solo en el grupo seleccionado
+  const tabla = document.getElementById(`tablaGrupo${grupo}`);
+  if (!tabla) return;
+
+  // Mostrar la columna de checkboxes (activar)
+  tabla.querySelectorAll(".checkbox-col").forEach(th => th.classList.remove("d-none"));
+
+  // Mostrar los checkboxes por fila
+  tabla.querySelectorAll("tbody tr").forEach(tr => {
+    const td = tr.querySelector("td.checkbox-col");
+    if (td) {
+      td.classList.remove("d-none");
+    }
+  });
+
+  // Agregar barra de acción debajo de la tabla
+  const wrapper = tabla.closest(".card");
+
+  // Evitar duplicar botones
+  if (wrapper.querySelector(".acciones-grupo")) return;
+
+  const barra = document.createElement("div");
+  barra.className = "acciones-grupo border-top p-2 bg-light text-end";
+  let grupos = getConfig()?.cantidadGrupos || 1;
+
+  barra.innerHTML = `
+    <label for="nuevoGrupo${grupo}" class="me-2">Mover al grupo:</label>
+    <select id="nuevoGrupo${grupo}" class="form-select d-inline-block w-auto me-2">
+      ${[...Array(grupos).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join("")}
+    </select>
+    <button class="btn btn-sm btn-outline-primary" onclick="moverPublicadoresDeGrupo(${grupo})">✔</button>
+    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="cancelarSeleccionGrupo(${grupo})">❌</button>
+  `;
+
+  wrapper.appendChild(barra);
+}
+
+
+function cancelarSeleccionGrupo(grupo) {
+  const tabla = document.getElementById(`tablaGrupo${grupo}`);
+  if (!tabla) return;
+
+  tabla.querySelectorAll(".checkbox-col").forEach(th => th.classList.add("d-none"));
+  tabla.querySelectorAll("tbody tr").forEach(tr => {
+    const td = tr.querySelector("td.checkbox-col");
+    if (td) td.classList.add("d-none");
+  });
+
+  // Quitar barra de acción
+  const wrapper = tabla.closest(".card");
+  const barra = wrapper.querySelector(".acciones-grupo");
+  if (barra) barra.remove();
+}
+
+
+async function moverPublicadoresDeGrupo(grupoOrigen) {
+  const tabla = document.getElementById(`tablaGrupo${grupoOrigen}`);
+  const checkboxes = tabla.querySelectorAll("tbody tr input[type='checkbox']:checked");
+
+  const nuevoGrupo = parseInt(document.getElementById(`nuevoGrupo${grupoOrigen}`).value);
+
+  if (!nuevoGrupo || isNaN(nuevoGrupo)) {
+    alert("⚠️ Debes seleccionar un grupo destino válido.");
+    return;
+  }
+
+  if (checkboxes.length === 0) {
+    alert("⚠️ No hay publicadores seleccionados.");
+    return;
+  }
+
+  const confirmacion = confirm(`¿Mover ${checkboxes.length} publicadores al grupo ${nuevoGrupo}?`);
+  if (!confirmacion) return;
+
+  try {
+    mostrarBanner("Moviendo publicadores...", "info", true);
+
+    const cambios = [];
+
+    checkboxes.forEach(cb => {
+      const row = cb.closest("tr");
+      const id = row.getAttribute("data-id");
+      cambios.push(db.collection("publicadores").doc(id).update({ grupo: nuevoGrupo }));
+    });
+
+    await Promise.all(cambios);
+
+    mostrarBanner(`✅ ${checkboxes.length} publicadores movidos al grupo ${nuevoGrupo}`, "success", false, 4000);
+
+    // Actualiza datos
+    await actualizarYRecargar();
+  } catch (err) {
+    console.error("❌ Error al mover publicadores:", err);
+    mostrarBanner("❌ Error al mover publicadores", "danger");
+  }
+}

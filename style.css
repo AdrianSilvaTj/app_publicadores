@@ -58,6 +58,10 @@ h2, h3 {
   width: 30%;
 }
 
+.group-header-color {
+  background-color: antiquewhite;
+}
+
 @media (max-width: 1200px) {
   .gridGrupos {
     grid-template-columns: repeat(2, 1fr);
