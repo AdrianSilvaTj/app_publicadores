@@ -440,3 +440,42 @@ async function moverPublicadoresDeGrupo(grupoOrigen) {
     mostrarBanner("❌ Error al mover publicadores", "danger");
   }
 }
+
+
+const buscarPublicador = () => {
+  const buscador = document.getElementById("buscadorPublicador");
+  const q = buscador.value.trim().toLowerCase(); // texto ingresado en el buscador
+  let hit = false; // bandera para scroll al primer resultado
+  let encontrado = false;
+
+  // Recorre todas las filas de todas las tablas de grupos
+  document.querySelectorAll("#tablasGrupos tbody tr").forEach(tr => {
+    const nombre = tr.querySelector("td:nth-child(2)")?.textContent.toLowerCase() || "";
+
+    if (q && nombre.includes(q)) {
+      tr.classList.add("resaltado"); // aplica clase de resaltado
+      encontrado = true;
+      // Si es la primera coincidencia, hacer scroll
+      if (!hit) {
+        tr.scrollIntoView({ behavior: "smooth", block: "center" });
+        hit = true;
+      }
+    } else {
+      tr.classList.remove("resaltado"); // limpia resaltado si no coincide
+    }
+  });
+  !encontrado && mostrarBanner("❌ No se encontró el publicador", "danger", false, 3000)
+};
+
+
+function limpiarBusquedaPublicador() {
+  const input = document.getElementById("buscadorPublicador");
+  input.value = "";
+
+  // Quitar resaltado de todas las filas
+  document.querySelectorAll("#tablasGrupos tbody tr").forEach(tr => {
+    tr.classList.remove("resaltado");
+  });
+}
+
+

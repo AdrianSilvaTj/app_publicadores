@@ -65,6 +65,26 @@
       <div><span class="badge">⚫ Inactivo</span></div>
       <div><span class="badge">🟣 No bautizado</span></div>
     </div>
+    <div class="input-group mb-3">
+      <input type="text"
+            id="buscadorPublicador"
+            class="form-control"
+            placeholder="Buscar publicador por nombre..."
+            onkeydown="if (event.key === 'Enter') { event.preventDefault(); buscarPublicador(); }">
+            
+      <button class="btn btn-primary"
+              onclick="buscarPublicador()"
+              title="Buscar publicador">
+        <span class="me-2 d-none d-sm-inline">🔍 Buscar</span>
+        <span class="d-inline d-sm-none">🔍</span>
+      </button>
+
+      <button class="btn btn-outline-secondary"
+              onclick="limpiarBusquedaPublicador()"
+              title="Limpiar búsqueda">
+        🧹
+      </button>
+    </div>
 
 
     <div id="tablasGrupos" class="gridGrupos"></div>

@@ -22,7 +22,7 @@ h2, h3 {
 
 .modal-body {
   overflow-y: auto;
-  max-height: 80vh;
+  max-height: 88vh;
 }
 
 @keyframes spin {
@@ -61,6 +61,18 @@ h2, h3 {
 .group-header-color {
   background-color: antiquewhite;
 }
+
+.resaltado {
+  animation: flash 0.5s ease-in-out;
+  font-weight: bold;
+  font-style: italic;
+}
+
+@keyframes flash {
+  0%   { background-color: #fff3cd; }
+  100% { background-color: #ffeeba; }
+}
+
 
 @media (max-width: 1200px) {
   .gridGrupos {

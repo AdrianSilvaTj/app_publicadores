@@ -17,10 +17,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
+            <a class="nav-link active" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="asignaciones.html">📖 Asignaciones</a>
+            <a class="nav-link" href="asignaciones.html">📖 Asignaciones</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="servicio.html">💼 Servicio</a>
@@ -33,10 +33,23 @@
     </div>
   </nav>
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
+
   <!-- CONTENIDO DE LA SECCIÓN -->
   <div class="marginBody">
-    <h2>👨‍👩‍👧‍👦 Gestión de Publicadores</h2>
-    <p>Aquí implementaremos el formulario, importación, exportación, búsqueda, etc.</p>
+    <h2>📅 Asignaciones – Reunión Vida y Ministerio</h2>
+
+  <form id="formS140">
+    <div class="mb-3">
+      <label for="fechaAsignacion" class="form-label">Fecha de la semana</label>
+      <input type="date" id="fechaAsignacion" class="form-control" required>
+    </div>
+
+    <div class="row g-3" id="seccionesAsignacion">
+      <!-- Aquí se insertarán dinámicamente las secciones -->
+    </div>
+
+    <button class="btn btn-primary mt-4" type="submit">💾 Guardar asignaciones</button>
+  </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
