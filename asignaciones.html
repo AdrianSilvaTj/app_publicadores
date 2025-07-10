@@ -38,18 +38,106 @@
   <div class="marginBody">
     <h2>📅 Asignaciones – Reunión Vida y Ministerio</h2>
 
-  <form id="formS140">
-    <div class="mb-3">
-      <label for="fechaAsignacion" class="form-label">Fecha de la semana</label>
-      <input type="date" id="fechaAsignacion" class="form-control" required>
-    </div>
+    <form id="formS140">
+      <div class="mb-3">
+        <label for="fechaAsignacion" class="form-label">Fecha de la semana</label>
+        <input type="date" id="fechaAsignacion" class="form-control" required>
+      </div>
 
-    <div class="row g-3" id="seccionesAsignacion">
-      <!-- Aquí se insertarán dinámicamente las secciones -->
-    </div>
+      <div class="row g-3">
+        <!-- Cada sección se repite con el mismo patrón -->
+        
+        <!-- Presidente -->
+        <div class="col-md-6">
+          <label class="form-label">Presidente de la reunión</label>
+          <select name="asignado_presidente" class="form-select" required></select>
+        </div>
 
-    <button class="btn btn-primary mt-4" type="submit">💾 Guardar asignaciones</button>
-  </form>
+        <!-- Lectura de la Biblia -->
+        <div class="col-md-6">
+          <label class="form-label">Lectura de la Biblia</label>
+          <select name="asignado_lectura_biblia" class="form-select" required></select>
+        </div>
+
+        <!-- Tesoro de la Biblia -->
+        <div class="col-md-6">
+          <label class="form-label">Tesoro de la Biblia</label>
+          <select name="asignado_tesoro" class="form-select" required></select>
+        </div>
+
+        <!-- Perlas escondidas -->
+        <div class="col-md-6">
+          <label class="form-label">Perlas escondidas</label>
+          <select name="asignado_perlas" class="form-select" required></select>
+        </div>
+
+        <!-- Lectura bíblica semanal -->
+        <div class="col-md-6">
+          <label class="form-label">Lectura bíblica semanal</label>
+          <select name="asignado_lectura_semanal" class="form-select" required></select>
+        </div>
+
+        <!-- Asignaciones ministerio: Primera, Segunda, Tercera -->
+        <div class="col-md-6">
+          <label class="form-label">Primera asignación</label>
+          <select name="asignado_primera" class="form-select mb-2" required></select>
+          <select name="tipo_primera" class="form-select">
+            <option value="">Tipo de asignación</option>
+            <option>Empiece conversaciones</option>
+            <option>Haga revisitas</option>
+            <option>Haga discípulos</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Segunda asignación</label>
+          <select name="asignado_segunda" class="form-select mb-2" required></select>
+          <select name="tipo_segunda" class="form-select">
+            <option value="">Tipo de asignación</option>
+            <option>Empiece conversaciones</option>
+            <option>Haga revisitas</option>
+            <option>Haga discípulos</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Tercera asignación</label>
+          <select name="asignado_tercera" class="form-select mb-2" required></select>
+          <select name="tipo_tercera" class="form-select">
+            <option value="">Tipo de asignación</option>
+            <option>Empiece conversaciones</option>
+            <option>Haga revisitas</option>
+            <option>Haga discípulos</option>
+          </select>
+        </div>
+
+        <!-- Nuestra vida cristiana -->
+        <div class="col-md-6">
+          <label class="form-label">Nuestra vida cristiana</label>
+          <select name="asignado_vidacristiana" class="form-select" required></select>
+        </div>
+
+        <!-- Estudio bíblico congregación -->
+        <div class="col-md-6">
+          <label class="form-label">Estudio bíblico de la congregación</label>
+          <select name="asignado_estudio" class="form-select" required></select>
+        </div>
+
+        <!-- Oración inicial -->
+        <div class="col-md-6">
+          <label class="form-label">Oración inicial</label>
+          <select name="asignado_oracion_inicial" class="form-select" required></select>
+        </div>
+
+        <!-- Oración final -->
+        <div class="col-md-6">
+          <label class="form-label">Oración final</label>
+          <select name="asignado_oracion_final" class="form-select" required></select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-4">💾 Guardar asignaciones</button>
+    </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -11,7 +11,7 @@ function getClaseFila(pub, grupo) {
 }
 
 
-function renderFila(pub, grupoNumero) {
+function renderFila(pub, index, grupoNumero) {
   const id = pub.id;
   const nombre = pub.nombre || "Sin nombre";
   const iconos = getClaseFila(pub, grupoNumero);
@@ -19,7 +19,7 @@ function renderFila(pub, grupoNumero) {
   return `
     <tr data-id="${id}" data-grupo="${grupoNumero}">
       <td class="d-none checkbox-col"><input type="checkbox" class="form-check-input"></td>
-      <td>${iconos + ' ' + nombre}</td>
+      <td>${index + 1}. ${iconos + ' ' + nombre}</td>
       <td>
         <div class="dropdown text-end">
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -82,7 +82,7 @@ async function renderPublicadoresPorGrupo(grupos) {
               </tr>
             </thead>
             <tbody>
-              ${grupoPublicadores.map(pub => renderFila(pub, g)).join("")}
+              ${grupoPublicadores.map((pub, index) => renderFila(pub, index, g)).join("")}
             </tbody>
           </table>
         </div>
@@ -477,5 +477,104 @@ function limpiarBusquedaPublicador() {
     tr.classList.remove("resaltado");
   });
 }
+
+
+async function descargarListadoPublicadores() {
+  const {
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+    HeadingLevel,
+    PageOrientation
+  } = window.docx;
+
+  const cache = JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
+  if (cache.length === 0) return alert("⚠️ No hay publicadores en memoria.");
+
+  // Agrupar
+  const grupos = {};
+  cache.forEach(pub => {
+    const grupo = Number(pub.grupo) || 0;
+    if (!grupos[grupo]) grupos[grupo] = [];
+    grupos[grupo].push(pub);
+  });
+
+  // Construir todos los párrafos en un solo array
+  const contenido = [];
+
+  // Leyenda
+  contenido.push(
+    new Paragraph({
+      text: "📌 Leyenda de iconos:",
+      heading: HeadingLevel.HEADING_2,
+    }),
+    new Paragraph("🧔 Anciano    👔 Siervo ministerial    🌱 Precursor regular    🌿 Precursor especial    📕 Misionero    🚫 Inactivo    ❌ No bautizado"),
+    new Paragraph(" ")
+  );
+
+  // Agregar grupos
+  for (let g = 1; g <= 9; g++) {
+    const lista = grupos[g];
+    if (!lista || lista.length === 0) continue;
+
+    contenido.push(
+      new Paragraph({
+        text: `Grupo ${g}`,
+        heading: HeadingLevel.HEADING_2
+      }),
+      ...lista
+        .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""))
+        .map(p =>
+          new Paragraph({
+            children: [new TextRun(`${p.nombre || ""} ${generarIconos(p.estadoEspiritual || [])}`)]
+          })
+        ),
+      new Paragraph(" ")
+    );
+  }
+
+  const doc = new Document({
+    sections: [
+      {
+        properties: {
+          page: {
+            margin: {
+              top: 360,
+              bottom: 360,
+              left: 360,
+              right: 360
+            },
+            size: {
+              orientation: PageOrientation.LANDSCAPE
+            }
+          }
+        },
+        children: contenido
+      }
+    ]
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `Listado_Publicadores_${new Date().toISOString().slice(0, 10)}.docx`;
+  link.click();
+}
+
+
+function generarIconos(estados) {
+  const e = estados.map(e => e.toLowerCase());
+  let out = "";
+  if (e.includes("anciano")) out += "🧔";
+  if (e.includes("siervo ministerial")) out += " 👔";
+  if (e.includes("precursor regular")) out += " 🌱";
+  if (e.includes("precursor especial")) out += " 🌿";
+  if (e.includes("misionero-campo") || e.includes("misionero")) out += " 📕";
+  if (e.includes("inactivo")) out += " 🚫";
+  if (e.includes("no bautizado")) out += " ❌";
+  return out;
+}
+
 
 

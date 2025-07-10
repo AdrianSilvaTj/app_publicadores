@@ -48,6 +48,11 @@
           <span class="me-2 d-none d-sm-inline">➕ Crear</span>
           <span class="d-inline d-sm-none">➕</span>
         </button>
+        <button class="btn btn-primary d-flex align-items-center" onclick="descargarListadoPublicadores()"
+          title="Descargar listado">
+          <span class="me-2 d-none d-sm-inline">📄 Descargar listado</span>
+          <span class="d-inline d-sm-none">📄</span>
+        </button>
         <button class="btn btn-primary d-flex align-items-center" onclick="actualizarColeccion('publicadores')"
           title="Actualizar información">
           <span class="me-2 d-none d-sm-inline">🔄 Actualizar</span>
@@ -240,6 +245,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@9.0.3/build/index.umd.min.js"></script>
   <script src="scripts/firebase-config.js"></script>
   <script src="scripts/publicadores.js"></script>
   <script>
