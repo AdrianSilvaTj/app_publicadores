@@ -249,16 +249,7 @@
   <script src="scripts/firebase-config.js"></script>
   <script src="scripts/publicadores.js"></script>
   <script>
-    const selectGrupo = document.getElementById('grupo');
-    const grupos = getConfig().cantidadGrupos
-    for (let i = 1; i <= grupos; i++) {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = i;
-      selectGrupo.appendChild(opt);
-    }
-
-    renderPublicadoresPorGrupo(grupos)
+    
   </script>
 </body>
 

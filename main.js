@@ -69,10 +69,6 @@ async function cargarConfiguracionGlobal() {
   }
 }
 
-function getConfig() {
-  const cache = localStorage.getItem("configuracion_congregacion");
-  return cache ? JSON.parse(cache) : null;
-}
 
 async function actualizarColeccion(coleccion) {
   try {

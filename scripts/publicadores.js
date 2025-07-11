@@ -1,3 +1,18 @@
+document.addEventListener("DOMContentLoaded", async function () {
+  const selectGrupo = document.getElementById('grupo');
+    const config = await cargarConfiguracionGlobal();
+    const grupos = config.cantidadGrupos;
+    for (let i = 1; i <= grupos; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = i;
+      selectGrupo.appendChild(opt);
+    }
+    renderPublicadoresPorGrupo(grupos)
+});
+
+
+
 function getClaseFila(pub, grupo) {
   icons = ""
   if (pub.superGrupo == true) icons += "🔶";
@@ -98,7 +113,8 @@ async function renderPublicadoresPorGrupo(grupos) {
 
 async function actualizarYRecargar() {
   await actualizarColeccion("publicadores");
-  const grupos = getConfig()?.cantidadGrupos || 1;
+  const config = await cargarConfiguracionGlobal();
+  const grupos = config.cantidadGrupos;
   renderPublicadoresPorGrupo(grupos);
 }
 
@@ -262,7 +278,8 @@ async function eliminarPublicador(id, nombre = "el publicador") {
     mostrarBanner("✅ Publicador eliminado correctamente", "success", false, 3000);
 
     // Volver a renderizar
-    const grupos = getConfig()?.cantidadGrupos || 1;
+    const config = await cargarConfiguracionGlobal();
+    const grupos = config.cantidadGrupos;
     renderPublicadoresPorGrupo(grupos);
   } catch (err) {
     console.error("Error al eliminar:", err);
@@ -343,7 +360,7 @@ async function asignarAuxGrupo(id, grupo) {
 }
 
 
-function activarSeleccionGrupo(grupo) {
+async function activarSeleccionGrupo(grupo) {
   // Mostrar la columna de checkboxes solo en el grupo seleccionado
   const tabla = document.getElementById(`tablaGrupo${grupo}`);
   if (!tabla) return;
@@ -367,7 +384,8 @@ function activarSeleccionGrupo(grupo) {
 
   const barra = document.createElement("div");
   barra.className = "acciones-grupo border-top p-2 bg-light text-end";
-  let grupos = getConfig()?.cantidadGrupos || 1;
+  const config = await cargarConfiguracionGlobal();
+  let grupos = config.cantidadGrupos;
 
   barra.innerHTML = `
     <label for="nuevoGrupo${grupo}" class="me-2">Mover al grupo:</label>
