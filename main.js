@@ -85,7 +85,7 @@ async function actualizarColeccion(coleccion) {
 
     cerrarBanner();
     mostrarBanner(`Datos de "${coleccion}" actualizados ✅`, "success", false, 3000);
-
+    location.reload()
     return data;
   } catch (err) {
     console.error(`Error al actualizar ${coleccion}:`, err);
