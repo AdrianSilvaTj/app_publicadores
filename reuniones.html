@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reuniones</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px">
+    
+  </nav>
+  <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
+
+  <!-- CONTENIDO DE LA SECCIÓN -->
+  <div class="marginBody">
+    <!-- Botón Crear -->
+    <div class="d-flex justify-content-between mb-3">
+      <h3>📅 Reuniones</h3>
+      <div class="d-flex gap-1">
+        <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal"
+          data-bs-target="#modalReunion" title="Crear nueva reunión">
+          <span class="me-2 d-none d-sm-inline">➕ Crear</span>
+          <span class="d-inline d-sm-none">➕</span>
+        </button>
+        <button class="btn btn-primary d-flex align-items-center" onclick="descargarListadoPublicadores()"
+          title="Descargar listado">
+          <span class="me-2 d-none d-sm-inline">📄 Descargar listado</span>
+          <span class="d-inline d-sm-none">📄</span>
+        </button>
+        <button class="btn btn-primary d-flex align-items-center" onclick="actualizarColeccion('publicadores')"
+          title="Actualizar información">
+          <span class="me-2 d-none d-sm-inline">🔄 Actualizar</span>
+          <span class="d-inline d-sm-none">🔄</span>
+        </button>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modalReunion" tabindex="-1" aria-labelledby="modalReunionLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <form id="formReunion" data-edicion-id="">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalReunionLabel">➕ Crear nueva reunión </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Datos básicos -->
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="fecha">
+              </div>
+              <div class="col-md-2">
+                <label for="cancion" class="form-label">Canción <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="cancion" required>
+              </div>
+              <div class="col-md-6">
+                <label for="presidente" class="form-label">Presidente <span class="text-danger">*</span></label>
+                <select class="form-select" id="presidente" required>
+                  <option value="">Selecciona...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+              </div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label for="consejero" class="form-label">Consejero sala auxiliar<span class="text-danger">*</span></label>
+                <select class="form-select" id="consejero" required>
+                  <option value="">Selecciona...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="oracion-ini" class="form-label">Oración inicial<span class="text-danger">*</span></label>
+                <select class="form-select" id="oracion-ini" required>
+                  <option value="">Selecciona...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tesoros de la biblia -->
+            <div class="mt-3">
+              <h5 style="background-color: #575a5d; color: white; height: 30px;">
+                💎 Tesoros de la Biblia</h5>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label for="tesoros" class="form-label">Título <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="tesoros" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="tesoros-enc" class="form-label">Encargado <span class="text-danger">*</span></label>
+                  <select class="form-select" id="tesoros-enc" required>
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-2 mt-2">
+                <div class="col-md-4">
+                  <label for="perlas-enc" class="form-label">Busquemos perlas escondidas<span class="text-danger">*</span></label>
+                  <select class="form-select" id="perlas-enc" required>
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="lectura-enc" class="form-label">Lectura de la Biblia (Principal)<span class="text-danger">*</span></label>
+                  <select class="form-select" id="lectura-enc" required>
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="lectura-aux-enc" class="form-label">Lectura de la Biblia (Auxiliar)</label>
+                  <select class="form-select" id="lectura-aux-enc">
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seamos mejores maestros -->
+            <div class="mt-3" id="seccion-smm">
+              <div class="d-flex justify-content-between">
+                <h5 style="background-color: #be8900;color: white;width: 80%; height: 30px;">
+                  🌾 Seamos mejores maestros</h5>
+                <button class="btn btn-primary d-flex align-items-center" type="button"
+                    title="Agregar nueva sección" onclick="agregarSeccionSMM()">
+                  <span class="me-2 d-none d-sm-inline">➕ Agregar sección</span>
+                  <span class="d-inline d-sm-none">➕</span>
+                </button>
+              </div>
+              
+            </div>
+
+            <!-- Nuestra vida cristiana -->
+            <div class="mt-3">
+              <div class="d-flex justify-content-between">
+                <h5 style="background-color: #7e0024;color: white;width: 80%; height: 30px;">
+                  🐑 Nuestra vida cristiana</h5>
+                <button class="btn btn-primary d-flex align-items-center" type="button"
+                    title="Agregar nueva sección" onclick="agregarSeccionNVC()">
+                  <span class="me-2 d-none d-sm-inline">➕ Agregar sección</span>
+                  <span class="d-inline d-sm-none">➕</span>
+                </button>
+              </div>
+              <div class="row g-2">
+                <div class="d-flex" style="height: 35px;">
+                  <label class="form-label">Canción <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="cancion-int" required
+                      style="width: 80px; margin-left: 1rem;">
+                </div>
+              </div>
+
+              <div id="secciones-nvc"></div>
+
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label">Estudio bíblico de la congregación (Conductor)
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select">
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Lector <span class="text-danger">*</span></label>
+                  <select class="form-select">
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-2 mt-2">
+                <div class="col-md-4">
+                  <label class="form-label">Canción final
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" required>
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label">Oración final <span class="text-danger">*</span></label>
+                  <select class="form-select">
+                    <option value="">Selecciona...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer p-0 pt-2 mt-2">
+              <button type="submit" class="btn btn-success">💾 Guardar</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancelar</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      await cargarMenuYScripts();
+    });
+  </script>
+</body>
+
+</html>

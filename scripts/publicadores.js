@@ -1,16 +1,15 @@
-document.addEventListener("DOMContentLoaded", async function () {
+async function iniciarPublicadores() {
   const selectGrupo = document.getElementById('grupo');
-    const config = await cargarConfiguracionGlobal();
-    const grupos = config.cantidadGrupos;
-    for (let i = 1; i <= grupos; i++) {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = i;
-      selectGrupo.appendChild(opt);
-    }
-    renderPublicadoresPorGrupo(grupos)
-});
-
+  const config = await cargarConfiguracionGlobal();
+  const grupos = config.cantidadGrupos;
+  for (let i = 1; i <= grupos; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    selectGrupo.appendChild(opt);
+  }
+  renderPublicadoresPorGrupo(grupos)
+}
 
 
 function getClaseFila(pub, grupo) {

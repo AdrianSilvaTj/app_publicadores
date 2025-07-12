@@ -11,29 +11,8 @@
 
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">🏠 DigitCong</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="asignaciones.html">📖 Asignaciones</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="servicio.html">💼 Servicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="configuracion.html">⚙ Configuración</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px">
+    
   </nav>
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
 
@@ -240,16 +219,12 @@
     </div>
   </div>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="main.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@9.0.3/build/index.umd.min.js"></script>
-  <script src="scripts/firebase-config.js"></script>
-  <script src="scripts/publicadores.js"></script>
   <script>
-    
+    document.addEventListener("DOMContentLoaded", async function () {
+      await cargarMenuYScripts();
+      iniciarPublicadores()
+    });
   </script>
 </body>
 

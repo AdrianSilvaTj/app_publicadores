@@ -1,3 +1,84 @@
+// carga los scripts
+function cargarScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+    script.onload = resolve;
+    script.onerror = () => reject(`❌ Error cargando: ${src}`);
+    document.body.appendChild(script);
+  });
+}
+
+// cargar el menú principal
+async function cargarMenuYScripts() {
+  const path = window.location.pathname;
+  let pagina = path.substring(path.lastIndexOf("/") + 1).split('.')[0];
+  const menu = document.getElementById('menu');
+  if (menu) {
+    menu.innerHTML = `
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">🏠 DigitCong</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link ${pagina === 'publicadores' && 'active'}" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${pagina === 'reuniones' && 'active'}" href="reuniones.html">📅 Reuniones</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link  ${pagina === 'servicio' && 'active'}" href="servicio.html">💼 Servicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link ${pagina === 'configuracion' && 'active'}" href="configuracion.html">⚙ Configuración</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="cerrarSesion()">❗ Cerrar sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    `;
+  }
+  // ✅ 1. Bootstrap
+  await cargarScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js");
+
+  // ✅ 2. Firebase core
+  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
+  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js");
+  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js");
+
+  // ✅ 3. Tu inicialización de Firebase
+  await cargarScript("scripts/firebase-config.js");
+
+  // ✅ 4. Scripts globales
+  await cargarScript("main.js");
+  await cargarScript("scripts/auth.js");
+
+  // ✅ 5. Script por página
+  switch (pagina) {
+    case "publicadores":
+      await cargarScript("scripts/publicadores.js");
+      break;
+    case "configuracion":
+      await cargarScript("scripts/configuracion.js");
+      break;
+    case "reuniones":
+      await cargarScript("scripts/reuniones.js");
+      break;
+    case "configuracion":
+      await cargarScript("scripts/configuracion.js");
+      break;
+  }
+}
+
+
 /**
  * Muestra un banner de estado fijo arriba
  * @param {string} mensaje - El texto a mostrar (puede incluir HTML)
@@ -27,11 +108,13 @@ function mostrarBanner(mensaje, tipo = 'info', conSpinner = false, duracion = nu
   }
 }
 
+// ocultar banner de mensajes
 function cerrarBanner() {
   const banner = document.getElementById("bannerEstado");
   if (banner) banner.classList.add("d-none");
 }
 
+// cargar la configuración de la congregación
 async function cargarConfiguracionGlobal() {
   const cacheKey = "configuracion_congregacion";
 
@@ -69,7 +152,7 @@ async function cargarConfiguracionGlobal() {
   }
 }
 
-
+// actualizar la data de la colección
 async function actualizarColeccion(coleccion) {
   try {
     mostrarBanner(`Consultando "${coleccion}"...`, "info", true);
@@ -90,7 +173,7 @@ async function actualizarColeccion(coleccion) {
   }
 }
 
-
+// ordenar los publicador por grupos
 function ordenarPublicadoresGrupo(pubs, grupo) {
   return [...pubs].sort((a, b) => {
     const prioridad = pub => {
