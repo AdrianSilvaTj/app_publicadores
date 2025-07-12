@@ -39,7 +39,7 @@ function agregarSeccionSMM() {
       </button>
 
       <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center" onclick="eliminarSeccion(this)">
-        <span class="me-2 d-none d-sm-inline">🗑️ Eliminar sección</span>
+        <span class="me-2 d-none d-sm-inline">🗑️ Eliminar asignación</span>
         <span class="d-inline d-sm-none">🗑️</span>
       </button>
     </div>
@@ -113,7 +113,7 @@ function agregarSeccionNVC() {
     </div>
     <div class="text-end mt-2 d-flex gap-2 justify-content-end">
       <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center" onclick="eliminarSeccionNVC(this)">
-        <span class="me-2 d-none d-sm-inline">🗑️ Eliminar sección</span>
+        <span class="me-2 d-none d-sm-inline">🗑️ Eliminar asignación</span>
         <span class="d-inline d-sm-none">🗑️</span>
       </button>
     </div>
@@ -122,3 +122,34 @@ function agregarSeccionNVC() {
   divNVC.appendChild(nuevaSeccion);
 }
 
+async function llenarSelectsReunion() {
+  const publicadores = JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
+
+  // Define qué clase requiere qué tipo de publicador
+  const roles = {
+    oracion: pub => pub.privilegiosCongregacion?.includes("oracion"),
+    presidente: pub => pub.estadoEspiritual?.includes("Anciano"),
+    lector: pub => pub.estadoEspiritual?.includes("Anciano") || pub.estadoEspiritual?.includes("Siervo ministerial"),
+    asignacion: pub => true, // todos
+  };
+
+  // Para cada tipo de clase definida...
+  Object.keys(roles).forEach(clase => {
+    const selects = document.querySelectorAll(`select.${clase}`);
+    selects.forEach(select => {
+      // limpiar
+      select.innerHTML = '<option value="">Selecciona...</option>';
+
+      // agregar publicadores filtrados
+      publicadores
+        .filter(roles[clase])
+        .sort((a, b) => a.nombre.localeCompare(b.nombre))
+        .forEach(pub => {
+          const opt = document.createElement("option");
+          opt.value = pub.id || pub.nombre;
+          opt.textContent = pub.nombre;
+          select.appendChild(opt);
+        });
+    });
+  });
+}

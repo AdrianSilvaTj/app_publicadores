@@ -138,11 +138,8 @@ form.addEventListener("submit", async (e) => {
   });
 
   const privilegiosCongregacion = [];
-  document.querySelectorAll('#formPublicador input[type="checkbox"]').forEach(cb => {
-    const label = cb.labels?.[0]?.innerText?.trim();
-    if (label && cb.checked && !estadoEspiritual.includes(cb.value)) {
-      privilegiosCongregacion.push(label);
-    }
+  document.querySelectorAll('.privilegios').forEach(cb => {
+    if (cb.checked) privilegiosCongregacion.push(cb.id);
   });
 
   const data = {
@@ -218,7 +215,7 @@ async function editarPublicador(id) {
     // Privilegios de congregación
     const privCong = pub.privilegiosCongregacion || [];
     document.querySelectorAll('.privilegios').forEach(cb => {
-      cb.checked = privCong.includes(cb.labels[0].innerText.trim());
+      cb.checked = privCong.includes(cb.id);
     });
     controlarDesactivacionPrivilegios()
     // Mostrar el modal
