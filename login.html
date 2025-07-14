@@ -3,55 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <title>Iniciar sesión</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" />
 </head>
 <body class="bg-light">
+  <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
 
-  <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-      <h4 class="mb-4 text-center">🔐 Iniciar sesión</h4>
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+        <div class="card shadow p-4 border-0">
+          <h4 class="mb-4 text-center">🔐 Iniciar sesión</h4>
 
-      <form id="formLogin">
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo electrónico</label>
-          <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+          <form id="formLogin" novalidate>
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+
+            <div class="text-center mt-3">
+              <button type="button" class="btn btn-link p-0" onclick="recordarClave()">¿Olvidaste tu contraseña?</button>
+            </div>
+          </form>
         </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Contraseña</label>
-          <input type="password" class="form-control" id="password" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-        <div class="text-center mt-2">
-          <button type="button" class="btn btn-link p-0" onclick="recordarClave()">¿Olvidaste tu contraseña?</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
+  <!-- Firebase scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="scripts/firebase-config.js"></script>
+  <script src="main.js"></script>
+
+  <!-- Login logic -->
   <script>
     const auth = firebase.auth();
 
     document.getElementById("formLogin").addEventListener("submit", async (e) => {
-        e.preventDefault();
+      e.preventDefault();
 
-        const emailInput = document.getElementById("email");
-        const passwordInput = document.getElementById("password");
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-
-        try {
-            await firebase.auth().signInWithEmailAndPassword(email, password);
-            window.location.href = "index.html";
-        } catch (err) {
-            alert("❌ Error al iniciar sesión: " + err.message);
-        }
+      try {
+        mostrarBanner("Cargando información...", "info", true);
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = "index.html";
+      } catch (err) {
+        mostrarBanner("❌ Error al iniciar sesión: " + err.message, "danger");
+      }
     });
 
     function recordarClave() {

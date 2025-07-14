@@ -506,7 +506,7 @@ async function descargarListadoPublicadores() {
   const cache = JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
   if (cache.length === 0) return alert("⚠️ No hay publicadores en memoria.");
 
-  // Agrupar
+  // Agrupar por grupo
   const grupos = {};
   cache.forEach(pub => {
     const grupo = Number(pub.grupo) || 0;
@@ -514,7 +514,6 @@ async function descargarListadoPublicadores() {
     grupos[grupo].push(pub);
   });
 
-  // Construir todos los párrafos en un solo array
   const contenido = [];
 
   // Leyenda
@@ -523,27 +522,35 @@ async function descargarListadoPublicadores() {
       text: "📌 Leyenda de iconos:",
       heading: HeadingLevel.HEADING_2,
     }),
-    new Paragraph("🧔 Anciano    👔 Siervo ministerial    🌱 Precursor regular    🌿 Precursor especial    📕 Misionero    🚫 Inactivo    ❌ No bautizado"),
+    new Paragraph(`🔶 Superintendente de grupo
+      🔷 Auxiliar de grupo
+      🔴 Precursor regular
+      🟠 Anciano
+      🔵 Siervo ministerial
+      ⚫ Inactivo
+      🟣 No bautizado`),
     new Paragraph(" ")
   );
 
-  // Agregar grupos
+  // Grupos del 1 al 9
   for (let g = 1; g <= 9; g++) {
     const lista = grupos[g];
     if (!lista || lista.length === 0) continue;
+
+    const ordenados = ordenarPublicadoresGrupo(lista, g); // ✅ tu función
 
     contenido.push(
       new Paragraph({
         text: `Grupo ${g}`,
         heading: HeadingLevel.HEADING_2
       }),
-      ...lista
-        .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""))
-        .map(p =>
-          new Paragraph({
-            children: [new TextRun(`${p.nombre || ""} ${generarIconos(p.estadoEspiritual || [])}`)]
-          })
-        ),
+      ...ordenados.map(pub =>
+        new Paragraph({
+          children: [
+            new TextRun(`${pub.nombre || ""} ${getClaseFila(pub, g)}`)
+          ]
+        })
+      ),
       new Paragraph(" ")
     );
   }
