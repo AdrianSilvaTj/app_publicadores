@@ -61,6 +61,12 @@ async function cargarMenuYScripts() {
   await cargarScript("main.js");
   await cargarScript("scripts/auth.js");
 
+  auth.onAuthStateChanged(user => {
+      if (!user) {
+          window.location.href = "login.html";
+      }
+  })
+
   // ✅ 5. Script por página
   switch (pagina) {
     case "publicadores":

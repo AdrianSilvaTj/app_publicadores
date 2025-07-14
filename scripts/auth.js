@@ -27,9 +27,6 @@ function recordarClave() {
         .catch(err => alert("❌ Error: " + err.message));
 }
 
-// Verificar sesión al cargar
-document.addEventListener("DOMContentLoaded", verificarSesionActiva);
-
 // mostrar al usuario logeado en la interfaz
 // auth.onAuthStateChanged(user => {
 //   if (user) {
