@@ -23,7 +23,7 @@
   <script src="main.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      cargarMenuYScripts()
+      await cargarMenuYScripts()
       const config = await cargarConfiguracionGlobal();
       if (config) {
         document.querySelector("h1").innerText = `👋 Bienvenido a Cong. ${config.nombreCongregacion}`;

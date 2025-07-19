@@ -1,4 +1,9 @@
-// carga los scripts
+/**
+ * Carga un archivo JavaScript de manera dinámica y lo agrega al DOM si no ha sido cargado antes.
+ * @param {string} src - La ruta o URL del script a cargar.
+ * @returns {Promise<void>} Promesa que se resuelve cuando el script ha sido cargado exitosamente.
+ */
+
 function cargarScript(src) {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -12,7 +17,15 @@ function cargarScript(src) {
   });
 }
 
-// cargar el menú principal
+/**
+ * Carga el menú principal dinámicamente en función de la URL actual,
+ * y carga los scripts necesarios por página incluyendo dependencias globales.
+ * También valida la sesión del usuario mediante Firebase Auth.
+ * @async
+ * @function
+ * @returns {Promise<void>} Promesa que se resuelve cuando todos los scripts están cargados.
+ */
+
 async function cargarMenuYScripts() {
   const path = window.location.pathname;
   let pagina = path.substring(path.lastIndexOf("/") + 1).split('.')[0];
@@ -114,13 +127,23 @@ function mostrarBanner(mensaje, tipo = 'info', conSpinner = false, duracion = nu
   }
 }
 
-// ocultar banner de mensajes
+/**
+ * Oculta el banner de estado si está presente en el DOM.
+ * @function
+ */
 function cerrarBanner() {
   const banner = document.getElementById("bannerEstado");
   if (banner) banner.classList.add("d-none");
 }
 
-// cargar la configuración de la congregación
+/**
+ * Carga la configuración general de la congregación.
+ * Intenta recuperar la data desde localStorage primero, y si no existe, la consulta desde Firestore.
+ * La configuración se almacena en localStorage para futuras llamadas.
+ * @async
+ * @function
+ * @returns {Promise<Object|null>} Retorna el objeto de configuración si se encuentra, o `null` si hay error o no existe en Firestore.
+ */
 async function cargarConfiguracionGlobal() {
   const cacheKey = "configuracion_congregacion";
 
@@ -158,7 +181,14 @@ async function cargarConfiguracionGlobal() {
   }
 }
 
-// actualizar la data de la colección
+/**
+ * Consulta los documentos de una colección específica en Firestore,
+ * guarda los resultados en localStorage, y recarga la página.
+ * @async
+ * @function
+ * @param {string} coleccion - Nombre de la colección a consultar.
+ * @returns {Promise<Array<Object>>} Array de objetos con los datos de cada documento.
+ */
 async function actualizarColeccion(coleccion) {
   try {
     mostrarBanner(`Consultando "${coleccion}"...`, "info", true);
@@ -179,7 +209,14 @@ async function actualizarColeccion(coleccion) {
   }
 }
 
-// ordenar los publicador por grupos
+/**
+ * Ordena los publicadores de una congregación según prioridad por rol espiritual y pertenencia a un grupo.
+ * Si tienen la misma prioridad, se ordenan alfabéticamente por nombre.
+ * @function
+ * @param {Array<Object>} pubs - Lista de publicadores.
+ * @param {number} grupo - Número identificador del grupo para filtrar relevancia.
+ * @returns {Array<Object>} Lista de publicadores ordenada por prioridad y nombre.
+ */
 function ordenarPublicadoresGrupo(pubs, grupo) {
   return [...pubs].sort((a, b) => {
     const prioridad = pub => {

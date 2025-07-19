@@ -21,8 +21,8 @@ h2, h3 {
 }
 
 .modal-body {
-  overflow-y: auto;
-  max-height: 88vh;
+  overflow-y: auto !important;
+  max-height: 95vh !important;
 }
 
 @keyframes spin {
