@@ -22,7 +22,7 @@ h2, h3 {
 
 .modal-body {
   overflow-y: auto !important;
-  max-height: 95vh !important;
+  max-height: 90vh !important;
 }
 
 @keyframes spin {
@@ -66,6 +66,19 @@ h2, h3 {
   animation: flash 0.5s ease-in-out;
   font-weight: bold;
   font-style: italic;
+}
+
+.modal-content.custom-shadow {
+  box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+  border-radius: 8px;
+}
+
+.modal-header.main {
+  background-color: bisque;
+}
+
+.modal-header.second {
+  background-color:cadetblue;
 }
 
 @keyframes flash {

@@ -42,13 +42,13 @@
     
   </div>
 
-  <!-- Modal -->
+  <!-- Modal Crear/Editar reunión-->
   <div class="modal fade" id="modalReunion" tabindex="-1" aria-labelledby="modalReunionLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <form id="formReunion" data-edicion-id="">
-          <div class="modal-header">
+          <div class="modal-header main">
             <h5 class="modal-title" id="modalReunionLabel">➕ Crear nueva reunión </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
@@ -65,11 +65,12 @@
               </div>
               <div class="col-md-6">
                 <label for="presidente" class="form-label">Presidente <span class="text-danger">*</span></label>
-                <select class="form-select" id="presidente" required>
-                  <option value="">Selecciona...</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Femenino</option>
-                </select>
+                <div class="d-flex">
+                  <input type="text" class="form-control" id="presidente" required>
+                  <button class="btn btn-outline-secondary" type="button" onclick="abrirSelectorPublicador('presidente')">
+                    🔍
+                  </button>
+                </div>
               </div>
             </div>
             <div class="row g-2 mt-2">
@@ -220,6 +221,26 @@
         </form>
       </div>
     </div>
+  </div>
+
+  <!-- Modal publicadores-->
+  <div class="modal fade" id="modalSeleccionPublicador" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content custom-shadow">
+        <div class="modal-header second">
+          <h5 class="modal-title">Selecciona un publicador</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control mb-3" placeholder="Buscar..." oninput="buscarPublicadorTabla(this.value)">
+          <table class="table table-hover" id="tablaPublicadoresModal">
+            <thead><tr><th>Nombre</th><th>Grupo</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 
   <script src="main.js"></script>

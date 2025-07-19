@@ -122,34 +122,28 @@ function agregarSeccionNVC() {
   divNVC.appendChild(nuevaSeccion);
 }
 
-async function llenarSelectsReunion() {
-  const publicadores = JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
+let inputDestinoPublicador = null;
+async function abrirSelectorPublicador(inputId) {
+  inputDestinoPublicador = document.getElementById(inputId);
 
-  // Define qué clase requiere qué tipo de publicador
-  const roles = {
-    oracion: pub => pub.privilegiosCongregacion?.includes("oracion"),
-    presidente: pub => pub.estadoEspiritual?.includes("Anciano"),
-    lector: pub => pub.estadoEspiritual?.includes("Anciano") || pub.estadoEspiritual?.includes("Siervo ministerial"),
-    asignacion: pub => true, // todos
-  };
+  const publicadores = await obtenerDataColeccion("publicadores");
+  const tbody = document.querySelector("#tablaPublicadoresModal tbody");
+  tbody.innerHTML = "";
 
-  // Para cada tipo de clase definida...
-  Object.keys(roles).forEach(clase => {
-    const selects = document.querySelectorAll(`select.${clase}`);
-    selects.forEach(select => {
-      // limpiar
-      select.innerHTML = '<option value="">Selecciona...</option>';
-
-      // agregar publicadores filtrados
-      publicadores
-        .filter(roles[clase])
-        .sort((a, b) => a.nombre.localeCompare(b.nombre))
-        .forEach(pub => {
-          const opt = document.createElement("option");
-          opt.value = pub.id || pub.nombre;
-          opt.textContent = pub.nombre;
-          select.appendChild(opt);
-        });
+  publicadores.forEach(pub => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${pub.nombre}</td>
+      <td>${pub.grupo}</td>`;
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", () => {
+      if (inputDestinoPublicador) {
+        inputDestinoPublicador.value = pub.nombre;
+        inputDestinoPublicador.dataset.id = pub.id; // opcional
+      }
+      bootstrap.Modal.getInstance(document.getElementById("modalSeleccionPublicador")).hide();
     });
+    tbody.appendChild(tr);
   });
+  new bootstrap.Modal(document.getElementById("modalSeleccionPublicador")).show();
 }
+

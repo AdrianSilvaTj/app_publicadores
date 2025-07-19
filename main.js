@@ -209,6 +209,21 @@ async function actualizarColeccion(coleccion) {
   }
 }
 
+async function obtenerDataColeccion(coleccion) {
+  // Intentar leer desde localStorage
+  const cache = localStorage.getItem(`firebase_${coleccion}`);
+  let data = [];
+
+  if (cache) {
+    console.log("✅ Datos cargados desde localStorage.");
+    data = JSON.parse(cache);
+  } else {
+    // Si no hay cache, cargar y guardar
+    data = await actualizarColeccion(coleccion);
+  }
+  return data
+}
+
 /**
  * Ordena los publicadores de una congregación según prioridad por rol espiritual y pertenencia a un grupo.
  * Si tienen la misma prioridad, se ordenan alfabéticamente por nombre.
@@ -242,4 +257,16 @@ function ordenarPublicadoresGrupo(pubs, grupo) {
     // Mismo grupo de prioridad → ordenar por nombre
     return (a.nombre || "").localeCompare(b.nombre || "");
   });
+}
+
+function mostrarFondoOscuro() {
+  const sombra = document.createElement("div");
+  sombra.className = "modal-backdrop-custom";
+  sombra.id = "backdropCustom";
+  document.body.appendChild(sombra);
+}
+
+function ocultarFondoOscuro() {
+  const sombra = document.getElementById("backdropCustom");
+  if (sombra) sombra.remove();
 }
