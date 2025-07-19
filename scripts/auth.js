@@ -13,6 +13,7 @@ function verificarSesionActiva() {
 // Cerrar sesión
 function cerrarSesion() {
     auth.signOut().then(() => {
+        localStorage.removeItem('user');
         window.location.href = "login.html";
     });
 }

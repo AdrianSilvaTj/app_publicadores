@@ -209,7 +209,78 @@ async function reiniciarPublicadores() {
 }
 
 
+async function backupFirebaseDB() {
+  const db = firebase.firestore();
+  const colecciones = ["publicadores", "configuracion", "reuniones"]; // 🔁 agrega aquí tus colecciones
+  const backupData = {};
+
+  mostrarBanner("Generando backup...", "warning", true);
+
+  for (const colName of colecciones) {
+    const snapshot = await db.collection(colName).get();
+    backupData[colName] = [];
+
+    snapshot.forEach(doc => {
+      backupData[colName].push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+  }
+
+  // Generar archivo JSON
+  const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `firebase_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  mostrarBanner("✅ Backup creado correctamente", "success", false, 4000);
+}
 
 
+async function restoreFirebaseDBFromFile(file) {
+  mostrarBanner("Restaurando backup...", "warning", true);
+  const db = firebase.firestore();
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const backupData = JSON.parse(e.target.result);
+      const batch = db.batch();
+
+      for (const [colName, docs] of Object.entries(backupData)) {
+        const colRef = db.collection(colName);
+
+        docs.forEach(doc => {
+          const docRef = colRef.doc(doc.id);
+          const { id, ...data } = doc;
+          batch.set(docRef, data);
+        });
+      }
+
+      await batch.commit();
+      mostrarBanner("✅ Restore realizado correctamente", "success", false, 4000);
+      
+    } catch (err) {
+      console.error("❌ Error restaurando:", err);
+      mostrarBanner("❌ Ocurrió un error al restaurar.", "danger", false, 4000);
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function verificarUsuario() {
+  const user = localStorage.getItem('user');
+  if (!user) return;
+  const seccion = document.getElementById('advanced-section');
+  if (seccion) {
+    user.toLowerCase() === "adrian.silva.tj@gmail.com" ?
+      seccion.removeAttribute("hidden") : seccion.setAttribute('hidden', true);
+  }
+}
 
 

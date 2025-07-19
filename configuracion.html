@@ -9,29 +9,7 @@
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">🏠 DigitCong</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="reuniones.html">📖 Reuniones</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="servicio.html">💼 Servicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="configuracion.html">⚙ Configuración</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px">
   </nav>
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
 
@@ -97,26 +75,37 @@
         <button type="submit" class="btn btn-success">💾 Guardar configuración</button>
       </div>
 
-      <div class="mt-5" hidden id="import-section">
-        <h5>📥 Importar lista de publicadores (Excel)</h5>
-        <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" />
-        <div class="mt-2 d-flex gap-2">
-          <button class="btn btn-outline-success btn-sm" onclick="guardarPublicadoresImportados()">💾 Guardar</button>
-          <button class="btn btn-outline-danger" onclick="reiniciarPublicadores()">🗑️ Reiniciar publicadores</button>
+      <div class="row g-2 pb-4" hidden id="advanced-section">
+        <div class="col-md-6">
+          <h5>📥 Importar lista de publicadores (Excel)</h5>
+          <input type="file" class="form-control" id="archivoExcel" accept=".xls,.xlsx" />
+          <div class="mt-2 d-flex gap-2">
+            <button type="button" class="btn btn-outline-success btn-sm" onclick="guardarPublicadoresImportados()">
+              💾 Guardar</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="reiniciarPublicadores()">
+              🗑️ Reiniciar publicadores</button>
+          </div>
+          <div class="form-text">Formato soportado: Excel (.xls, .xlsx) con columnas:
+            Nombre, Grupo, Sexo, Esperanza, Privilegios...</div>
         </div>
-        <div class="form-text">Formato soportado: Excel (.xls, .xlsx) con columnas: Nombre, Grupo, Sexo, Esperanza, Privilegios...</div>
+        <div class="col-md-6">
+          <h5>🛑 Restaurar base de datos</h5>
+          <input class="form-control" type="file" accept=".json" onchange="restoreFirebaseDBFromFile(this.files[0])">
+          <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="backupFirebaseDB()">📤 Descargar backup</button>
+        </div>
       </div>
 
     </form>
   </div>
 
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="scripts/firebase-config.js"></script>
   <script src="main.js"></script>
-  <script src="scripts/configuracion.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      await cargarMenuYScripts();
+      verificarSesionActiva();
+      verificarUsuario();
+    });
+  </script>
 </body>
 </html>

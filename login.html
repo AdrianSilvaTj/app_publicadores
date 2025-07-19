@@ -47,6 +47,7 @@
 
   <!-- Login logic -->
   <script>
+    localStorage.removeItem('user')
     const auth = firebase.auth();
 
     document.getElementById("formLogin").addEventListener("submit", async (e) => {
@@ -59,6 +60,7 @@
         mostrarBanner("Cargando información...", "info", true);
         await auth.signInWithEmailAndPassword(email, password);
         window.location.href = "index.html";
+        localStorage.setItem('user', email)
       } catch (err) {
         mostrarBanner("❌ Error al iniciar sesión: " + err.message, "danger");
       }
