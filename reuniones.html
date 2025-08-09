@@ -61,13 +61,13 @@
               </div>
               <div class="col-md-2">
                 <label for="cancion" class="form-label">Canción <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" id="cancion" required>
+                <input type="number" class="form-control" id="cancionIni" required>
               </div>
-              <div class="col-md-6">
+                <div class="col-md-6">
                 <label for="presidente" class="form-label">Presidente <span class="text-danger">*</span></label>
                 <div class="d-flex">
                   <input type="text" class="form-control" id="presidente" required>
-                  <button class="btn btn-outline-secondary" type="button" onclick="abrirSelectorPublicador('presidente')">
+                  <button class="btn btn-outline-secondary" type="button" onclick="abrirSelectorPublicador('presidente', 'pdteVida')">
                     🔍
                   </button>
                 </div>
@@ -75,20 +75,24 @@
             </div>
             <div class="row g-2 mt-2">
               <div class="col-md-6">
-                <label for="consejero" class="form-label">Consejero sala auxiliar<span class="text-danger">*</span></label>
-                <select class="form-select" id="consejero" required>
-                  <option value="">Selecciona...</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Femenino</option>
-                </select>
+                <label for="consejAux" class="form-label">Consejero sala auxiliar<span class="text-danger">*</span></label>
+                <div class="d-flex">
+                  <input type="text" class="form-control" id="consejAux" required>
+                  <button class="btn btn-outline-secondary" type="button" 
+                    onclick="abrirSelectorPublicador('consejAux', 'consejAux')">
+                    🔍
+                  </button>
+                </div>
               </div>
               <div class="col-md-6">
-                <label for="oracion-ini" class="form-label">Oración inicial<span class="text-danger">*</span></label>
-                <select class="form-select" id="oracion-ini" required>
-                  <option value="">Selecciona...</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Femenino</option>
-                </select>
+                <label for="oracionIni" class="form-label">Oración inicial<span class="text-danger">*</span></label>
+                <div class="d-flex">
+                  <input type="text" class="form-control" id="oracionIni" required>
+                  <button class="btn btn-outline-secondary" type="button" 
+                    onclick="abrirSelectorPublicador('oracionIni', 'oracion')">
+                    🔍
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -99,47 +103,55 @@
               <div class="row g-2">
                 <div class="col-md-6">
                   <label for="tesoros" class="form-label">Título <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="tesoros" required>
+                  <input type="text" class="form-control" id="tesorosTitulo" required>
                 </div>
                 <div class="col-md-6">
-                  <label for="tesoros-enc" class="form-label">Encargado <span class="text-danger">*</span></label>
-                  <select class="form-select" id="tesoros-enc" required>
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <label for="tesorosEnc" class="form-label">Encargado <span class="text-danger">*</span></label>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="tesorosEnc" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('tesorosEnc', 'tesoros')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
               </div>
               <div class="row g-2 mt-2">
                 <div class="col-md-4">
-                  <label for="perlas-enc" class="form-label">Busquemos perlas escondidas<span class="text-danger">*</span></label>
-                  <select class="form-select" id="perlas-enc" required>
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <label for="perlasEnc" class="form-label">Busquemos perlas escondidas<span class="text-danger">*</span></label>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="perlasEnc" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('perlasEnc', 'perlas')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
                 <div class="col-md-4">
-                  <label for="lectura-enc" class="form-label">Lectura de la Biblia (Principal)<span class="text-danger">*</span></label>
-                  <select class="form-select" id="lectura-enc" required>
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <label for="lecturaEnc" class="form-label">Lectura de la Biblia (Principal)<span class="text-danger">*</span></label>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="lecturaEnc" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('lecturaEnc', 'asignaciones')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
                 <div class="col-md-4">
-                  <label for="lectura-aux-enc" class="form-label">Lectura de la Biblia (Auxiliar)</label>
-                  <select class="form-select" id="lectura-aux-enc">
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <label for="lecturaAuxEnc" class="form-label">Lectura de la Biblia (Auxiliar)</label>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="lecturaAuxEnc">
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('lecturaAuxEnc', 'asignaciones')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Seamos mejores maestros -->
-            <div class="mt-3" id="seccion-smm">
+            <div class="mt-3" id="seccionSmm">
               <div class="d-flex justify-content-between">
                 <h5 style="background-color: #be8900;color: white;width: 80%; height: 30px;">
                   🌾 Seamos mejores maestros</h5>
@@ -166,31 +178,35 @@
               <div class="row g-2">
                 <div class="d-flex" style="height: 35px;">
                   <label class="form-label">Canción <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="cancion-int" required
+                  <input type="number" class="form-control" id="cancionInt" required
                       style="width: 80px; margin-left: 1rem;">
                 </div>
               </div>
 
-              <div id="secciones-nvc"></div>
+              <div id="seccionesNvc"></div>
 
               <div class="row g-2">
                 <div class="col-md-6">
                   <label class="form-label">Estudio bíblico de la congregación (Conductor)
                     <span class="text-danger">*</span>
                   </label>
-                  <select class="form-select">
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="estudioLibro" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('estudioLibro', 'nuestraVida')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Lector <span class="text-danger">*</span></label>
-                  <select class="form-select">
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="lectorEstudioLibro" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('lectorEstudioLibro', 'lecturaLibro')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -199,15 +215,17 @@
                   <label class="form-label">Canción final
                     <span class="text-danger">*</span>
                   </label>
-                  <input type="text" class="form-control" required>
+                  <input type="number" class="form-control" id="cancionFin" required>
                 </div>
                 <div class="col-md-8">
                   <label class="form-label">Oración final <span class="text-danger">*</span></label>
-                  <select class="form-select">
-                    <option value="">Selecciona...</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                  </select>
+                  <div class="d-flex">
+                    <input type="text" class="form-control" id="oracionFin" required>
+                    <button class="btn btn-outline-secondary" type="button" 
+                      onclick="abrirSelectorPublicador('oracionFin', 'oracion')">
+                      🔍
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
