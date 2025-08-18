@@ -40,7 +40,13 @@ h2, h3 {
   color: black !important
 }
 
-.gridGrupos {
+.grid-2 {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(3, 1fr);
@@ -88,8 +94,11 @@ h2, h3 {
 
 
 @media (max-width: 1200px) {
-  .gridGrupos {
+  .grid-3 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-2 {
+    grid-template-columns: 1fr;
   }
   .marginBody {
     margin: 1rem;
@@ -97,7 +106,7 @@ h2, h3 {
 }
 
 @media (max-width: 600px) {
-  .gridGrupos {
+  .grid-3 {
     grid-template-columns: 1fr;
   }
   .banner {

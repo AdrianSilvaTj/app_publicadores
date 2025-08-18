@@ -1,3 +1,99 @@
+// Variable globales
+publicadores = []
+
+
+function obtenerPublicador(id) {
+  return publicadores.find(pub => pub.id === id)
+}
+
+function obtenerSeccionesSMM(reunion) {
+  let secciones = '';
+  reunion.smm.forEach(sec => {
+    secciones += `
+      <div class="row g-0">
+        <span class="col-md-4 borde-celda"><b>Título:</b></br>${sec.smmTitulo}</span>
+        <span class="col-md-4 borde-celda"><b>Encargado (Principal):</b></br>
+          ${obtenerPublicador(sec.smmEncargado).nombre}</span>
+        <span class="col-md-4 borde-celda"><b>Ayudante (Principal):</b></br>
+          ${obtenerPublicador(sec.smmAyudante).nombre}</span>
+      </div>
+    `
+  })
+  return secciones
+}
+
+
+function renderDetalleReunion(reunion) {
+  return `
+    <div class="row g-0">
+      <span class="col-md-6 borde-celda"><b>Canción inicial:</b></br>${reunion.cancionIni}</span>
+      <span class="col-md-6 borde-celda"><b>Presidente:</b></br>
+        ${obtenerPublicador(reunion.presidente).nombre}</span>
+    </div>
+    <div class="row g-0">
+      <span class="col-md-6 borde-celda"><b>Consejero sala auxiliar:</b></br>
+        ${obtenerPublicador(reunion.consejAux).nombre}</span>
+      <span class="col-md-6 borde-celda"><b>Oración inicial:</b></br>
+        ${obtenerPublicador(reunion.oracionIni).nombre}</span>
+    </div>
+    <h5 class="mt-2" style="background-color: #575a5d; color: white; height: 30px;">
+      💎 Tesoros de la Biblia</h5>
+    <div class="row g-0">
+      <span class="col-md-6 borde-celda"><b>Título:</b></br>${reunion.tesoros.tesorosTitulo}</span>
+      <span class="col-md-6 borde-celda"><b>Encargado:</b></br>
+        ${obtenerPublicador(reunion.tesoros.tesorosEnc).nombre}</span>
+    </div>
+    <div class="row g-0">
+      <span class="col-md-4 borde-celda"><b>Busquemos perlas escondidas:</b></br>
+        ${obtenerPublicador(reunion.tesoros.perlasEnc).nombre}</span>
+      <span class="col-md-4 borde-celda"><b>Lectura de la Biblia (Principal)</b></br>
+        ${obtenerPublicador(reunion.tesoros.lecturaEnc).nombre}</span>
+      <span class="col-md-4 borde-celda"><b>Lectura de la Biblia (Auxiliar)</b></br>
+        ${obtenerPublicador(reunion.tesoros.lecturaAuxEnc).nombre}</span>
+    </div>
+    <h5 class="mt-2" style="background-color: #be8900;color: white; height: 30px;">
+      🌾 Seamos mejores maestros</h5>
+    ${obtenerSeccionesSMM(reunion)}
+    <h5 class="mt-2" style="background-color: #7e0024;color: white; height: 30px;">
+      🐑 Nuestra vida cristiana</h5>
+  `;
+}
+
+
+async function renderReuniones() {
+  const contenedor = document.getElementById("tablasReuniones");
+  contenedor.innerHTML = ""; // Limpiar contenido anterior
+
+  mostrarBanner("Cargando información...", "info", true);
+  // Intentar leer desde localStorage
+  let reuniones = await obtenerDataColeccion('reuniones');
+  publicadores = await obtenerDataColeccion('publicadores');
+
+  reuniones.forEach(reunion =>{
+    const tablaId = `tablaReuniones${reunion}`;
+
+    const card = document.createElement("div");
+    card.className = "col-12";
+
+    card.innerHTML = `
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center group-header-color">
+          <strong>Fecha ${reunion.fecha}</strong>
+          <button class="btn btn-sm btn-outline-secondary" onclick="editarReunion(${reunion})">✏️ Editar</button>
+        </div>
+        <div class="card-body p-0">
+          ${renderDetalleReunion(reunion)}
+        </div>
+      </div>
+    `;
+
+    contenedor.appendChild(card);
+  })
+
+  cerrarBanner();
+}
+
+
 function agregarSeccionSMM() {
   const divSMM = document.getElementById('seccionSmm');
 
