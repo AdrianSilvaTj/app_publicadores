@@ -87,6 +87,10 @@ h2, h3 {
   background-color:cadetblue;
 }
 
+.card-shadow {
+  box-shadow: 0px 6px 12px 8px lavender
+}
+
 @keyframes flash {
   0%   { background-color: #fff3cd; }
   100% { background-color: #ffeeba; }

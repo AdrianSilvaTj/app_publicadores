@@ -23,8 +23,8 @@
     <div class="d-flex justify-content-between mb-3">
       <h3>📅 Reuniones</h3>
       <div class="d-flex gap-1">
-        <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal"
-          data-bs-target="#modalReunion" title="Crear nueva reunión">
+        <button class="btn btn-primary d-flex align-items-center" title="Crear nueva reunión"
+            onclick="nuevaReunion()">
           <span class="me-2 d-none d-sm-inline">➕ Crear</span>
           <span class="d-inline d-sm-none">➕</span>
         </button>
@@ -58,7 +58,7 @@
             <div class="row g-2">
               <div class="col-md-4">
                 <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" id="fecha">
+                <input type="date" class="form-control" id="fecha" >
               </div>
               <div class="col-md-2">
                 <label for="cancion" class="form-label">Canción <span class="text-danger">*</span></label>
@@ -67,7 +67,7 @@
                 <div class="col-md-6">
                 <label for="presidente" class="form-label">Presidente <span class="text-danger">*</span></label>
                 <div class="d-flex">
-                  <input type="text" class="form-control" id="presidente" required>
+                  <input disabled type="text" class="form-control" id="presidente" required>
                   <button class="btn btn-outline-secondary" type="button" onclick="abrirSelectorPublicador('presidente', 'pdteVida')">
                     🔍
                   </button>
@@ -78,7 +78,7 @@
               <div class="col-md-6">
                 <label for="consejAux" class="form-label">Consejero sala auxiliar<span class="text-danger">*</span></label>
                 <div class="d-flex">
-                  <input type="text" class="form-control" id="consejAux" required>
+                  <input disabled type="text" class="form-control" id="consejAux" required>
                   <button class="btn btn-outline-secondary" type="button" 
                     onclick="abrirSelectorPublicador('consejAux', 'consejAux')">
                     🔍
@@ -88,7 +88,7 @@
               <div class="col-md-6">
                 <label for="oracionIni" class="form-label">Oración inicial<span class="text-danger">*</span></label>
                 <div class="d-flex">
-                  <input type="text" class="form-control" id="oracionIni" required>
+                  <input disabled type="text" class="form-control" id="oracionIni" required>
                   <button class="btn btn-outline-secondary" type="button" 
                     onclick="abrirSelectorPublicador('oracionIni', 'oracion')">
                     🔍
@@ -109,7 +109,7 @@
                 <div class="col-md-6">
                   <label for="tesorosEnc" class="form-label">Encargado <span class="text-danger">*</span></label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="tesorosEnc" required>
+                    <input disabled type="text" class="form-control" id="tesorosEnc" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('tesorosEnc', 'tesoros')">
                       🔍
@@ -121,7 +121,7 @@
                 <div class="col-md-4">
                   <label for="perlasEnc" class="form-label">Busquemos perlas escondidas<span class="text-danger">*</span></label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="perlasEnc" required>
+                    <input disabled type="text" class="form-control" id="perlasEnc" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('perlasEnc', 'perlas')">
                       🔍
@@ -131,7 +131,7 @@
                 <div class="col-md-4">
                   <label for="lecturaEnc" class="form-label">Lectura de la Biblia (Principal)<span class="text-danger">*</span></label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="lecturaEnc" required>
+                    <input disabled type="text" class="form-control" id="lecturaEnc" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('lecturaEnc', 'asignaciones')">
                       🔍
@@ -141,7 +141,7 @@
                 <div class="col-md-4">
                   <label for="lecturaAuxEnc" class="form-label">Lectura de la Biblia (Auxiliar)</label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="lecturaAuxEnc">
+                    <input disabled type="text" class="form-control" id="lecturaAuxEnc">
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('lecturaAuxEnc', 'asignaciones')">
                       🔍
@@ -192,7 +192,7 @@
                     <span class="text-danger">*</span>
                   </label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="estudioLibro" required>
+                    <input disabled type="text" class="form-control" id="estudioLibro" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('estudioLibro', 'nuestraVida')">
                       🔍
@@ -202,7 +202,7 @@
                 <div class="col-md-6">
                   <label class="form-label">Lector <span class="text-danger">*</span></label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="lectorEstudioLibro" required>
+                    <input disabled type="text" class="form-control" id="lectorEstudioLibro" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('lectorEstudioLibro', 'lecturaLibro')">
                       🔍
@@ -221,7 +221,7 @@
                 <div class="col-md-8">
                   <label class="form-label">Oración final <span class="text-danger">*</span></label>
                   <div class="d-flex">
-                    <input type="text" class="form-control" id="oracionFin" required>
+                    <input disabled type="text" class="form-control" id="oracionFin" required>
                     <button class="btn btn-outline-secondary" type="button" 
                       onclick="abrirSelectorPublicador('oracionFin', 'oracion')">
                       🔍
@@ -253,7 +253,7 @@
         <div class="modal-body">
           <input type="text" class="form-control mb-3" placeholder="Buscar..." oninput="buscarPublicadorTabla(this.value)">
           <table class="table table-hover" id="tablaPublicadoresModal">
-            <thead><tr><th>Nombre</th><th>Grupo</th></tr></thead>
+            <thead><tr><th>Nombre</th><th>Grupo</th><th>Última asig.</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -263,6 +263,7 @@
   </div>
 
   <script src="main.js"></script>
+  <script src="scripts/date-functions.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async function () {
       await cargarMenuYScripts();
