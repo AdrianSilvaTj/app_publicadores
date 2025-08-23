@@ -325,17 +325,20 @@ async function abrirSelectorPublicador(inputId, filtro) {
 
   publicadores.forEach((pub) => {
     let asignStr = "Sin asignaciones";
-    if (auxUltimasAsig.some((x) => x.id === pub.id)) {
-      asignStr = "Esta reunión";
+    let asigEstaReu = auxUltimasAsig.find((x) => x.id === pub.id);
+    if (asigEstaReu) {
+      asignStr = `Esta reunión - ${descripAsignacion(
+        asigEstaReu.nueva.asignacion
+      )}<span onclick="mostrarUltimasAsig('${pub}', ${asigEstaReu})" title="Ver últimas asignaciones">📜</span>`;
     } else if (pub.ultAsignaciones?.length > 0) {
-      asignStr =
-        dateTimeStrToAnother(
+      asignStr = `
+        ${dateTimeStrToAnother(
           pub.ultAsignaciones[0].fecha,
           "YYYY-MM-DD",
           "DD-MM-YYYY"
-        ) +
-        " - " +
-        descripAsignacion(pub.ultAsignaciones[0].asignacion);
+        )}
+        - ${descripAsignacion(pub.ultAsignaciones[0].asignacion)}
+        <span onclick="mostrarUltimasAsig('${pub}')" title="Ver últimas asignaciones">🔼</span>`;
     }
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -448,8 +451,7 @@ formReunion.addEventListener("submit", async (e) => {
       mostrarBanner("✅ Reunión creada", "success", false, 3000);
     }
     await agregarUltimasAsign(auxUltimasAsig);
-    actualizarColeccion("reuniones");
-    actualizarColeccion("publicadores");
+    actualizarColecciones(["reuniones", "publicadores"]);
 
     // Reset y cerrar modal
     formReunion.reset();
@@ -620,4 +622,10 @@ function descripAsignacion(asig) {
   if (asig.includes("smmAuxEnc")) return "Encargado (Auxiliar)";
   if (asig.includes("smmAuxAyud")) return "Ayudante (Auxiliar)";
   if (asig.includes("nvcEnc")) return "Nuestra Vida Crist.";
+}
+
+function mostrarUltimasAsig(id, asigEstaReu = null) {}
+
+async function actualizar() {
+  await actualizarColecciones(["reuniones", "publicadores"]);
 }

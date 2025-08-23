@@ -65,7 +65,7 @@ async function renderPublicadoresPorGrupo(grupos) {
     console.log("✅ Datos cargados desde localStorage.");
   } else {
     // Si no hay cache, cargar y guardar
-    publicadores = await actualizarColeccion("publicadores");
+    publicadores = await actualizarColecciones(["publicadores"]);
   }
 
   for (let g = 1; g <= grupos; g++) {
@@ -110,7 +110,7 @@ async function renderPublicadoresPorGrupo(grupos) {
 }
 
 async function actualizarYRecargar() {
-  await actualizarColeccion("publicadores");
+  await actualizarColecciones(["publicadores"]);
   const config = await cargarConfiguracionGlobal();
   const grupos = config.cantidadGrupos;
   renderPublicadoresPorGrupo(grupos);
@@ -653,4 +653,8 @@ function generarIconos(estados) {
   if (e.includes("inactivo")) out += " 🚫";
   if (e.includes("no bautizado")) out += " ❌";
   return out;
+}
+
+function actualizar() {
+  actualizarColecciones(["publicadores"]);
 }

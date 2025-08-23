@@ -28,8 +28,8 @@ function cargarScript(src) {
 
 async function cargarMenuYScripts() {
   const path = window.location.pathname;
-  let pagina = path.substring(path.lastIndexOf("/") + 1).split('.')[0];
-  const menu = document.getElementById('menu');
+  let pagina = path.substring(path.lastIndexOf("/") + 1).split(".")[0];
+  const menu = document.getElementById("menu");
   if (menu) {
     menu.innerHTML = `
     <div class="container-fluid">
@@ -40,16 +40,24 @@ async function cargarMenuYScripts() {
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link ${pagina === 'publicadores' && 'active'}" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
+            <a class="nav-link ${
+              pagina === "publicadores" && "active"
+            }" href="publicadores.html">👨‍👩‍👧‍👦 Publicadores</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link ${pagina === 'reuniones' && 'active'}" href="reuniones.html">📅 Reuniones</a>
+            <a class="nav-link ${
+              pagina === "reuniones" && "active"
+            }" href="reuniones.html">📅 Reuniones</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link  ${pagina === 'servicio' && 'active'}" href="servicio.html">💼 Servicio</a>
+            <a class="nav-link  ${
+              pagina === "servicio" && "active"
+            }" href="servicio.html">💼 Servicio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link ${pagina === 'configuracion' && 'active'}" href="configuracion.html">⚙ Configuración</a>
+            <a class="nav-link ${
+              pagina === "configuracion" && "active"
+            }" href="configuracion.html">⚙ Configuración</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="cerrarSesion()">❗ Cerrar sesión</a>
@@ -60,12 +68,20 @@ async function cargarMenuYScripts() {
     `;
   }
   // ✅ 1. Bootstrap
-  await cargarScript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js");
+  await cargarScript(
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  );
 
   // ✅ 2. Firebase core
-  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
-  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js");
-  await cargarScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js");
+  await cargarScript(
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"
+  );
+  await cargarScript(
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"
+  );
+  await cargarScript(
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"
+  );
 
   // ✅ 3. Tu inicialización de Firebase
   await cargarScript("scripts/firebase-config.js");
@@ -74,11 +90,11 @@ async function cargarMenuYScripts() {
   await cargarScript("main.js");
   await cargarScript("scripts/auth.js");
 
-  auth.onAuthStateChanged(user => {
-      if (!user) {
-          window.location.href = "login.html";
-      }
-  })
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
 
   // ✅ 5. Script por página
   switch (pagina) {
@@ -97,7 +113,6 @@ async function cargarMenuYScripts() {
   }
 }
 
-
 /**
  * Muestra un banner de estado fijo arriba
  * @param {string} mensaje - El texto a mostrar (puede incluir HTML)
@@ -105,12 +120,17 @@ async function cargarMenuYScripts() {
  * @param {boolean} conSpinner - Si debe girar el emoji 🌀
  * @param {number} duracion - Duración opcional para ocultarse (en ms)
  */
-function mostrarBanner(mensaje, tipo = 'info', conSpinner = false, duracion = null) {
-  const banner = document.getElementById('bannerEstado');
+function mostrarBanner(
+  mensaje,
+  tipo = "info",
+  conSpinner = false,
+  duracion = null
+) {
+  const banner = document.getElementById("bannerEstado");
   if (!banner) return;
 
   // Limpiar clases anteriores
-  banner.className = 'alert text-center m-0 py-2 banner';
+  banner.className = "alert text-center m-0 py-2 banner";
   banner.classList.add(`alert-${tipo}`);
 
   // Construir contenido
@@ -118,11 +138,11 @@ function mostrarBanner(mensaje, tipo = 'info', conSpinner = false, duracion = nu
     ? `<span class="spinner-emoji">📀</span> ${mensaje}`
     : mensaje;
 
-  banner.classList.remove('d-none');
+  banner.classList.remove("d-none");
 
   if (duracion) {
     setTimeout(() => {
-      banner.classList.add('d-none');
+      banner.classList.add("d-none");
     }, duracion);
   }
 }
@@ -162,7 +182,12 @@ async function cargarConfiguracionGlobal() {
     cerrarBanner();
 
     if (!doc.exists) {
-      mostrarBanner("⚠️ No hay configuración en Firestore", "warning", false, 3000);
+      mostrarBanner(
+        "⚠️ No hay configuración en Firestore",
+        "warning",
+        false,
+        3000
+      );
       return null;
     }
 
@@ -189,24 +214,31 @@ async function cargarConfiguracionGlobal() {
  * @param {string} coleccion - Nombre de la colección a consultar.
  * @returns {Promise<Array<Object>>} Array de objetos con los datos de cada documento.
  */
-async function actualizarColeccion(coleccion) {
-  try {
-    mostrarBanner(`Consultando "${coleccion}"...`, "info", true);
+async function actualizarColecciones(colecciones) {
+  colecciones.forEach(async (coleccion) => {
+    try {
+      mostrarBanner(`Consultando "${coleccion}"...`, "info", true);
 
-    const snapshot = await db.collection(coleccion).get();
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const snapshot = await db.collection(coleccion).get();
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-    localStorage.setItem(`firebase_${coleccion}`, JSON.stringify(data));
+      localStorage.setItem(`firebase_${coleccion}`, JSON.stringify(data));
 
-    cerrarBanner();
-    mostrarBanner(`Datos de "${coleccion}" actualizados ✅`, "success", false, 3000);
-    location.reload()
-    return data;
-  } catch (err) {
-    console.error(`Error al actualizar ${coleccion}:`, err);
-    mostrarBanner(`❌ Error al actualizar "${coleccion}"`, "danger");
-    return [];
-  }
+      cerrarBanner();
+      mostrarBanner(
+        `Datos de "${coleccion}" actualizados ✅`,
+        "success",
+        false,
+        3000
+      );
+      location.reload();
+      return data;
+    } catch (err) {
+      console.error(`Error al actualizar ${coleccion}:`, err);
+      mostrarBanner(`❌ Error al actualizar "${coleccion}"`, "danger");
+      return [];
+    }
+  });
 }
 
 async function obtenerDataColeccion(coleccion) {
@@ -219,9 +251,9 @@ async function obtenerDataColeccion(coleccion) {
     data = JSON.parse(cache);
   } else {
     // Si no hay cache, cargar y guardar
-    data = await actualizarColeccion(coleccion);
+    data = await actualizarColecciones([coleccion]);
   }
-  return data
+  return data;
 }
 
 /**
@@ -234,7 +266,7 @@ async function obtenerDataColeccion(coleccion) {
  */
 function ordenarPublicadoresGrupo(pubs, grupo) {
   return [...pubs].sort((a, b) => {
-    const prioridad = pub => {
+    const prioridad = (pub) => {
       const estado = pub.estadoEspiritual || [];
 
       if (pub.superGrupo && Number(pub.grupo) === grupo) return 0;
