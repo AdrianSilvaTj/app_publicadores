@@ -107,6 +107,9 @@ async function cargarMenuYScripts() {
     case "reuniones":
       await cargarScript("scripts/reuniones.js");
       break;
+    case "servicio":
+      await cargarScript("scripts/servicio.js");
+      break;
     case "configuracion":
       await cargarScript("scripts/configuracion.js");
       break;

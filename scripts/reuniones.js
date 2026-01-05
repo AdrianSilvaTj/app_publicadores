@@ -117,6 +117,9 @@ function renderDetalleReunion(reunion) {
   `;
 }
 
+document.getElementById("anio").addEventListener("change", renderReuniones);
+document.getElementById("mes").addEventListener("change", renderReuniones);
+
 async function renderReuniones() {
   const contenedor = document.getElementById("tablasReuniones");
   contenedor.innerHTML = ""; // Limpiar contenido anterior
@@ -125,6 +128,31 @@ async function renderReuniones() {
   // Intentar leer desde localStorage
   let reuniones = await obtenerDataColeccion("reuniones");
   publicadores = await obtenerDataColeccion("publicadores");
+
+  // 🔽 TOMAR FILTROS
+  const selectAnio = document.getElementById("anio");
+  const selectMes = document.getElementById("mes");
+
+  const anio = selectAnio ? parseInt(selectAnio.value) : null;
+  const mes = selectMes ? parseInt(selectMes.value) : null;
+
+  // 🔍 FILTRAR POR FECHA
+  reuniones = reuniones.filter((reunion) => {
+    if (!reunion.fecha) return false;
+
+    const [y, m] = reunion.fecha.split("-").map(Number);
+
+    if (anio && y !== anio) return false;
+    if (mes && m !== mes) return false;
+
+    return true;
+  });
+
+  reuniones.sort((a, b) => {
+    const fechaA = stringToDateTime(a.fecha, "YYYY-MM-DD");
+    const fechaB = stringToDateTime(b.fecha, "YYYY-MM-DD");
+    return fechaA - fechaB;
+  });
 
   reuniones.forEach((reunion) => {
     const tablaId = `tablaReuniones${reunion}`;

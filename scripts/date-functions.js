@@ -205,3 +205,55 @@ function addDays(date, days) {
   newDate.setDate(newDate.getDate() + days);
   return newDate;
 }
+
+function cargarAniosSelect(selectId, anioInicio = 2020, anioFin = 2050) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  for (let anio = anioInicio; anio <= anioFin; anio++) {
+    const option = document.createElement("option");
+    option.value = anio;
+    option.textContent = anio;
+    select.appendChild(option);
+  }
+
+  // Seleccionar año actual si está dentro del rango
+  const anioActual = new Date().getFullYear();
+  if (anioActual >= anioInicio && anioActual <= anioFin) {
+    select.value = anioActual;
+  }
+}
+
+function cargarMesesSelect(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  const meses = [
+    { id: 1, nombre: "Enero" },
+    { id: 2, nombre: "Febrero" },
+    { id: 3, nombre: "Marzo" },
+    { id: 4, nombre: "Abril" },
+    { id: 5, nombre: "Mayo" },
+    { id: 6, nombre: "Junio" },
+    { id: 7, nombre: "Julio" },
+    { id: 8, nombre: "Agosto" },
+    { id: 9, nombre: "Septiembre" },
+    { id: 10, nombre: "Octubre" },
+    { id: 11, nombre: "Noviembre" },
+    { id: 12, nombre: "Diciembre" },
+  ];
+
+  select.innerHTML = "";
+
+  meses.forEach((mes) => {
+    const option = document.createElement("option");
+    option.value = mes.id;
+    option.textContent = mes.nombre;
+    select.appendChild(option);
+  });
+
+  // Seleccionar mes actual
+  select.value = new Date().getMonth() + 1;
+}
