@@ -209,39 +209,71 @@ async function cargarConfiguracionGlobal() {
   }
 }
 
+function guardarEstadoVista() {
+  const estado = {
+    scrollY: window.scrollY,
+    mes: document.getElementById("mes")?.value,
+    anio: document.getElementById("anio")?.value,
+  };
+
+  localStorage.setItem("estado_vista_servicio", JSON.stringify(estado));
+}
+
 /**
- * Consulta los documentos de una colección específica en Firestore,
- * guarda los resultados en localStorage, y recarga la página.
+ * Consulta documentos de colecciones en Firestore,
+ * aplicando filtros opcionales, guarda resultados en localStorage
+ * y recarga la página.
+ *
  * @async
  * @function
- * @param {string} coleccion - Nombre de la colección a consultar.
- * @returns {Promise<Array<Object>>} Array de objetos con los datos de cada documento.
+ * @param {Array<{nombre: string, filtros?: Object}>} colecciones
+ * @returns {Promise<void>}
  */
-async function actualizarColecciones(colecciones) {
-  colecciones.forEach(async (coleccion) => {
+async function actualizarColecciones(colecciones, noReload = false) {
+  for (const item of colecciones) {
+    const nombreColeccion = typeof item === "string" ? item : item.nombre;
+    const filtros = typeof item === "object" ? item.filtros : null;
+
     try {
-      mostrarBanner(`Consultando "${coleccion}"...`, "info", true);
+      mostrarBanner(`Consultando "${nombreColeccion}"...`, "info", true);
 
-      const snapshot = await db.collection(coleccion).get();
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      let query = db.collection(nombreColeccion);
 
-      localStorage.setItem(`firebase_${coleccion}`, JSON.stringify(data));
+      // 🔍 Aplicar filtros si existen
+      if (filtros && typeof filtros === "object") {
+        Object.entries(filtros).forEach(([campo, valor]) => {
+          if (valor !== undefined && valor !== null && valor !== "") {
+            query = query.where(campo, "==", valor);
+          }
+        });
+      }
+
+      const snapshot = await query.get();
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      localStorage.setItem(`firebase_${nombreColeccion}`, JSON.stringify(data));
 
       cerrarBanner();
       mostrarBanner(
-        `Datos de "${coleccion}" actualizados ✅`,
+        `Datos de "${nombreColeccion}" actualizados ✅`,
         "success",
         false,
         3000
       );
-      location.reload();
-      return data;
     } catch (err) {
-      console.error(`Error al actualizar ${coleccion}:`, err);
-      mostrarBanner(`❌ Error al actualizar "${coleccion}"`, "danger");
-      return [];
+      console.error(`Error al actualizar ${nombreColeccion}:`, err);
+      mostrarBanner(`❌ Error al actualizar "${nombreColeccion}"`, "danger");
     }
-  });
+  }
+
+  // 🔄 Recargar una sola vez al final
+  if (!noReload) {
+    guardarEstadoVista();
+    location.reload();
+  }
 }
 
 async function obtenerDataColeccion(coleccion) {
@@ -304,4 +336,28 @@ function mostrarFondoOscuro() {
 function ocultarFondoOscuro() {
   const sombra = document.getElementById("backdropCustom");
   if (sombra) sombra.remove();
+}
+
+function restaurarFiltrosVista() {
+  const estado = JSON.parse(localStorage.getItem("estado_vista_servicio"));
+
+  if (!estado) return;
+
+  if (estado.mes) document.getElementById("mes").value = estado.mes;
+  if (estado.anio) document.getElementById("anio").value = estado.anio;
+}
+
+function restaurarPosicionVista() {
+  const estado = JSON.parse(localStorage.getItem("estado_vista_servicio"));
+
+  if (!estado) return;
+  // Esperar a que el DOM y las tablas estén renderizadas
+  setTimeout(() => {
+    window.scrollTo({
+      top: estado.scrollY || 0,
+      behavior: "smooth",
+    });
+  }, 300);
+
+  localStorage.removeItem("estado_vista_servicio");
 }

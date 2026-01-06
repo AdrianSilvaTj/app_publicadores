@@ -48,24 +48,27 @@
           </button>
         </div>
       </div>
+      <!-- Leyenda de colores -->
+      <div
+        class="alert alert-light border d-flex flex-wrap gap-3 mb-3 p-2 small"
+      >
+        <div><span class="badge">🔴 Precursor regular</span></div>
+        <div><span class="badge">⚫ Inactivo</span></div>
+      </div>
 
       <!-- FILTRO AÑO MES -->
       <div class="row g-2 mb-2">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="anio" class="form-label"
             >Año <span class="text-danger">*</span></label
           >
           <select class="form-select" id="anio" required></select>
         </div>
-        <div class="col-md-4">
-          <label for="mes" class="form-label">Mes</label>
+        <div class="col-md-6">
+          <label for="mes" class="form-label"
+            >Mes<span class="text-danger">*</span></label
+          >
           <select class="form-select" id="mes" required></select>
-        </div>
-        <div class="col-md-4">
-          <label for="mes" class="form-label">Grupo</label>
-          <select id="filtroGrupo" class="form-select">
-            <option value="todos">Todos los grupos</option>
-          </select>
         </div>
       </div>
 
