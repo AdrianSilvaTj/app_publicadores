@@ -1,3 +1,17 @@
+function limpiarCacheFirebase() {
+  Object.keys(localStorage).forEach((key) => {
+    if (key !== "user") {
+      localStorage.removeItem(key);
+    }
+  });
+}
+
+if (!sessionStorage.getItem("app_abierta")) {
+  limpiarCacheFirebase();
+}
+
+sessionStorage.setItem("app_abierta", "1");
+
 /**
  * Carga un archivo JavaScript de manera dinámica y lo agrega al DOM si no ha sido cargado antes.
  * @param {string} src - La ruta o URL del script a cargar.
