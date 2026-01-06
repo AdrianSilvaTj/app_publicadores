@@ -273,8 +273,8 @@ async function guardarServicioGrupo(grupo) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
-    if (!data.participo) {
-      data.notas += " No participó.";
+    if (!data.participo && !data.notas.toLowerCase().includes("no participó")) {
+      data.notas += (data.notas ? " " : "") + "No participó";
     }
 
     batch.set(ref, data, { merge: true });
