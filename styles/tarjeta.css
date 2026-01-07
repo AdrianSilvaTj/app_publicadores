@@ -1,0 +1,143 @@
+/* ===== RESET BÁSICO ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+}
+
+/* ===== RESET BÁSICO ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: #000;
+  margin: 0;
+  padding: 20px;
+}
+
+/* ===== TARJETA ===== */
+.tarjeta-servicio {
+  font-size: 14px;
+}
+
+/* Título */
+.titulo {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* ===== DATOS ===== */
+.datos-publicador {
+  margin-bottom: 12px;
+}
+
+.fila {
+  margin-bottom: 6px;
+}
+
+.fila.nombre {
+  display: flex;
+  gap: 6px;
+}
+
+.label {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Doble columna */
+.fila.doble {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.fila.doble .col {
+  flex: 1;
+}
+
+.linea {
+  margin-bottom: 4px;
+}
+
+/* Checks */
+.checks,
+.checks-full {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.grupo-checks {
+  margin-bottom: 6px;
+}
+
+label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+/* ===== TABLA ===== */
+.tabla-servicio {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla-servicio th,
+.tabla-servicio td {
+  border: 1px solid #000;
+  padding: 4px;
+  vertical-align: middle;
+}
+
+.tabla-servicio th {
+  text-align: center;
+  font-size: 12px;
+}
+
+.tabla-servicio th small {
+  font-size: 9px;
+  display: block;
+}
+
+.tabla-servicio td {
+  font-size: 12px;
+}
+
+.tabla-servicio tbody td:first-child {
+  text-align: left;
+}
+
+.tabla-servicio td:not(:first-child) {
+  text-align: center;
+}
+
+.tabla-servicio .total td {
+  font-weight: bold;
+}
+
+.btn {
+    background: #0d6efd;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 10px;
+}

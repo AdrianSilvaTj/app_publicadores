@@ -552,140 +552,135 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
   cerrarBanner();
   return `
   <div id="tarjeta-servicio" class="tarjeta-servicio">
-    <h5 class="text-center mb-3">
-      REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
-    </h5>
 
-    <div class="mb-2">
+    <h3 class="titulo">
+      REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
+    </h3>
+
+    <!-- ===== DATOS DEL PUBLICADOR ===== -->
+    <div class="datos-publicador">
 
       <!-- Nombre -->
-      <div class="d-flex align-items-center mb-1">
-        <strong class="me-2">Nombre:</strong>
-        <div id="nombre-pub" class="flex-grow-1 bg-light px-2">
-          ${pub.nombre || ""}
-        </div>
+      <div class="fila nombre">
+        <span class="label">Nombre:</span>
+        <span class="valor">${pub.nombre || ""}</span>
       </div>
 
-      <!-- Fechas + Sexo + Esperanza -->
-      <div class="row d-flex justify-content-between align-items-start mb-1">
+      <!-- Fechas + Sexo / Esperanza -->
+      <div class="fila doble">
 
-        <div class="col-md-8">
-          <div>
-            <strong>Fecha de nacimiento:</strong> ${
-              pub.fechaNacimiento
-                ? dateTimeStrToAnother(
-                    pub.fechaNacimiento,
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY"
-                  )
-                : ""
-            }
+        <div class="col">
+          <div class="linea">
+            <span class="label">Fecha de nacimiento:</span>
+            <span class="valor">
+              ${
+                pub.fechaNacimiento
+                  ? dateTimeStrToAnother(
+                      pub.fechaNacimiento,
+                      "YYYY-MM-DD",
+                      "DD-MM-YYYY"
+                    )
+                  : ""
+              }
+            </span>
           </div>
-          <div>
-            <strong>Fecha de bautismo:</strong> ${
-              pub.fechaBautismo
-                ? dateTimeStrToAnother(
-                    pub.fechaBautismo,
-                    "YYYY-MM-DD",
-                    "DD-MM-YYYY"
-                  )
-                : pub.estadoEspiritual?.includes("No bautizado")
-                ? "No bautizado"
-                : ""
-            }
+
+          <div class="linea">
+            <span class="label">Fecha de bautismo:</span>
+            <span class="valor">
+              ${
+                pub.fechaBautismo
+                  ? dateTimeStrToAnother(
+                      pub.fechaBautismo,
+                      "YYYY-MM-DD",
+                      "DD-MM-YYYY"
+                    )
+                  : pub.estadoEspiritual?.includes("No bautizado")
+                  ? "No bautizado"
+                  : ""
+              }
+            </span>
           </div>
         </div>
 
-        <div  class="col-md-4">
-          <label class="me-2">
-            <input type="checkbox" ${isChecked(pub.sexo === "M")}>
-            Hombre
-          </label>
-          <label>
-            <input type="checkbox" ${isChecked(pub.sexo === "F")}>
-            Mujer
-          </label>
-          <br>
-          <label class="me-2">
-            <input type="checkbox" ${isChecked(
+        <div class="col checks">
+          <div class="grupo-checks">
+            <label><input type="checkbox" ${isChecked(
+              pub.sexo === "M"
+            )}> Hombre</label>
+            <label><input type="checkbox" ${isChecked(
+              pub.sexo === "F"
+            )}> Mujer</label>
+          </div>
+
+          <div class="grupo-checks">
+            <label><input type="checkbox" ${isChecked(
               pub.esperanza === "Otras ovejas"
-            )}>
-            Otras ovejas
-          </label>
-          <label>
-            <input type="checkbox" ${isChecked(pub.esperanza === "Ungido")}>
-            Ungido
-          </label>
+            )}> Otras ovejas</label>
+            <label><input type="checkbox" ${isChecked(
+              pub.esperanza === "Ungido"
+            )}> Ungido</label>
+          </div>
         </div>
 
       </div>
 
       <!-- Estado espiritual -->
-      <div class="d-flex gap-3 mt-1">
-
-        <label>
-          <input type="checkbox"
-            ${isChecked(pub.estadoEspiritual?.includes("Anciano"))}>
-          Anciano
-        </label>
-
-        <label>
-          <input type="checkbox"
-            ${isChecked(pub.estadoEspiritual?.includes("Siervo ministerial"))}>
-          Siervo ministerial
-        </label>
-
-        <label>
-          <input type="checkbox"
-            ${isChecked(pub.estadoEspiritual?.includes("Precursor regular"))}>
-          Precursor regular
-        </label>
-
-        <label>
-          <input type="checkbox"
-            ${isChecked(pub.estadoEspiritual?.includes("Precursor especial"))}>
-          Precursor especial
-        </label>
-
-        <label>
-          <input type="checkbox"
-            ${isChecked(pub.estadoEspiritual?.includes("Misionero-campo"))}>
+      <div class="fila checks-full">
+        <label><input type="checkbox" ${isChecked(
+          pub.estadoEspiritual?.includes("Anciano")
+        )}> Anciano</label>
+        <label><input type="checkbox" ${isChecked(
+          pub.estadoEspiritual?.includes("Siervo ministerial")
+        )}> Siervo ministerial</label>
+        <label><input type="checkbox" ${isChecked(
+          pub.estadoEspiritual?.includes("Precursor regular")
+        )}> Precursor regular</label>
+        <label><input type="checkbox" ${isChecked(
+          pub.estadoEspiritual?.includes("Precursor especial")
+        )}> Precursor especial</label>
+        <label><input type="checkbox" ${isChecked(
+          pub.estadoEspiritual?.includes("Misionero-campo")
+        )}>
           Misionero que sirve<br>en el campo
         </label>
-
       </div>
+
     </div>
 
-    <table class="table table-bordered table-sm mt-3">
+    <!-- ===== TABLA DE SERVICIO ===== -->
+    <table class="tabla-servicio">
       <thead>
         <tr>
-          <th style="width:180px" class="text-center">Año de servicio<br>${
-            anioServicio + 1
-          }</th>
-          <th style="width:60px" class="text-center font-10 pe-0">Participación<br>en el ministerio</th>
-          <th style="width:60px" class="text-center font-10 pe-0">Cursos<br>bíblicos</th>
-          <th style="width:60px" class="text-center font-10 pe-0">Precursor<br>auxiliar</th>
-          <th style="width:100px" class="text-center font-10 pe-0">
-            Horas<br>
-            <small class="text-muted">
-              Si es precursor o<br>misionero que sirve<br>en el campo
+          <th style="width:170px">Año de servicio<br>${anioServicio + 1}</th>
+          <th style="width:70px">Participación<br>en el ministerio</th>
+          <th style="width:70px">Cursos<br>bíblicos</th>
+          <th style="width:70px">Precursor<br>auxiliar</th>
+          <th style="width:110px">
+            Horas
+            <small>
+              Si es precursor o<br>
+              misionero que sirve<br>
+              en el campo
             </small>
           </th>
-          <th class="text-center pe-0">Notas</th>
+          <th>Notas</th>
         </tr>
       </thead>
+
       <tbody>
         ${filas}
-        <tr>
-          <td><strong>Total</strong></td>
+        <tr class="total">
+          <td>Total</td>
           <td></td>
           <td></td>
           <td></td>
-          <td class="text-center"><strong>${totalHoras}</strong></td>
+          <td>${totalHoras}</td>
           <td></td>
         </tr>
       </tbody>
     </table>
+
   </div>
   `;
 }
@@ -754,6 +749,7 @@ async function verTarjetaPublicador(id) {
   const width = 900;
   const height = 900;
   const anioServicio = Number(document.getElementById("anio").value);
+
   const left = (screen.width - width) / 2;
   const top = (screen.height - height) / 2;
 
@@ -783,156 +779,53 @@ async function verTarjetaPublicador(id) {
 
   ventana.document.open();
   ventana.document.write(`
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8" />
-      <title>Registro de Publicador</title>
-      <!-- html2pdf -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro de Publicador</title>
 
-      <style>
-        body {
-          margin: 0;
-          padding: 20px;
-          background: #fff;
-          font-family: Arial, Helvetica, sans-serif;
-          color: #000;
+  <!-- CSS PROPIO (SIN BOOTSTRAP) -->
+  <link rel="stylesheet" href="styles/tarjeta.css">
+
+  <!-- html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <div class="acciones">
+    <button class="btn" onclick="descargar()">⬇ Descargar</button>
+    <button class="btn" onclick="window.close()">❌ Cerrar</button>
+  </div>
+
+  <div id="contenidoTarjeta">
+    ${htmlTarjeta}
+  </div>
+
+  <script>
+    function descargar() {
+      const el = document.getElementById("contenidoTarjeta");
+
+      html2pdf().set({
+        margin: 10,
+        filename: "Registro.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          backgroundColor: "#ffffff"
+        },
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait"
         }
+      }).from(el).save();
+    }
+  </script>
 
-        .tarjeta-servicio {
-          width: 100%;
-          font-size: 12px;
-        }
-
-        h5 {
-          text-align: center;
-          font-size: 14px;
-          margin: 0 0 10px 0;
-        }
-
-        /* Cabecera */
-        .fila-datos {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 6px;
-        }
-
-        .fila-datos span {
-          display: inline-block;
-        }
-
-        .bloque-checks {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px 20px;
-          font-size: 12px;
-          margin-bottom: 10px;
-        }
-
-        .bloque-checks label {
-          white-space: nowrap;
-        }
-
-        /* Checkboxes solo visuales */
-        input[type="checkbox"] {
-          transform: scale(0.9);
-          pointer-events: none;
-        }
-
-        /* Tabla */
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
-        }
-
-        th,
-        td {
-          border: 1px solid #000;
-          padding: 4px;
-          vertical-align: middle;
-        }
-
-        thead th {
-          font-size: 11px;
-          font-weight: bold;
-          text-align: center;
-        }
-
-        thead small {
-          font-size: 9px;
-          display: block;
-        }
-
-        tbody td {
-          font-size: 12px;
-        }
-
-        td.text-center {
-          text-align: center;
-        }
-
-        /* Fila total */
-        tbody tr:last-child td {
-          font-weight: bold;
-        }
-
-        /* Botones superiores */
-        .acciones {
-          position: sticky;
-          top: 0;
-          background: #fff;
-          padding-bottom: 8px;
-          margin-bottom: 10px;
-          border-bottom: 1px solid #000;
-        }
-
-        button {
-          font-size: 12px;
-          padding: 4px 10px;
-          cursor: pointer;
-        }
-      </style>
-    </head>
-    <body>
-
-      <div class="acciones">
-        <button class="btn btn-success" onclick="descargar()">
-          ⬇ Descargar
-        </button>
-        <button class="btn btn-secondary" onclick="window.close()">
-          ❌ Cerrar
-        </button>
-      </div>
-
-      <div id="contenidoTarjeta" class="tarjeta-container">
-        ${htmlTarjeta}
-      </div>
-
-      <script>
-        function descargar() {
-          const el = document.getElementById("contenidoTarjeta");
-
-          html2pdf().set({
-            margin: 10,
-            filename: "Registro.pdf",
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: {
-              scale: 2,
-              backgroundColor: "#ffffff"
-            },
-            jsPDF: {
-              unit: "mm",
-              format: "a4",
-              orientation: "portrait"
-            }
-          }).from(el).save();
-        }
-      </script>
-
-    </body>
-    </html>
+</body>
+</html>
   `);
+
   ventana.document.close();
 }
