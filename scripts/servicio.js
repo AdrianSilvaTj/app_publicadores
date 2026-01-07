@@ -685,65 +685,56 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
   `;
 }
 
-// async function verTarjetaPublicador(id) {
-//   const anioServicio = Number(document.getElementById("anio").value);
-//   const html = await renderTarjetaPublicador(id, anioServicio);
-//   document.getElementById("div-tarjeta").innerHTML = html;
-//   const modalEl = document.getElementById("modalTarjeta");
-//   const modal = new bootstrap.Modal(modalEl);
-//   modal.show();
+// function descargarTarjeta() {
+//   // const contenido = document.getElementById("menu").innerHTML;
+//   const contenido =
+//     document.getElementsByClassName("container-fluid").innerHTML;
+//   const nombrePublicador =
+//     document.getElementById("nombre-pub")?.innerText.trim() || "Registro";
+
+//   if (!contenido || contenido.trim() === "") {
+//     return alert("No hay contenido para descargar");
+//   }
+
+//   // Creamos un contenedor "fantasma" con estilos CSS inline
+//   // para asegurar que las tablas y el texto sean visibles
+//   const worker = document.createElement("div");
+//   worker.innerHTML = `
+//     <style>
+//       body { font-family: sans-serif; padding: 20px; color: #000; background: #fff; }
+//       .tarjeta-servicio { width: 100%; }
+//       table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+//       th, td { border: 1px solid #333; padding: 6px; font-size: 11px; text-align: left; }
+//       .text-center { text-align: center; }
+//       .d-flex { display: flex; }
+//       .flex-grow-1 { flex-grow: 1; }
+//       .mb-3 { margin-bottom: 1rem; }
+//       .bg-light { background-color: #f8f9fa; border-bottom: 1px solid #ccc; }
+//       input[type="checkbox"] { transform: scale(1.2); margin-right: 5px; }
+//       .row { display: flex; flex-wrap: wrap; }
+//       .col-md-8 { width: 66%; }
+//       .col-md-4 { width: 33%; }
+//     </style>
+//     ${contenido}
+//   `;
+
+//   const opt = {
+//     margin: [10, 10],
+//     filename: `lelelele.pdf`,
+//     image: { type: "jpeg", quality: 0.98 },
+//     html2canvas: {
+//       scale: 2,
+//       useCORS: true,
+//       letterRendering: true,
+//       backgroundColor: "#ffffff",
+//     },
+//     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+//   };
+
+//   // Ejecutar sobre el objeto 'worker' que vive en memoria
+//   // html2pdf().set(opt).from(worker).save();
+//   html2pdf().set(opt).from(contenido).save();
 // }
-
-function descargarTarjeta() {
-  // const contenido = document.getElementById("menu").innerHTML;
-  const contenido =
-    document.getElementsByClassName("container-fluid").innerHTML;
-  const nombrePublicador =
-    document.getElementById("nombre-pub")?.innerText.trim() || "Registro";
-
-  if (!contenido || contenido.trim() === "") {
-    return alert("No hay contenido para descargar");
-  }
-
-  // Creamos un contenedor "fantasma" con estilos CSS inline
-  // para asegurar que las tablas y el texto sean visibles
-  const worker = document.createElement("div");
-  worker.innerHTML = `
-    <style>
-      body { font-family: sans-serif; padding: 20px; color: #000; background: #fff; }
-      .tarjeta-servicio { width: 100%; }
-      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-      th, td { border: 1px solid #333; padding: 6px; font-size: 11px; text-align: left; }
-      .text-center { text-align: center; }
-      .d-flex { display: flex; }
-      .flex-grow-1 { flex-grow: 1; }
-      .mb-3 { margin-bottom: 1rem; }
-      .bg-light { background-color: #f8f9fa; border-bottom: 1px solid #ccc; }
-      input[type="checkbox"] { transform: scale(1.2); margin-right: 5px; }
-      .row { display: flex; flex-wrap: wrap; }
-      .col-md-8 { width: 66%; }
-      .col-md-4 { width: 33%; }
-    </style>
-    ${contenido}
-  `;
-
-  const opt = {
-    margin: [10, 10],
-    filename: `lelelele.pdf`,
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      letterRendering: true,
-      backgroundColor: "#ffffff",
-    },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-  };
-
-  // Ejecutar sobre el objeto 'worker' que vive en memoria
-  // html2pdf().set(opt).from(worker).save();
-  html2pdf().set(opt).from(contenido).save();
-}
 
 async function verTarjetaPublicador(id) {
   const width = 900;
