@@ -375,3 +375,26 @@ function restaurarPosicionVista() {
 
   localStorage.removeItem("estado_vista_servicio");
 }
+
+/**
+ * Consulta una colección de Firestore con filtros opcionales
+ * y retorna los datos.
+ *
+ * @param {string} coleccion - Nombre de la colección
+ * @param {Object} filtros - Filtros opcionales { campo: valor }
+ * @returns {Promise<Array<Object>>}
+ */
+async function consultarFirebase(coleccion, filtros = {}) {
+  let query = db.collection(coleccion);
+
+  Object.entries(filtros).forEach(([campo, valor]) => {
+    if (Array.isArray(valor)) {
+      query = query.where(campo, "in", valor);
+    } else {
+      query = query.where(campo, "==", valor);
+    }
+  });
+
+  const snapshot = await query.get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}

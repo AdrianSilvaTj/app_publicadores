@@ -1,3 +1,6 @@
+// Globales
+let publicadorSel = null;
+
 async function iniciarPublicadores() {
   const config = await cargarConfiguracionGlobal();
   const grupos = config.cantidadGrupos;
@@ -209,7 +212,7 @@ async function renderPublicadoresPorGrupo(grupos) {
                     Si es precursor o<br>misionero que sirve<br>en el campo
                   </small>
                 </th>
-                <th calsss="pe-0">Notas</th>
+                <th class="pe-0">Notas</th>
                 <th></th>
               </tr>
             </thead>
@@ -492,4 +495,444 @@ async function descargarListadoPublicadores() {
 
 function actualizar() {
   actualizarColecciones(["publicadores", "servicio"]);
+}
+
+async function renderTarjetaPublicador(publicadorId, anioServicio) {
+  mostrarBanner("Procesando...", "info", true);
+  const isChecked = (cond) => (cond ? "checked" : "");
+
+  const publicadores =
+    JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
+
+  const servicios = await consultarFirebase("servicio", {
+    publicadorId,
+    anio: [anioServicio, anioServicio + 1],
+  });
+
+  const pub = (publicadorSel = publicadores.find((p) => p.id === publicadorId));
+  if (!pub) return "<p>Publicador no encontrado</p>";
+
+  // 🔹 Definición del año de servicio (septiembre → agosto)
+  const mesesServicio = [
+    { nombre: "Septiembre", mes: 9, anio: anioServicio },
+    { nombre: "Octubre", mes: 10, anio: anioServicio },
+    { nombre: "Noviembre", mes: 11, anio: anioServicio },
+    { nombre: "Diciembre", mes: 12, anio: anioServicio },
+    { nombre: "Enero", mes: 1, anio: anioServicio + 1 },
+    { nombre: "Febrero", mes: 2, anio: anioServicio + 1 },
+    { nombre: "Marzo", mes: 3, anio: anioServicio + 1 },
+    { nombre: "Abril", mes: 4, anio: anioServicio + 1 },
+    { nombre: "Mayo", mes: 5, anio: anioServicio + 1 },
+    { nombre: "Junio", mes: 6, anio: anioServicio + 1 },
+    { nombre: "Julio", mes: 7, anio: anioServicio + 1 },
+    { nombre: "Agosto", mes: 8, anio: anioServicio + 1 },
+  ];
+
+  let totalHoras = 0;
+
+  const filas = mesesServicio
+    .map(({ nombre, mes, anio }) => {
+      const reg = servicios.find((s) => s.mes === mes && s.anio === anio) || {};
+
+      totalHoras += reg.horas || 0;
+
+      return `
+        <tr>
+          <td>${nombre}</td>
+          <td class="text-center">${reg.participo ? "✓" : ""}</td>
+          <td class="text-center">${reg.cursos || ""}</td>
+          <td class="text-center">${reg.auxiliar ? "✓" : ""}</td>
+          <td class="text-center">${reg.horas || ""}</td>
+          <td>${reg.notas || ""}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  cerrarBanner();
+  return `
+  <div id="tarjeta-servicio" class="tarjeta-servicio">
+    <h5 class="text-center mb-3">
+      REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
+    </h5>
+
+    <div class="mb-2">
+
+      <!-- Nombre -->
+      <div class="d-flex align-items-center mb-1">
+        <strong class="me-2">Nombre:</strong>
+        <div id="nombre-pub" class="flex-grow-1 bg-light px-2">
+          ${pub.nombre || ""}
+        </div>
+      </div>
+
+      <!-- Fechas + Sexo + Esperanza -->
+      <div class="row d-flex justify-content-between align-items-start mb-1">
+
+        <div class="col-md-8">
+          <div>
+            <strong>Fecha de nacimiento:</strong> ${
+              pub.fechaNacimiento
+                ? dateTimeStrToAnother(
+                    pub.fechaNacimiento,
+                    "YYYY-MM-DD",
+                    "DD-MM-YYYY"
+                  )
+                : ""
+            }
+          </div>
+          <div>
+            <strong>Fecha de bautismo:</strong> ${
+              pub.fechaBautismo
+                ? dateTimeStrToAnother(
+                    pub.fechaBautismo,
+                    "YYYY-MM-DD",
+                    "DD-MM-YYYY"
+                  )
+                : pub.estadoEspiritual?.includes("No bautizado")
+                ? "No bautizado"
+                : ""
+            }
+          </div>
+        </div>
+
+        <div  class="col-md-4">
+          <label class="me-2">
+            <input type="checkbox" ${isChecked(pub.sexo === "M")}>
+            Hombre
+          </label>
+          <label>
+            <input type="checkbox" ${isChecked(pub.sexo === "F")}>
+            Mujer
+          </label>
+          <br>
+          <label class="me-2">
+            <input type="checkbox" ${isChecked(
+              pub.esperanza === "Otras ovejas"
+            )}>
+            Otras ovejas
+          </label>
+          <label>
+            <input type="checkbox" ${isChecked(pub.esperanza === "Ungido")}>
+            Ungido
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Estado espiritual -->
+      <div class="d-flex gap-3 mt-1">
+
+        <label>
+          <input type="checkbox"
+            ${isChecked(pub.estadoEspiritual?.includes("Anciano"))}>
+          Anciano
+        </label>
+
+        <label>
+          <input type="checkbox"
+            ${isChecked(pub.estadoEspiritual?.includes("Siervo ministerial"))}>
+          Siervo ministerial
+        </label>
+
+        <label>
+          <input type="checkbox"
+            ${isChecked(pub.estadoEspiritual?.includes("Precursor regular"))}>
+          Precursor regular
+        </label>
+
+        <label>
+          <input type="checkbox"
+            ${isChecked(pub.estadoEspiritual?.includes("Precursor especial"))}>
+          Precursor especial
+        </label>
+
+        <label>
+          <input type="checkbox"
+            ${isChecked(pub.estadoEspiritual?.includes("Misionero-campo"))}>
+          Misionero que sirve<br>en el campo
+        </label>
+
+      </div>
+    </div>
+
+    <table class="table table-bordered table-sm mt-3">
+      <thead>
+        <tr>
+          <th style="width:180px" class="text-center">Año de servicio<br>${
+            anioServicio + 1
+          }</th>
+          <th style="width:60px" class="text-center font-10 pe-0">Participación<br>en el ministerio</th>
+          <th style="width:60px" class="text-center font-10 pe-0">Cursos<br>bíblicos</th>
+          <th style="width:60px" class="text-center font-10 pe-0">Precursor<br>auxiliar</th>
+          <th style="width:100px" class="text-center font-10 pe-0">
+            Horas<br>
+            <small class="text-muted">
+              Si es precursor o<br>misionero que sirve<br>en el campo
+            </small>
+          </th>
+          <th class="text-center pe-0">Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filas}
+        <tr>
+          <td><strong>Total</strong></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="text-center"><strong>${totalHoras}</strong></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  `;
+}
+
+// async function verTarjetaPublicador(id) {
+//   const anioServicio = Number(document.getElementById("anio").value);
+//   const html = await renderTarjetaPublicador(id, anioServicio);
+//   document.getElementById("div-tarjeta").innerHTML = html;
+//   const modalEl = document.getElementById("modalTarjeta");
+//   const modal = new bootstrap.Modal(modalEl);
+//   modal.show();
+// }
+
+function descargarTarjeta() {
+  // const contenido = document.getElementById("menu").innerHTML;
+  const contenido =
+    document.getElementsByClassName("container-fluid").innerHTML;
+  const nombrePublicador =
+    document.getElementById("nombre-pub")?.innerText.trim() || "Registro";
+
+  if (!contenido || contenido.trim() === "") {
+    return alert("No hay contenido para descargar");
+  }
+
+  // Creamos un contenedor "fantasma" con estilos CSS inline
+  // para asegurar que las tablas y el texto sean visibles
+  const worker = document.createElement("div");
+  worker.innerHTML = `
+    <style>
+      body { font-family: sans-serif; padding: 20px; color: #000; background: #fff; }
+      .tarjeta-servicio { width: 100%; }
+      table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+      th, td { border: 1px solid #333; padding: 6px; font-size: 11px; text-align: left; }
+      .text-center { text-align: center; }
+      .d-flex { display: flex; }
+      .flex-grow-1 { flex-grow: 1; }
+      .mb-3 { margin-bottom: 1rem; }
+      .bg-light { background-color: #f8f9fa; border-bottom: 1px solid #ccc; }
+      input[type="checkbox"] { transform: scale(1.2); margin-right: 5px; }
+      .row { display: flex; flex-wrap: wrap; }
+      .col-md-8 { width: 66%; }
+      .col-md-4 { width: 33%; }
+    </style>
+    ${contenido}
+  `;
+
+  const opt = {
+    margin: [10, 10],
+    filename: `lelelele.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      letterRendering: true,
+      backgroundColor: "#ffffff",
+    },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+  };
+
+  // Ejecutar sobre el objeto 'worker' que vive en memoria
+  // html2pdf().set(opt).from(worker).save();
+  html2pdf().set(opt).from(contenido).save();
+}
+
+async function verTarjetaPublicador(id) {
+  const width = 900;
+  const height = 900;
+  const anioServicio = Number(document.getElementById("anio").value);
+  const left = (screen.width - width) / 2;
+  const top = (screen.height - height) / 2;
+
+  const ventana = window.open(
+    "",
+    "tarjetaPublicador",
+    `
+      width=${width},
+      height=${height},
+      left=${left},
+      top=${top},
+      resizable=yes,
+      scrollbars=yes,
+      toolbar=no,
+      menubar=no,
+      location=no,
+      status=no
+    `
+  );
+
+  if (!ventana) {
+    alert("Permite las ventanas emergentes para ver la tarjeta");
+    return;
+  }
+
+  const htmlTarjeta = await renderTarjetaPublicador(id, anioServicio);
+
+  ventana.document.open();
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Registro de Publicador</title>
+      <!-- html2pdf -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+      <style>
+        body {
+          margin: 0;
+          padding: 20px;
+          background: #fff;
+          font-family: Arial, Helvetica, sans-serif;
+          color: #000;
+        }
+
+        .tarjeta-servicio {
+          width: 100%;
+          font-size: 12px;
+        }
+
+        h5 {
+          text-align: center;
+          font-size: 14px;
+          margin: 0 0 10px 0;
+        }
+
+        /* Cabecera */
+        .fila-datos {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        }
+
+        .fila-datos span {
+          display: inline-block;
+        }
+
+        .bloque-checks {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px 20px;
+          font-size: 12px;
+          margin-bottom: 10px;
+        }
+
+        .bloque-checks label {
+          white-space: nowrap;
+        }
+
+        /* Checkboxes solo visuales */
+        input[type="checkbox"] {
+          transform: scale(0.9);
+          pointer-events: none;
+        }
+
+        /* Tabla */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+
+        th,
+        td {
+          border: 1px solid #000;
+          padding: 4px;
+          vertical-align: middle;
+        }
+
+        thead th {
+          font-size: 11px;
+          font-weight: bold;
+          text-align: center;
+        }
+
+        thead small {
+          font-size: 9px;
+          display: block;
+        }
+
+        tbody td {
+          font-size: 12px;
+        }
+
+        td.text-center {
+          text-align: center;
+        }
+
+        /* Fila total */
+        tbody tr:last-child td {
+          font-weight: bold;
+        }
+
+        /* Botones superiores */
+        .acciones {
+          position: sticky;
+          top: 0;
+          background: #fff;
+          padding-bottom: 8px;
+          margin-bottom: 10px;
+          border-bottom: 1px solid #000;
+        }
+
+        button {
+          font-size: 12px;
+          padding: 4px 10px;
+          cursor: pointer;
+        }
+      </style>
+    </head>
+    <body>
+
+      <div class="acciones">
+        <button class="btn btn-success" onclick="descargar()">
+          ⬇ Descargar
+        </button>
+        <button class="btn btn-secondary" onclick="window.close()">
+          ❌ Cerrar
+        </button>
+      </div>
+
+      <div id="contenidoTarjeta" class="tarjeta-container">
+        ${htmlTarjeta}
+      </div>
+
+      <script>
+        function descargar() {
+          const el = document.getElementById("contenidoTarjeta");
+
+          html2pdf().set({
+            margin: 10,
+            filename: "Registro.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              backgroundColor: "#ffffff"
+            },
+            jsPDF: {
+              unit: "mm",
+              format: "a4",
+              orientation: "portrait"
+            }
+          }).from(el).save();
+        }
+      </script>
+
+    </body>
+    </html>
+  `);
+  ventana.document.close();
 }
