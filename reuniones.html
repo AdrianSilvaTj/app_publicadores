@@ -482,12 +482,31 @@
             ></button>
           </div>
           <div class="modal-body">
-            <input
-              type="text"
-              class="form-control mb-3"
-              placeholder="Buscar..."
-              oninput="buscarPublicadorTabla(this.value)"
-            />
+            <div class="d-flex gap-3 mb-3">
+              <input
+                type="text"
+                id="texto-buscador"
+                class="form-control"
+                placeholder="Buscar..."
+                oninput="filtrarPublicador()"
+              />
+              <select
+                class="form-select"
+                id="filtro-buscador"
+                required
+                onchange="filtrarPublicador()"
+              >
+                <option value="todos" selected>Todos</option>
+                <option value="sexoM">Hombres</option>
+                <option value="sexoF">Mujeres</option>
+                <option value="Precursor regular">Precursores</option>
+                <option value="Anciano">Ancianos</option>
+                <option value="Siervo ministerial">
+                  Siervos ministeriales
+                </option>
+                <option value="No bautizado">No bautizados</option>
+              </select>
+            </div>
             <table class="table table-hover" id="tablaPublicadoresModal">
               <thead>
                 <tr>

@@ -193,7 +193,7 @@ async function renderPublicadoresPorGrupo(grupos) {
             <button class="btn btn-sm btn-outline-primary" onclick="guardarServicioGrupo(${g})">
               💾 Guardar
             </button>
-            <button class="btn btn-sm btn-outline-primary" onclick="limpiarServicioGrupo(${g})">
+            <button class="btn btn-sm btn-outline-danger" onclick="limpiarServicioGrupo(${g})">
               🧹 Limpiar
             </button>
           </div>

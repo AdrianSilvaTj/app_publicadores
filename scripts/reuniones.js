@@ -1,6 +1,8 @@
 // Variable globales
 publicadores = [];
 auxUltimasAsig = [];
+inputDestinoPublicador = null;
+filtroInput = null;
 
 function obtenerPublicador(id) {
   return publicadores.find((pub) => pub.id === id);
@@ -168,9 +170,14 @@ async function renderReuniones() {
             "YYYY-MM-DD",
             "DD-MM-YYYY"
           )}</strong>
-          <button class="btn btn-sm btn-outline-secondary" onclick="editarReunion('${
-            reunion.id
-          }')">✏️ Editar</button>
+          <div>
+            <button class="btn btn-sm btn-outline-primary" onclick="editarReunion('${
+              reunion.id
+            }')">✏️ Editar</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="eliminarReunion('${
+              reunion.id
+            }')">🗑 Eliminar</button>
+          </div>
         </div>
         <div class="card-body p-0">
           ${renderDetalleReunion(reunion)}
@@ -339,19 +346,15 @@ function agregarSeccionNVC(titulo = null, encargado = null) {
   divNVC.appendChild(nuevaSeccion);
 }
 
-let inputDestinoPublicador = null;
-async function abrirSelectorPublicador(inputId, filtro) {
-  inputDestinoPublicador = document.getElementById(inputId);
-
-  publicadores = await obtenerDataColeccion("publicadores");
-  publicadores = publicadores.filter((pub) =>
-    pub.privilegiosCongregacion.includes(filtro)
+function renderPublicadoresEnModal(publicadoresFiltr) {
+  publicadoresFiltr = publicadoresFiltr.filter((pub) =>
+    pub.privilegiosCongregacion.includes(filtroInput)
   );
-  publicadores = ordenarPublicadores();
+  publicadoresFiltr = ordenarPublicadores();
   const tbody = document.querySelector("#tablaPublicadoresModal tbody");
   tbody.innerHTML = "";
 
-  publicadores.forEach((pub) => {
+  publicadoresFiltr.forEach((pub) => {
     let asignStr = "Sin asignaciones";
     let asigEstaReu = auxUltimasAsig.find((x) => x.id === pub.id);
     if (asigEstaReu) {
@@ -380,13 +383,13 @@ async function abrirSelectorPublicador(inputId, filtro) {
         inputDestinoPublicador.value = pub.nombre;
         inputDestinoPublicador.dataset.id = pub.id;
         auxUltimasAsig = auxUltimasAsig.filter(
-          (asig) => asig.nueva.asignacion !== inputId
+          (asig) => asig.nueva.asignacion !== inputDestinoPublicador.id
         );
         auxUltimasAsig.push({
           id: pub.id,
           nueva: {
             fecha: document.getElementById("fecha").value,
-            asignacion: inputId,
+            asignacion: inputDestinoPublicador.id,
           },
         });
       }
@@ -396,6 +399,35 @@ async function abrirSelectorPublicador(inputId, filtro) {
     });
     tbody.appendChild(tr);
   });
+}
+
+async function filtrarPublicador() {
+  let buscar = document.getElementById("texto-buscador").value.toLowerCase();
+  let filtro = document.getElementById("filtro-buscador").value;
+  publicadores = await obtenerDataColeccion("publicadores");
+  if (buscar) {
+    publicadores = publicadores.filter((pub) =>
+      pub.nombre.toLowerCase().includes(buscar)
+    );
+  }
+  if (filtro !== "todos") {
+    publicadores = publicadores.filter((pub) => {
+      return filtro === "sexoM"
+        ? pub.sexo === "M"
+        : filtro === "sexoF"
+        ? pub.sexo === "F"
+        : (pub.estadoEspiritual || []).includes(filtro);
+    });
+  }
+  renderPublicadoresEnModal(publicadores);
+}
+
+async function abrirSelectorPublicador(inputId, filtro) {
+  inputDestinoPublicador = document.getElementById(inputId);
+  filtroInput = filtro;
+  publicadores = await obtenerDataColeccion("publicadores");
+
+  renderPublicadoresEnModal(publicadores);
   new bootstrap.Modal(
     document.getElementById("modalSeleccionPublicador")
   ).show();
@@ -568,6 +600,34 @@ async function editarReunion(id) {
   } catch (err) {
     console.error("Error al editar reunión:", err);
     alert("❌ Ocurrió un error al cargar los datos de la reunión.");
+  }
+}
+
+async function eliminarReunion(id) {
+  let reuniones = await obtenerDataColeccion("reuniones");
+  const reunion = reuniones.find((reu) => reu.id === id);
+  if (!reunion) {
+    alert("La reunión no existe");
+    return;
+  }
+  const confirmar = confirm(
+    `⚠️ ¿Estás seguro?\n\nSe eliminará la reunión del: ` +
+      `${dateTimeStrToAnother(reunion.fecha, "YYYY-MM-DD", "DD-MM-YYYY")}\n\n` +
+      `Esta acción no se puede deshacer.`
+  );
+  if (!confirmar) return;
+  try {
+    mostrarBanner("Eliminando...", "info", true);
+    await db.collection("reuniones").doc(id).delete();
+
+    reunionesLocal = reuniones.filter((reu) => reu.id !== id);
+    localStorage.setItem("firebase_reuniones", JSON.stringify(reunionesLocal));
+
+    mostrarBanner("Reunión eliminada correctamente", "success");
+    location.reload();
+  } catch (error) {
+    console.error("Error eliminando reunión:", error);
+    mostrarBanner("Error al eliminar la reunión", "error");
   }
 }
 
