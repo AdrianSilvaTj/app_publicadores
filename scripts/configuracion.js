@@ -182,6 +182,39 @@ document
     }
   });
 
+document
+  .getElementById("archivoExcelServicio")
+  .addEventListener("change", async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      let servicio = XLSX.utils.sheet_to_json(sheet);
+
+      if (!Array.isArray(servicio) || servicio.length === 0) {
+        mostrarBanner("❌ El archivo no contiene datos válidos.", "danger");
+        return;
+      }
+
+      // Guardar temporalmente en localStorage (igual que publicadores)
+      localStorage.setItem("import_servicio", JSON.stringify(servicio));
+
+      mostrarBanner(
+        `✅ ${servicio.length} registros de servicio cargados del Excel`,
+        "success",
+        false,
+        4000
+      );
+    } catch (err) {
+      console.error("❌ Error al leer Excel de servicio:", err);
+      mostrarBanner("❌ Error al procesar el archivo Excel", "danger");
+    }
+  });
+
 async function guardarPublicadoresImportados() {
   const data = localStorage.getItem("import_publicadores");
   if (!data) {
@@ -329,5 +362,140 @@ function verificarUsuario() {
     user.toLowerCase() === "adrian.silva.tj@gmail.com"
       ? seccion.removeAttribute("hidden")
       : seccion.setAttribute("hidden", true);
+  }
+}
+
+async function cargarServicioDesdeExcel(filasExcel) {
+  const publicadores = JSON.parse(
+    localStorage.getItem("firebase_publicadores") || "[]"
+  );
+
+  if (!publicadores.length) {
+    return alert("No hay publicadores en localStorage");
+  }
+
+  mostrarBanner("Cargando servicio desde Excel...", "info", true);
+
+  const batch = db.batch();
+  let guardados = 0;
+  let omitidos = 0;
+
+  filasExcel.forEach((row) => {
+    const nombreExcel = (row.publicador || "").toString().toLowerCase().trim();
+    if (!nombreExcel) return;
+
+    // 🔍 Buscar publicador por nombre
+    const pub = publicadores.find((p) =>
+      p.nombre.toLowerCase().includes(nombreExcel)
+    );
+
+    if (!pub) {
+      console.log(`No se pudo crear el servicio de: ${nombreExcel}`);
+      omitidos++;
+      return; // no se guarda
+    }
+
+    const publicadorId = pub.id;
+    const grupo = pub.grupo;
+
+    const mes = Number(row.mes);
+    const anio = Number(row.anio);
+
+    if (!mes || !anio) {
+      omitidos++;
+      return;
+    }
+
+    // 🧠 Reglas de horas / auxiliar
+    const horasAux = Number(row.horas_auxiliar) || 0;
+    const horasNormal = Number(row.horas) || 0;
+
+    const auxiliar = horasAux > 0;
+    const horas = auxiliar ? horasAux : horasNormal;
+
+    const docId = `${publicadorId}_${grupo}_${anio}_${mes}`;
+    const ref = db.collection("servicio").doc(docId);
+    const participo = String(row.participo).toLowerCase() === "si";
+
+    const data = {
+      publicadorId,
+      grupo,
+      mes,
+      anio,
+      participo,
+      cursos: Number(row.cursos) || 0,
+      auxiliar,
+      horas,
+      notas: !participo ? "No participó" : "",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    batch.set(ref, data, { merge: true });
+    guardados++;
+  });
+
+  await batch.commit();
+
+  mostrarBanner(
+    `✅ Servicio cargado: ${guardados} guardados, ${omitidos} omitidos`,
+    "success",
+    false,
+    4000
+  );
+}
+
+async function guardarServicioImportados() {
+  const data = localStorage.getItem("import_servicio");
+
+  if (!data) {
+    mostrarBanner(
+      "⚠️ No hay datos de servicio importados",
+      "warning",
+      false,
+      3000
+    );
+    return;
+  }
+
+  const filasExcel = JSON.parse(data);
+
+  try {
+    await cargarServicioDesdeExcel(filasExcel);
+
+    localStorage.removeItem("import_servicio");
+    document.getElementById("archivoExcelServicio").value = "";
+  } catch (err) {
+    console.error("❌ Error al guardar servicio:", err);
+    mostrarBanner("❌ Error al guardar servicio", "danger");
+  }
+}
+
+async function reiniciarServicio() {
+  const confirmar = confirm(
+    "⚠️ ¿Estás seguro de que deseas eliminar TODOS los registros de servicio?"
+  );
+  if (!confirmar) return;
+
+  try {
+    mostrarBanner("Eliminando servicio...", "warning", true);
+
+    const snapshot = await db.collection("servicio").get();
+    const promesas = [];
+
+    snapshot.forEach((doc) => {
+      promesas.push(db.collection("servicio").doc(doc.id).delete());
+    });
+
+    await Promise.all(promesas);
+
+    mostrarBanner(
+      "✅ Servicio eliminado correctamente",
+      "success",
+      false,
+      4000
+    );
+  } catch (err) {
+    console.error("❌ Error al reiniciar servicio:", err);
+    mostrarBanner("❌ Error al eliminar servicio", "danger");
   }
 }
