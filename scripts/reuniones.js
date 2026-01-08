@@ -350,7 +350,7 @@ function renderPublicadoresEnModal(publicadoresFiltr) {
   publicadoresFiltr = publicadoresFiltr.filter((pub) =>
     pub.privilegiosCongregacion.includes(filtroInput)
   );
-  publicadoresFiltr = ordenarPublicadores();
+  publicadoresFiltr = ordenarPublicadores(publicadoresFiltr);
   const tbody = document.querySelector("#tablaPublicadoresModal tbody");
   tbody.innerHTML = "";
 
@@ -363,11 +363,15 @@ function renderPublicadoresEnModal(publicadoresFiltr) {
       )}<span onclick="mostrarUltimasAsig('${pub}', ${asigEstaReu})" title="Ver últimas asignaciones">📜</span>`;
     } else if (pub.ultAsignaciones?.length > 0) {
       asignStr = `
-        ${dateTimeStrToAnother(
-          pub.ultAsignaciones[0].fecha,
-          "YYYY-MM-DD",
-          "DD-MM-YYYY"
-        )}
+        ${
+          pub.ultAsignaciones[0].fecha
+            ? dateTimeStrToAnother(
+                pub.ultAsignaciones[0].fecha,
+                "YYYY-MM-DD",
+                "DD-MM-YYYY"
+              )
+            : "Sin asignaciones"
+        }
         - ${descripAsignacion(pub.ultAsignaciones[0].asignacion)}
         <span onclick="mostrarUltimasAsig('${pub}')" title="Ver últimas asignaciones">🔼</span>`;
     }
@@ -404,14 +408,14 @@ function renderPublicadoresEnModal(publicadoresFiltr) {
 async function filtrarPublicador() {
   let buscar = document.getElementById("texto-buscador").value.toLowerCase();
   let filtro = document.getElementById("filtro-buscador").value;
-  publicadores = await obtenerDataColeccion("publicadores");
+  let publicadoresFiltr = await obtenerDataColeccion("publicadores");
   if (buscar) {
-    publicadores = publicadores.filter((pub) =>
+    publicadoresFiltr = publicadoresFiltr.filter((pub) =>
       pub.nombre.toLowerCase().includes(buscar)
     );
   }
   if (filtro !== "todos") {
-    publicadores = publicadores.filter((pub) => {
+    publicadoresFiltr = publicadoresFiltr.filter((pub) => {
       return filtro === "sexoM"
         ? pub.sexo === "M"
         : filtro === "sexoF"
@@ -419,15 +423,17 @@ async function filtrarPublicador() {
         : (pub.estadoEspiritual || []).includes(filtro);
     });
   }
-  renderPublicadoresEnModal(publicadores);
+
+  renderPublicadoresEnModal(publicadoresFiltr);
 }
 
 async function abrirSelectorPublicador(inputId, filtro) {
   inputDestinoPublicador = document.getElementById(inputId);
   filtroInput = filtro;
   publicadores = await obtenerDataColeccion("publicadores");
-
   renderPublicadoresEnModal(publicadores);
+  document.getElementById("texto-buscador").value = "";
+  document.getElementById("filtro-buscador").value = "todos";
   new bootstrap.Modal(
     document.getElementById("modalSeleccionPublicador")
   ).show();
@@ -667,30 +673,39 @@ async function agregarUltimasAsign(asignaciones) {
   console.log("✅ Asignaciones actualizadas y ordenadas en batch");
 }
 
-function ordenarPublicadores() {
-  return [...publicadores].sort((a, b) => {
+function ordenarPublicadores(publicadoresAux = publicadores) {
+  return [...publicadoresAux].sort((a, b) => {
     const enAuxA = auxUltimasAsig.some((x) => x.id === a.id);
     const enAuxB = auxUltimasAsig.some((x) => x.id === b.id);
 
-    // 1️⃣ Si alguno está en auxUltimasAsig -> mandarlos al final
-    if (enAuxA && !enAuxB) return 1; // A va después
-    if (!enAuxA && enAuxB) return -1; // B va después
-    if (enAuxA && enAuxB) return 0; // ambos iguales (los dos últimos)
+    // 1️⃣ Los de auxUltimasAsig al final
+    if (enAuxA && !enAuxB) return 1;
+    if (!enAuxA && enAuxB) return -1;
+    if (enAuxA && enAuxB) return 0;
 
-    // 2️⃣ Verificar ultAsignaciones
+    // 2️⃣ Últimas asignaciones
     const ultAsigA = a.ultAsignaciones?.[0];
     const ultAsigB = b.ultAsignaciones?.[0];
 
-    // sin asignaciones -> primero
     if (!ultAsigA && ultAsigB) return -1;
     if (ultAsigA && !ultAsigB) return 1;
     if (!ultAsigA && !ultAsigB) return 0;
 
-    // 3️⃣ Comparar fechas de la posición 0
-    const fechaA = stringToDateTime(ultAsigA.fecha, "YYYY-MM-DD");
-    const fechaB = stringToDateTime(ultAsigB.fecha, "YYYY-MM-DD");
+    // 3️⃣ Fechas seguras
+    const fechaA = ultAsigA?.fecha
+      ? stringToDateTime(ultAsigA.fecha, "YYYY-MM-DD")
+      : null;
 
-    // Más vieja primero (ascendente)
+    const fechaB = ultAsigB?.fecha
+      ? stringToDateTime(ultAsigB.fecha, "YYYY-MM-DD")
+      : null;
+
+    // fechas vacías primero
+    if (!fechaA && fechaB) return -1;
+    if (fechaA && !fechaB) return 1;
+    if (!fechaA && !fechaB) return 0;
+
+    // más vieja primero
     return fechaA - fechaB;
   });
 }
