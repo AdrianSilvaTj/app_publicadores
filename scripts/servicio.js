@@ -28,7 +28,7 @@ async function iniciarPublicadores() {
   restaurarFiltrosVista();
 
   // 🔄 Render inicial
-  renderPublicadoresPorGrupo(grupos);
+  await renderPublicadoresPorGrupo(grupos);
 
   // 🔁 Eventos
   document.getElementById("anio").addEventListener("change", () => {
@@ -158,16 +158,17 @@ async function renderPublicadoresPorGrupo(grupos) {
   const anio = Number(document.getElementById("anio").value);
   const contenedor = document.getElementById("tablasGrupos");
   contenedor.innerHTML = ""; // Limpiar contenido anterior
-
-  mostrarBanner("Cargando información...", "info", true);
-  // Intentar leer desde localStorage
-  const publicadoresCache = localStorage.getItem("firebase_publicadores");
+  let publicadoresCache = localStorage.getItem("firebase_publicadores");
   let publicadores = [];
   let pubsServicio = [];
   let actualizarCole = [{ nombre: "servicio", filtros: { mes, anio } }];
+
+  mostrarBanner("Cargando información...", "info", true);
   !publicadoresCache && actualizarCole.push("publicadores");
   await actualizarColecciones(actualizarCole, true);
   const pubsServicioCache = localStorage.getItem("firebase_servicio");
+  !publicadoresCache &&
+    (publicadoresCache = localStorage.getItem("firebase_publicadores"));
   if (publicadoresCache && pubsServicioCache) {
     publicadores = JSON.parse(publicadoresCache);
     pubsServicio = JSON.parse(pubsServicioCache);
