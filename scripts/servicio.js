@@ -1,5 +1,6 @@
 // Globales
 let publicadorSel = null;
+let ventanaTarjetas = null;
 
 async function iniciarPublicadores() {
   const config = await cargarConfiguracionGlobal();
@@ -40,6 +41,24 @@ async function iniciarPublicadores() {
     localStorage.removeItem("firebase_servicio");
     renderPublicadoresPorGrupo(grupos);
   });
+
+  setTimeout(() => {
+    const groupSelect = document.getElementById("grupo-descarga");
+    groupSelect.innerHTML = "";
+    let option = document.createElement("option");
+    option.value = "0";
+    option.textContent = "Todos";
+    groupSelect.appendChild(option);
+
+    for (let grupo = 1; grupo <= grupos; grupo++) {
+      option = document.createElement("option");
+      option.value = grupo;
+      option.textContent = grupo;
+      groupSelect.appendChild(option);
+    }
+    const selectAnioDesc = document.getElementById("anio-descarga");
+    selectAnioDesc.value = anio;
+  }, 300);
 }
 
 function getClaseFila(pub, grupo) {
@@ -554,9 +573,11 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
   return `
   <div id="tarjeta-servicio" class="tarjeta-servicio">
 
-    <h3 class="titulo">
-      REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
-    </h3>
+    <div>
+      <h3 class="titulo">
+        REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
+      </h3>
+    </div>
 
     <!-- ===== DATOS DEL PUBLICADOR ===== -->
     <div class="datos-publicador">
@@ -564,7 +585,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
       <!-- Nombre -->
       <div class="fila nombre">
         <span class="label">Nombre:</span>
-        <span class="valor">${pub.nombre || ""}</span>
+        <span id="nombre-pub" class="valor">${pub.nombre || ""}</span>
       </div>
 
       <!-- Fechas + Sexo / Esperanza -->
@@ -665,7 +686,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
               en el campo
             </small>
           </th>
-          <th>Notas</th>
+          <th style="width:260px">Notas</th>
         </tr>
       </thead>
 
@@ -685,57 +706,6 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
   </div>
   `;
 }
-
-// function descargarTarjeta() {
-//   // const contenido = document.getElementById("menu").innerHTML;
-//   const contenido =
-//     document.getElementsByClassName("container-fluid").innerHTML;
-//   const nombrePublicador =
-//     document.getElementById("nombre-pub")?.innerText.trim() || "Registro";
-
-//   if (!contenido || contenido.trim() === "") {
-//     return alert("No hay contenido para descargar");
-//   }
-
-//   // Creamos un contenedor "fantasma" con estilos CSS inline
-//   // para asegurar que las tablas y el texto sean visibles
-//   const worker = document.createElement("div");
-//   worker.innerHTML = `
-//     <style>
-//       body { font-family: sans-serif; padding: 20px; color: #000; background: #fff; }
-//       .tarjeta-servicio { width: 100%; }
-//       table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-//       th, td { border: 1px solid #333; padding: 6px; font-size: 11px; text-align: left; }
-//       .text-center { text-align: center; }
-//       .d-flex { display: flex; }
-//       .flex-grow-1 { flex-grow: 1; }
-//       .mb-3 { margin-bottom: 1rem; }
-//       .bg-light { background-color: #f8f9fa; border-bottom: 1px solid #ccc; }
-//       input[type="checkbox"] { transform: scale(1.2); margin-right: 5px; }
-//       .row { display: flex; flex-wrap: wrap; }
-//       .col-md-8 { width: 66%; }
-//       .col-md-4 { width: 33%; }
-//     </style>
-//     ${contenido}
-//   `;
-
-//   const opt = {
-//     margin: [10, 10],
-//     filename: `lelelele.pdf`,
-//     image: { type: "jpeg", quality: 0.98 },
-//     html2canvas: {
-//       scale: 2,
-//       useCORS: true,
-//       letterRendering: true,
-//       backgroundColor: "#ffffff",
-//     },
-//     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-//   };
-
-//   // Ejecutar sobre el objeto 'worker' que vive en memoria
-//   // html2pdf().set(opt).from(worker).save();
-//   html2pdf().set(opt).from(contenido).save();
-// }
 
 async function verTarjetaPublicador(id) {
   const width = 900;
@@ -771,53 +741,226 @@ async function verTarjetaPublicador(id) {
 
   ventana.document.open();
   ventana.document.write(`
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Registro de Publicador</title>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Registro de Publicador</title>
 
-  <!-- CSS PROPIO (SIN BOOTSTRAP) -->
-  <link rel="stylesheet" href="styles/tarjeta.css">
+      <!-- CSS PROPIO (SIN BOOTSTRAP) -->
+      <link rel="stylesheet" href="styles/tarjeta.css">
 
-  <!-- html2pdf -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
+      <!-- html2pdf -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    </head>
+    <body>
 
-  <div class="acciones">
-    <button class="btn" onclick="descargar()">⬇ Descargar</button>
-    <button class="btn" onclick="window.close()">❌ Cerrar</button>
-  </div>
+      <div class="acciones">
+        <button class="btn" onclick="descargar()">⬇ Descargar</button>
+        <button class="btn" onclick="window.close()">❌ Cerrar</button>
+      </div>
 
-  <div id="contenidoTarjeta">
-    ${htmlTarjeta}
-  </div>
+      <div id="contenidoTarjeta">
+        ${htmlTarjeta}
+      </div>
 
-  <script>
-    function descargar() {
-      const el = document.getElementById("contenidoTarjeta");
+      <script>
+        function descargar() {
+          const el = document.getElementById("contenidoTarjeta");
 
-      html2pdf().set({
-        margin: 10,
-        filename: "Registro.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          backgroundColor: "#ffffff"
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait"
+          html2pdf().set({
+            margin: 10,
+            filename: "Registro ${publicadorSel.nombre} ${
+    anioServicio + 1
+  }.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              backgroundColor: "#ffffff"
+            },
+            jsPDF: {
+              unit: "mm",
+              format: "a4",
+              orientation: "portrait"
+            }
+          }).from(el).save();
         }
-      }).from(el).save();
-    }
-  </script>
+      </script>
 
-</body>
-</html>
+    </body>
+    </html>
   `);
 
   ventana.document.close();
+}
+
+async function verTarjetasGrupo(grupo, anioServicio) {
+  const ventana = obtenerVentanaTarjetas();
+
+  if (!ventana) {
+    alert("Permite las ventanas emergentes");
+    return;
+  }
+
+  // Pantalla de carga
+  ventana.document.open();
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Generando tarjetas...</title>
+      <style>
+        body {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          font-family: Arial, sans-serif;
+          background: #f8f9fa;
+        }
+        .contador {
+          margin-top: 10px;
+          font-size: 1.1rem;
+          color: #555;
+        }
+      </style>
+    </head>
+    <body>
+      <h3>⏳ Generando tarjetas del grupo ${grupo}</h3>
+      <div id="contador" class="contador">Preparando...</div>
+    </body>
+    </html>
+  `);
+  ventana.document.close();
+
+  // Contenido
+  let publicadores = JSON.parse(
+    localStorage.getItem("firebase_publicadores") || "[]"
+  ).filter((p) => Number(p.grupo) === Number(grupo));
+
+  publicadores = orderArray(publicadores, "nombre");
+
+  if (!publicadores.length) {
+    ventana.close();
+    alert("No hay publicadores en este grupo");
+    return;
+  }
+
+  const total = publicadores.length;
+  let htmlTarjetas = "";
+
+  // Contador
+  for (let i = 0; i < total; i++) {
+    const pub = publicadores[i];
+
+    // actualizar contador visible
+    const contadorEl = ventana.document.getElementById("contador");
+    if (contadorEl) {
+      contadorEl.textContent = `Generando tarjeta ${i + 1} de ${total}…`;
+    }
+
+    const html = await renderTarjetaPublicador(pub.id, anioServicio);
+    htmlTarjetas += `
+      <div class="tarjeta">
+        ${html}
+      </div>
+    `;
+  }
+
+  // Renderizar todo
+  ventana.document.open();
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Tarjetas Grupo ${grupo}</title>
+
+      <link rel="stylesheet" href="styles/tarjeta.css">
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    </head>
+    <body>
+
+      <div class="acciones">
+        <button class="btn" onclick="descargar()">⬇ Descargar</button>
+        <button class="btn" onclick="window.close()">❌ Cerrar</button>
+      </div>
+
+      <div id="contenidoTarjetas">
+        ${htmlTarjetas}
+      </div>
+
+      <script>
+        function descargar() {
+          const el = document.getElementById("contenidoTarjetas");
+
+          html2pdf().set({
+            margin: 10,
+            filename: "Tarjetas Grupo ${grupo} ${anioServicio + 1}.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              backgroundColor: "#ffffff"
+            },
+            pagebreak: {
+              mode: ["avoid-all", "css", "legacy"],
+              after: ".tarjeta" // 👈 CLAVE ABSOLUTA
+            },
+            jsPDF: {
+              unit: "mm",
+              format: "b5",
+              orientation: "landscape"
+            }
+          }).from(el).save()
+        }
+      </script>
+
+    </body>
+    </html>
+  `);
+  ventana.document.close();
+}
+
+function obtenerVentanaTarjetas(width = 1000, height = 900) {
+  // Si existe y no está cerrada → reutilizar
+  if (ventanaTarjetas && !ventanaTarjetas.closed) {
+    ventanaTarjetas.focus();
+    return ventanaTarjetas;
+  }
+
+  // Si no existe o está cerrada → crear nueva
+  const left = (screen.width - width) / 2;
+  const top = (screen.height - height) / 2;
+
+  ventanaTarjetas = window.open(
+    "",
+    "tarjetasGrupo",
+    `
+      width=${width},
+      height=${height},
+      left=${left},
+      top=${top},
+      resizable=yes,
+      scrollbars=yes
+    `
+  );
+
+  return ventanaTarjetas;
+}
+
+function descargarTarjetas() {
+  const anioServicio = Number(
+    document.getElementById("anio-descarga").value - 1
+  );
+  const grupo = Number(document.getElementById("grupo-descarga").value);
+
+  if (!anioServicio || !grupo) {
+    alert("Selecciona año y grupo");
+    return;
+  }
+
+  verTarjetasGrupo(grupo, anioServicio);
 }

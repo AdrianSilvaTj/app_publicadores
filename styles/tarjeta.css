@@ -96,14 +96,14 @@ input[type="checkbox"] {
 
 /* ===== TABLA ===== */
 .tabla-servicio {
-  width: 100%;
+  width: 830px;
   border-collapse: collapse;
   margin-top: 10px;
 }
 
 .tabla-servicio th,
 .tabla-servicio td {
-  border: 1px solid #000;
+  border: 1px solid #726868;
   padding: 4px;
   vertical-align: middle;
 }
@@ -135,10 +135,18 @@ input[type="checkbox"] {
 }
 
 .btn {
-    background: #0d6efd;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    padding: 10px;
+  background: #0d6efd;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 10px;
+  cursor: pointer
 }
+
+.btn:hover {
+  background: #0b5ed7;
+}
+
+
+
 

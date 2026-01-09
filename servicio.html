@@ -32,10 +32,11 @@
         <div class="d-flex gap-1">
           <button
             class="btn btn-primary d-flex align-items-center"
-            onclick="descargarListadoPublicadores()"
-            title="Descargar listado"
+            title="Descargar tarjetas"
+            data-bs-toggle="modal"
+            data-bs-target="#modalDescargarTarjetas"
           >
-            <span class="me-2 d-none d-sm-inline">📄 Descargar listado</span>
+            <span class="me-2 d-none d-sm-inline">📄 Descargar tarjetas</span>
             <span class="d-inline d-sm-none">📄</span>
           </button>
           <button
@@ -101,20 +102,20 @@
 
       <div id="tablasGrupos" class="grid-2"></div>
 
-      <!-- Modal Tarjeta de publicador -->
+      <!-- Modal descargar tarjetas -->
       <div
         class="modal fade"
-        id="modalTarjeta"
+        id="modalDescargarTarjetas"
         tabindex="-1"
-        aria-labelledby="modalTarjetaLabel"
+        aria-labelledby="modalDescargarTarjetasLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <section id="formPublicador" data-edicion-id="">
               <div class="modal-header main">
-                <h5 class="modal-title" id="modalTarjetaLabel">
-                  👁 Registro de publicador
+                <h5 class="modal-title" id="modalDescargarTarjetasLabel">
+                  📄 Seleccione los datos
                 </h5>
                 <button
                   type="button"
@@ -124,12 +125,31 @@
                 ></button>
               </div>
               <div class="modal-body">
-                <div id="div-tarjeta"></div>
+                <div>
+                  <label for="anio-descarga" class="form-label"
+                    >Año <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    class="form-select"
+                    id="anio-descarga"
+                    required
+                  ></select>
+                </div>
+                <div class="mb-3">
+                  <label for="grupo-descarga" class="form-label"
+                    >Grupo <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    class="form-select"
+                    id="grupo-descarga"
+                    required
+                  ></select>
+                </div>
 
                 <div class="modal-footer p-0 pt-2">
                   <button
                     type="button"
-                    onclick="descargarTarjeta()"
+                    onclick="descargarTarjetas()"
                     class="btn btn-success"
                   >
                     ⬇ Descargar
@@ -151,12 +171,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/docx@9.0.3/build/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="main.js"></script>
     <script src="scripts/date-functions.js"></script>
+    <script src="scripts/utils-functions.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         await cargarMenuYScripts();
         cargarAniosSelect("anio");
+        cargarAniosSelect("anio-descarga");
         cargarMesesSelect("mes");
         verificarSesionActiva();
         iniciarPublicadores();
