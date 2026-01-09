@@ -41,6 +41,14 @@
           </button>
           <button
             class="btn btn-primary d-flex align-items-center"
+            title="Totales mes"
+            onclick="mostrarTotales()"
+          >
+            <span class="me-2 d-none d-sm-inline">📊 Totales mes</span>
+            <span class="d-inline d-sm-none">📊</span>
+          </button>
+          <button
+            class="btn btn-primary d-flex align-items-center"
             onclick="actualizar()"
             title="Actualizar información"
           >
@@ -161,6 +169,99 @@
                   >
                     ❌ Cancelar
                   </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal totales -->
+      <div
+        class="modal fade"
+        id="modalTotales"
+        tabindex="-1"
+        aria-labelledby="modalTotalesLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <section id="formPublicador" data-edicion-id="">
+              <div class="modal-header main">
+                <h5 class="modal-title" id="modalTotalesLabel">
+                  📊 Totales mes
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Cerrar"
+                ></button>
+              </div>
+              <div class="modal-body totales-modal">
+                <div class="total-card main">
+                  <div>
+                    <small>Activos</small>
+                    <strong id="totalActivos"></strong>
+                  </div>
+                </div>
+
+                <div class="total-card">
+                  <div>
+                    <small>Asistencia fin de semana</small>
+                    <strong id="totalAsistencia"></strong>
+                  </div>
+                </div>
+
+                <hr />
+
+                <h6 class="section-title">🔵 Publicadores</h6>
+                <div class="row-line">
+                  <span>Informes</span>
+                  <b id="totalPubli"></b>
+                </div>
+                <div class="row-line">
+                  <span>Cursos</span>
+                  <b id="totalCursosPubli"></b>
+                </div>
+
+                <hr />
+
+                <h6 class="section-title">🟡 Auxiliares</h6>
+                <div class="row-line">
+                  <span>Informes</span>
+                  <b id="totalAuxi"></b>
+                </div>
+                <div class="row-line">
+                  <span>Horas</span>
+                  <b id="totalHorasAuxi"></b>
+                </div>
+                <div class="row-line">
+                  <span>Cursos</span>
+                  <b id="totalCursosAuxi"></b>
+                </div>
+
+                <hr />
+
+                <h6 class="section-title">🔴 Regulares</h6>
+                <div class="row-line">
+                  <span>Informes</span>
+                  <b id="totalRegul"></b>
+                </div>
+                <div class="row-line">
+                  <span>Horas</span>
+                  <b id="totalHorasRegul"></b>
+                </div>
+                <div class="row-line">
+                  <span>Cursos</span>
+                  <b id="totalCursosRegul"></b>
+                </div>
+
+                <hr />
+
+                <div class="row-line irregular">
+                  <span>⚠️ Irregulares</span>
+                  <b id="totalIrregul"></b>
                 </div>
               </div>
             </section>

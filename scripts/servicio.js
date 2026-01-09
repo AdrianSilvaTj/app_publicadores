@@ -45,10 +45,6 @@ async function iniciarPublicadores() {
   setTimeout(() => {
     const groupSelect = document.getElementById("grupo-descarga");
     groupSelect.innerHTML = "";
-    let option = document.createElement("option");
-    option.value = "0";
-    option.textContent = "Todos";
-    groupSelect.appendChild(option);
 
     for (let grupo = 1; grupo <= grupos; grupo++) {
       option = document.createElement("option");
@@ -970,4 +966,86 @@ function descargarTarjetas() {
   }
 
   verTarjetasGrupo(grupo, anioServicio);
+}
+
+async function mostrarTotales() {
+  const publicadores = await obtenerDataColeccion("publicadores");
+  const servicio = await obtenerDataColeccion("servicio");
+
+  // Filtros base
+  const activos = publicadores.filter(
+    (p) => !(p.estadoEspiritual || []).includes("Inactivo")
+  );
+  const inactivosId = publicadores
+    .filter((p) => (p.estadoEspiritual || []).includes("Inactivo"))
+    .map((p) => p.id);
+  const informes = servicio.filter((s) => s.participo);
+  const irregulares = servicio.filter(
+    (s) => !s.participo && !inactivosId.includes(s.publicadorId)
+  );
+  const auxiliares = servicio.filter((s) => s.auxiliar);
+
+  const regularesId = publicadores
+    .filter((p) => (p.estadoEspiritual || []).includes("Precursor regular"))
+    .map((p) => p.id);
+
+  const regulares = servicio.filter((s) =>
+    regularesId.includes(s.publicadorId)
+  );
+
+  // Cálculos generales
+  const totalActivos = activos.length;
+  const promedioAsistencia = servicio.length
+    ? Math.round((informes.length / servicio.length) * 100)
+    : 0;
+
+  // Publicadores
+  const publicadoresServicio = servicio.filter(
+    (s) => !s.auxiliar && !regularesId.includes(s.publicadorId)
+  );
+
+  const totalPubli = publicadoresServicio.filter((s) => s.participo).length;
+  const totalCursosPubli = publicadoresServicio.reduce(
+    (acc, s) => acc + (s.cursos || 0),
+    0
+  );
+
+  // Auxiliares
+  const totalAuxi = auxiliares.filter((s) => s.participo).length;
+  const totalHorasAuxi = auxiliares.reduce((acc, s) => acc + (s.horas || 0), 0);
+  const totalCursosAuxi = auxiliares.reduce(
+    (acc, s) => acc + (s.cursos || 0),
+    0
+  );
+
+  // Regulares
+  const totalRegul = regulares.filter((s) => s.participo).length;
+  const totalHorasRegul = regulares.reduce((acc, s) => acc + (s.horas || 0), 0);
+  const totalCursosRegul = regulares.reduce(
+    (acc, s) => acc + (s.cursos || 0),
+    0
+  );
+
+  const totalIrregul = irregulares.length;
+
+  // Mostrar en modal
+  document.getElementById("totalActivos").textContent = totalActivos;
+  document.getElementById("totalAsistencia").textContent =
+    promedioAsistencia + "%";
+
+  document.getElementById("totalPubli").textContent = totalPubli;
+  document.getElementById("totalCursosPubli").textContent = totalCursosPubli;
+
+  document.getElementById("totalAuxi").textContent = totalAuxi;
+  document.getElementById("totalHorasAuxi").textContent = totalHorasAuxi;
+  document.getElementById("totalCursosAuxi").textContent = totalCursosAuxi;
+
+  document.getElementById("totalRegul").textContent = totalRegul;
+  document.getElementById("totalHorasRegul").textContent = totalHorasRegul;
+  document.getElementById("totalCursosRegul").textContent = totalCursosRegul;
+
+  document.getElementById("totalIrregul").textContent = totalIrregul;
+
+  const modal = new bootstrap.Modal(document.getElementById("modalTotales"));
+  modal.show();
 }
