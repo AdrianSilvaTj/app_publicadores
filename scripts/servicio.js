@@ -1030,8 +1030,8 @@ async function mostrarTotales() {
 
   // Mostrar en modal
   document.getElementById("totalActivos").textContent = totalActivos;
-  document.getElementById("totalAsistencia").textContent =
-    promedioAsistencia + "%";
+  // document.getElementById("totalAsistencia").textContent =
+  //   promedioAsistencia + "%";
 
   document.getElementById("totalPubli").textContent = totalPubli;
   document.getElementById("totalCursosPubli").textContent = totalCursosPubli;
