@@ -264,6 +264,7 @@ async function actualizarYRecargar() {
 }
 
 async function guardarServicioGrupo(grupo) {
+  const publicadores = await obtenerDataColeccion("publicadores");
   const filas = document.querySelectorAll(`#tablaGrupo${grupo} tbody tr`);
 
   const mes = Number(document.getElementById("mes").value);
@@ -279,7 +280,7 @@ async function guardarServicioGrupo(grupo) {
 
   filas.forEach((tr) => {
     const publicadorId = tr.dataset.id;
-
+    let pub = publicadores.find((pub) => pub.id == publicadorId);
     const docId = `${publicadorId}_${grupo}_${anio}_${mes}`;
     const ref = db.collection("servicio").doc(docId);
 
@@ -297,7 +298,13 @@ async function guardarServicioGrupo(grupo) {
     };
 
     if (!data.participo && !data.notas.toLowerCase().includes("no participó")) {
-      data.notas += (data.notas ? " " : "") + "No participó";
+      data.notas += (data.notas ? " " : "") + "No participó.";
+    }
+    if (
+      (pub.estadoEspiritual || []).includes("Inactivo") &&
+      !data.notas.toLowerCase().includes("inactivo")
+    ) {
+      data.notas += (data.notas ? " " : "") + "Inactivo.";
     }
 
     batch.set(ref, data, { merge: true });
