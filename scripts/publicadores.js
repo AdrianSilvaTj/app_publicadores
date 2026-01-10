@@ -16,6 +16,10 @@ function getClaseFila(pub, grupo) {
   if (pub.superGrupo == true) icons += "🔶";
   if (pub.auxGrupo == true) icons += "🔷";
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
+  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar"))
+    icons += "🟡";
+  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar mes"))
+    icons += "🟢";
   if ((pub.estadoEspiritual || []).includes("Anciano")) icons += "🟠";
   if ((pub.estadoEspiritual || []).includes("Siervo ministerial"))
     icons += "🔵";

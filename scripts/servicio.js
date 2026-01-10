@@ -60,6 +60,10 @@ async function iniciarPublicadores() {
 function getClaseFila(pub, grupo) {
   icons = "";
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
+  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar"))
+    icons += "🟡";
+  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar mes"))
+    icons += "🟢";
   if ((pub.estadoEspiritual || []).includes("Inactivo")) icons += "⚫";
   return icons;
 }
