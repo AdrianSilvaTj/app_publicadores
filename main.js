@@ -324,9 +324,10 @@ function ordenarPublicadoresGrupo(pubs, grupo) {
       if (estado.includes("Siervo ministerial")) return 3;
       if (estado.includes("Precursor regular")) return 4;
       if (estado.includes("Precursor auxiliar")) return 5;
-      if (estado.includes("") || estado.length === 0) return 6;
-      if (estado.includes("No bautizado")) return 7;
-      if (estado.includes("Inactivo")) return 8;
+      if (estado.includes("Precursor auxiliar mes")) return 6;
+      if (estado.includes("") || estado.length === 0) return 7;
+      if (estado.includes("No bautizado")) return 8;
+      if (estado.includes("Inactivo")) return 9;
 
       return 8;
     };

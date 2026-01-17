@@ -110,6 +110,40 @@ async function renderPublicadoresPorGrupo(grupos) {
     contenedor.appendChild(card);
   }
 
+  // Tabla No publicadores
+  const grupoPublicadores = ordenarPublicadoresGrupo(
+    publicadores.filter((p) => Number(p.grupo) === 0),
+    0
+  );
+  const tablaId = `tablaGrupo0`;
+  const card = document.createElement("div");
+  card.className = "col-12";
+
+  card.innerHTML = `
+    <div class="card card-shadow">
+      <div class="card-header d-flex justify-content-between align-items-center group-header-color">
+        <strong>No publicadores</strong>
+        <button class="btn btn-sm btn-outline-secondary" onclick="activarSeleccionGrupo(0)">🔁Mover publicadores</button>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0" id="${tablaId}">
+          <thead class="table-light">
+            <tr>
+              <th class="d-none checkbox-col">✓</th>
+              <th>Nombre</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${grupoPublicadores
+              .map((pub, index) => renderFila(pub, index, 0))
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  contenedor.appendChild(card);
   cerrarBanner();
 }
 

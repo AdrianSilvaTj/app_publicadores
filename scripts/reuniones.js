@@ -657,6 +657,9 @@ async function agregarUltimasAsign(asignaciones) {
 
     // ordenar por fecha descendente (más reciente primero)
     ultAsignaciones.sort((a, b) => {
+      if (!a.fecha && b.fecha) return -1;
+      if (a.fecha && !b.fecha) return 1;
+      if (!a.fecha && !b.fecha) return 0;
       const dateA = stringToDateTime(a.fecha, "YYYY-MM-DD");
       const dateB = stringToDateTime(b.fecha, "YYYY-MM-DD");
       return dateB - dateA; // descendente

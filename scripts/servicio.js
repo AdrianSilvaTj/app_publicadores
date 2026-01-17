@@ -787,8 +787,8 @@ async function verTarjetaPublicador(id) {
             },
             jsPDF: {
               unit: "mm",
-              format: "a4",
-              orientation: "portrait"
+              format: "b5",
+              orientation: "landscape"
             }
           }).from(el).save();
         }
@@ -973,7 +973,8 @@ function descargarTarjetas() {
 }
 
 async function mostrarTotales() {
-  const publicadores = await obtenerDataColeccion("publicadores");
+  let publicadores = await obtenerDataColeccion("publicadores");
+  publicadores = publicadores.filter((p) => p.grupo > 0);
   const servicio = await obtenerDataColeccion("servicio");
 
   // Filtros base
