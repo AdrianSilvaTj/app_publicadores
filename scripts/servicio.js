@@ -197,7 +197,7 @@ async function renderPublicadoresPorGrupo(grupos) {
   for (let g = 1; g <= grupos; g++) {
     const grupoPublicadores = ordenarPublicadoresGrupo(
       publicadores.filter((p) => Number(p.grupo) === g),
-      g
+      g,
     );
     let grupoPubsServicio = pubsServicio.filter((p) => Number(p.grupo) === g);
     const tablaId = `tablaGrupo${g}`;
@@ -239,7 +239,7 @@ async function renderPublicadoresPorGrupo(grupos) {
             <tbody>
               ${grupoPublicadores
                 .map((pub, index) =>
-                  renderFilaServicio(pub, index, g, grupoPubsServicio)
+                  renderFilaServicio(pub, index, g, grupoPubsServicio),
                 )
                 .join("")}
             </tbody>
@@ -327,7 +327,7 @@ async function limpiarServicioGrupo(grupo) {
 
   const confirmar = confirm(
     `⚠️ ¿Estás seguro?\n\nSe eliminarán TODOS los registros de servicio:\n` +
-      `Grupo ${grupo} - ${mes}/${anio}\n\nEsta acción no se puede deshacer.`
+      `Grupo ${grupo} - ${mes}/${anio}\n\nEsta acción no se puede deshacer.`,
   );
 
   if (!confirmar) return;
@@ -349,7 +349,7 @@ async function limpiarServicioGrupo(grupo) {
         "ℹ️ No hay registros para limpiar",
         "info",
         false,
-        3000
+        3000,
       );
     }
 
@@ -369,7 +369,7 @@ async function limpiarServicioGrupo(grupo) {
       "🧹 Registros de servicio eliminados correctamente",
       "success",
       false,
-      3000
+      3000,
     );
 
     await actualizarColecciones([
@@ -463,7 +463,7 @@ async function descargarListadoPublicadores() {
       🔵 Siervo ministerial
       ⚫ Inactivo
       🟣 No bautizado`),
-    new Paragraph(" ")
+    new Paragraph(" "),
   );
 
   // Grupos del 1 al 9
@@ -484,9 +484,9 @@ async function descargarListadoPublicadores() {
             children: [
               new TextRun(`${pub.nombre || ""} ${getClaseFila(pub, g)}`),
             ],
-          })
+          }),
       ),
-      new Paragraph(" ")
+      new Paragraph(" "),
     );
   }
 
@@ -533,7 +533,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
 
   const servicios = await consultarFirebase("servicio", {
     publicadorId,
-    anio: [anioServicio, anioServicio + 1],
+    anio: [anioServicio, anioServicio - 1],
   });
 
   const pub = (publicadorSel = publicadores.find((p) => p.id === publicadorId));
@@ -541,18 +541,18 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
 
   // 🔹 Definición del año de servicio (septiembre → agosto)
   const mesesServicio = [
-    { nombre: "Septiembre", mes: 9, anio: anioServicio },
-    { nombre: "Octubre", mes: 10, anio: anioServicio },
-    { nombre: "Noviembre", mes: 11, anio: anioServicio },
-    { nombre: "Diciembre", mes: 12, anio: anioServicio },
-    { nombre: "Enero", mes: 1, anio: anioServicio + 1 },
-    { nombre: "Febrero", mes: 2, anio: anioServicio + 1 },
-    { nombre: "Marzo", mes: 3, anio: anioServicio + 1 },
-    { nombre: "Abril", mes: 4, anio: anioServicio + 1 },
-    { nombre: "Mayo", mes: 5, anio: anioServicio + 1 },
-    { nombre: "Junio", mes: 6, anio: anioServicio + 1 },
-    { nombre: "Julio", mes: 7, anio: anioServicio + 1 },
-    { nombre: "Agosto", mes: 8, anio: anioServicio + 1 },
+    { nombre: "Septiembre", mes: 9, anio: anioServicio - 1 },
+    { nombre: "Octubre", mes: 10, anio: anioServicio - 1 },
+    { nombre: "Noviembre", mes: 11, anio: anioServicio - 1 },
+    { nombre: "Diciembre", mes: 12, anio: anioServicio - 1 },
+    { nombre: "Enero", mes: 1, anio: anioServicio },
+    { nombre: "Febrero", mes: 2, anio: anioServicio },
+    { nombre: "Marzo", mes: 3, anio: anioServicio },
+    { nombre: "Abril", mes: 4, anio: anioServicio },
+    { nombre: "Mayo", mes: 5, anio: anioServicio },
+    { nombre: "Junio", mes: 6, anio: anioServicio },
+    { nombre: "Julio", mes: 7, anio: anioServicio },
+    { nombre: "Agosto", mes: 8, anio: anioServicio },
   ];
 
   let totalHoras = 0;
@@ -607,7 +607,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
                   ? dateTimeStrToAnother(
                       pub.fechaNacimiento,
                       "YYYY-MM-DD",
-                      "DD-MM-YYYY"
+                      "DD-MM-YYYY",
                     )
                   : ""
               }
@@ -622,11 +622,11 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
                   ? dateTimeStrToAnother(
                       pub.fechaBautismo,
                       "YYYY-MM-DD",
-                      "DD-MM-YYYY"
+                      "DD-MM-YYYY",
                     )
                   : pub.estadoEspiritual?.includes("No bautizado")
-                  ? "No bautizado"
-                  : ""
+                    ? "No bautizado"
+                    : ""
               }
             </span>
           </div>
@@ -635,19 +635,19 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
         <div class="col checks">
           <div class="grupo-checks">
             <label><input type="checkbox" ${isChecked(
-              pub.sexo === "M"
+              pub.sexo === "M",
             )}> Hombre</label>
             <label><input type="checkbox" ${isChecked(
-              pub.sexo === "F"
+              pub.sexo === "F",
             )}> Mujer</label>
           </div>
 
           <div class="grupo-checks">
             <label><input type="checkbox" ${isChecked(
-              pub.esperanza === "Otras ovejas"
+              pub.esperanza === "Otras ovejas",
             )}> Otras ovejas</label>
             <label><input type="checkbox" ${isChecked(
-              pub.esperanza === "Ungido"
+              pub.esperanza === "Ungido",
             )}> Ungido</label>
           </div>
         </div>
@@ -657,19 +657,19 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
       <!-- Estado espiritual -->
       <div class="fila checks-full">
         <label><input type="checkbox" ${isChecked(
-          pub.estadoEspiritual?.includes("Anciano")
+          pub.estadoEspiritual?.includes("Anciano"),
         )}> Anciano</label>
         <label><input type="checkbox" ${isChecked(
-          pub.estadoEspiritual?.includes("Siervo ministerial")
+          pub.estadoEspiritual?.includes("Siervo ministerial"),
         )}> Siervo ministerial</label>
         <label><input type="checkbox" ${isChecked(
-          pub.estadoEspiritual?.includes("Precursor regular")
+          pub.estadoEspiritual?.includes("Precursor regular"),
         )}> Precursor regular</label>
         <label><input type="checkbox" ${isChecked(
-          pub.estadoEspiritual?.includes("Precursor especial")
+          pub.estadoEspiritual?.includes("Precursor especial"),
         )}> Precursor especial</label>
         <label><input type="checkbox" ${isChecked(
-          pub.estadoEspiritual?.includes("Misionero-campo")
+          pub.estadoEspiritual?.includes("Misionero-campo"),
         )}>
           Misionero que sirve<br>en el campo
         </label>
@@ -681,7 +681,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
     <table class="tabla-servicio">
       <thead>
         <tr>
-          <th style="width:170px">Año de servicio<br>${anioServicio + 1}</th>
+          <th style="width:170px">Año de servicio<br>${anioServicio}</th>
           <th style="width:70px">Participación<br>en el ministerio</th>
           <th style="width:70px">Cursos<br>bíblicos</th>
           <th style="width:70px">Precursor<br>auxiliar</th>
@@ -717,7 +717,10 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
 async function verTarjetaPublicador(id) {
   const width = 900;
   const height = 900;
-  const anioServicio = Number(document.getElementById("anio").value);
+  const mes = Number(document.getElementById("mes").value);
+  let anioServicio = Number(document.getElementById("anio").value);
+
+  if (mes >= 9 && mes <= 12) anioServicio += 1;
 
   const left = (screen.width - width) / 2;
   const top = (screen.height - height) / 2;
@@ -736,7 +739,7 @@ async function verTarjetaPublicador(id) {
       menubar=no,
       location=no,
       status=no
-    `
+    `,
   );
 
   if (!ventana) {
@@ -777,9 +780,7 @@ async function verTarjetaPublicador(id) {
 
           html2pdf().set({
             margin: 10,
-            filename: "Registro ${publicadorSel.nombre} ${
-    anioServicio + 1
-  }.pdf",
+            filename: "Registro ${publicadorSel.nombre} ${anioServicio}.pdf",
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: {
               scale: 2,
@@ -844,7 +845,7 @@ async function verTarjetasGrupo(grupo, anioServicio) {
 
   // Contenido
   let publicadores = JSON.parse(
-    localStorage.getItem("firebase_publicadores") || "[]"
+    localStorage.getItem("firebase_publicadores") || "[]",
   ).filter((p) => Number(p.grupo) === Number(grupo));
 
   publicadores = orderArray(publicadores, "nombre");
@@ -952,16 +953,14 @@ function obtenerVentanaTarjetas(width = 1000, height = 900) {
       top=${top},
       resizable=yes,
       scrollbars=yes
-    `
+    `,
   );
 
   return ventanaTarjetas;
 }
 
 function descargarTarjetas() {
-  const anioServicio = Number(
-    document.getElementById("anio-descarga").value - 1
-  );
+  const anioServicio = Number(document.getElementById("anio-descarga").value);
   const grupo = Number(document.getElementById("grupo-descarga").value);
 
   if (!anioServicio || !grupo) {
@@ -979,14 +978,14 @@ async function mostrarTotales() {
 
   // Filtros base
   const activos = publicadores.filter(
-    (p) => !(p.estadoEspiritual || []).includes("Inactivo")
+    (p) => !(p.estadoEspiritual || []).includes("Inactivo"),
   );
   const inactivosId = publicadores
     .filter((p) => (p.estadoEspiritual || []).includes("Inactivo"))
     .map((p) => p.id);
   const informes = servicio.filter((s) => s.participo);
   const irregulares = servicio.filter(
-    (s) => !s.participo && !inactivosId.includes(s.publicadorId)
+    (s) => !s.participo && !inactivosId.includes(s.publicadorId),
   );
   const auxiliares = servicio.filter((s) => s.auxiliar);
 
@@ -995,7 +994,7 @@ async function mostrarTotales() {
     .map((p) => p.id);
 
   const regulares = servicio.filter((s) =>
-    regularesId.includes(s.publicadorId)
+    regularesId.includes(s.publicadorId),
   );
 
   // Cálculos generales
@@ -1006,13 +1005,13 @@ async function mostrarTotales() {
 
   // Publicadores
   const publicadoresServicio = servicio.filter(
-    (s) => !s.auxiliar && !regularesId.includes(s.publicadorId)
+    (s) => !s.auxiliar && !regularesId.includes(s.publicadorId),
   );
 
   const totalPubli = publicadoresServicio.filter((s) => s.participo).length;
   const totalCursosPubli = publicadoresServicio.reduce(
     (acc, s) => acc + (s.cursos || 0),
-    0
+    0,
   );
 
   // Auxiliares
@@ -1020,7 +1019,7 @@ async function mostrarTotales() {
   const totalHorasAuxi = auxiliares.reduce((acc, s) => acc + (s.horas || 0), 0);
   const totalCursosAuxi = auxiliares.reduce(
     (acc, s) => acc + (s.cursos || 0),
-    0
+    0,
   );
 
   // Regulares
@@ -1028,7 +1027,7 @@ async function mostrarTotales() {
   const totalHorasRegul = regulares.reduce((acc, s) => acc + (s.horas || 0), 0);
   const totalCursosRegul = regulares.reduce(
     (acc, s) => acc + (s.cursos || 0),
-    0
+    0,
   );
 
   const totalIrregul = irregulares.length;
