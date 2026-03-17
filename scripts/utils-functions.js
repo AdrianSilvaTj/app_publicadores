@@ -1,3 +1,18 @@
+const NAMES = {
+  "pdteFds": "Presidente fin de semana",
+  "consejAux": "Consejero auxiliar",
+  "pdteVida": "Pre. Vida y Ministerio",
+  "asignaciones": "Asign. estudiantiles",
+  "acomodador": "Acomodador",
+  "oracion": "Oración",
+  "lecturaLibro": "Lec. del libro.",
+  "lecturaAtalaya": "Lec. Atalaya",
+  "tesoros": "Tesoros",
+  "perlas": "Perlas esc.",
+  "nuestraVida": "Nuestra vida cris.",
+  "estudioLibro": "Estudio libro",
+  "capitan": "Capitán serv."
+}
 /**
  * Replaces an item in an array based on a matching field value.
  *

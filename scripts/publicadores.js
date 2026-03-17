@@ -696,3 +696,96 @@ function generarIconos(estados) {
 function actualizar() {
   actualizarColecciones(["publicadores"]);
 }
+
+async function descargarPublicadoresPorCampos() {
+  let publicadores = await obtenerDataColeccion('publicadores')
+  if (!publicadores || !publicadores.length) {
+    alert("No hay publicadores para exportar");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // 🔹 Estructuras para agrupar por separado
+  const gruposEstado = {};
+  const gruposPrivilegios = {};
+
+  publicadores = publicadores.filter(p => p.nombre !== "No Aplica" )
+
+  publicadores.forEach((pub) => {
+    const nombre = pub.nombre || "Sin nombre";
+
+    // --- ESTADO ESPIRITUAL ---
+    let estados = [
+      "No bautizado",
+      "Anciano",
+      "Siervo ministerial",
+      "Precursor regular",
+      "Precursor auxiliar",
+      "Precursor auxiliar mes",
+      "Precursor especial",
+      "Misionero-campo",
+      "Inactivo"
+    ]
+
+    estados.forEach((estado) => {
+      let name = NAMES[estado] ?? estado
+      if (!gruposEstado[name]) {
+        gruposEstado[name] = [];
+      }
+      pub.estadoEspiritual?.includes(estado) && gruposEstado[name].push(nombre);
+    });
+
+    // --- PRIVILEGIOS ---
+    let privilegios = [
+      "asignaciones",
+      "acomodador",
+      "pdteFds",
+      "oracion",
+      "lecturaLibro",
+      "lecturaAtalaya",
+      "consejAux",
+      "pdteVida",
+      "tesoros",
+      "perlas",
+      "nuestraVida",
+      "estudioLibro",
+      "capitan"
+    ];
+
+    privilegios.forEach((priv) => {
+      let name = NAMES[priv] ?? priv
+      if (!gruposPrivilegios[name]) {
+        gruposPrivilegios[name] = [];
+      }
+      pub.privilegiosCongregacion?.includes(priv) && gruposPrivilegios[name].push(nombre);
+    });
+  });
+
+  // 🔹 Función para crear hojas
+  function crearHojas(grupos) {
+    Object.keys(grupos).forEach((key) => {
+      const nombres = grupos[key]
+        .filter((n) => n) // limpiar vacíos
+        .sort((a, b) => a.localeCompare(b)); // ordenar
+
+      const data = nombres.map((nombre) => ({
+        Nombre: nombre,
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(data);
+
+      // Excel limita a 31 caracteres
+      const nombreHoja = `${key}`.substring(0, 31);
+
+      XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+    });
+  }
+
+  // 🔹 Crear hojas separadas
+  crearHojas(gruposEstado);
+  crearHojas(gruposPrivilegios);
+
+  // 🔹 Descargar archivo
+  XLSX.writeFile(wb, "Pub-por-privilegios.xlsx");
+}

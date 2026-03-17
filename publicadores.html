@@ -38,14 +38,39 @@
             <span class="me-2 d-none d-sm-inline">➕ Crear</span>
             <span class="d-inline d-sm-none">➕</span>
           </button>
-          <button
+          <!-- <button
             class="btn btn-primary d-flex align-items-center"
             onclick="descargarListadoPublicadores()"
             title="Descargar listado"
           >
             <span class="me-2 d-none d-sm-inline">📄 Descargar listado</span>
             <span class="d-inline d-sm-none">📄</span>
-          </button>
+          </button> -->
+          <div class="dropdown">
+            <button
+              class="btn btn-primary dropdown-toggle d-flex align-items-center py-2"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              title="Descargar"
+            >
+              <span class="me-2 d-none d-sm-inline">📄 Descargar</span>
+              <span class="d-inline d-sm-none">📄</span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="#" onclick="descargarListadoPublicadores()">
+                  📄 Listado grupos
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="descargarPublicadoresPorCampos()">
+                  📊 Listado privilegios
+                </a>
+              </li>
+            </ul>
+          </div>
           <button
             class="btn btn-primary d-flex align-items-center"
             onclick="actualizar()"
@@ -465,7 +490,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/docx@9.0.3/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="main.js"></script>
+    <script src="scripts/utils-functions.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function () {
         await cargarMenuYScripts();
