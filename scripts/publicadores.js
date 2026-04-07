@@ -12,13 +12,15 @@ async function iniciarPublicadores() {
 }
 
 function getClaseFila(pub, grupo) {
+  let hoy = new Date
+  let fecha = `${hoy.getFullYear()}-${hoy.getMonth() + 1}`;
   icons = "";
   if (pub.superGrupo == true) icons += "🔶";
   if (pub.auxGrupo == true) icons += "🔷";
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
   if ((pub.estadoEspiritual || []).includes("Precursor auxiliar"))
     icons += "🟡";
-  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar mes"))
+  if ((pub.mesesAuxiliar || []).includes(fecha))
     icons += "🟢";
   if ((pub.estadoEspiritual || []).includes("Anciano")) icons += "🟠";
   if ((pub.estadoEspiritual || []).includes("Siervo ministerial"))
@@ -166,6 +168,7 @@ form.addEventListener("submit", async (e) => {
     document.getElementById("fechaNacimiento").value || null;
   const fechaBautismo = document.getElementById("fechaBautismo").value || null;
   const sexo = document.getElementById("sexo").value;
+  const notas = document.getElementById("notas").value;
   const esperanza = document.querySelector(
     'input[name="esperanza"]:checked'
   )?.value;
@@ -181,6 +184,19 @@ form.addEventListener("submit", async (e) => {
     if (cb.checked) privilegiosCongregacion.push(cb.id);
   });
 
+  const hoy = new Date()
+  const mesesAuxiliar = [];
+  document.querySelectorAll(".mes-aux").forEach((cb) => {
+    if (cb.checked) {
+      let year =
+        Number(cb.value) < hoy.getMonth() - 3
+          ? hoy.getFullYear() + 1
+          : hoy.getFullYear();
+       
+      mesesAuxiliar.push(`${year}-${cb.value}`)
+    };
+  });
+
   const data = {
     nombre,
     fechaNacimiento,
@@ -188,8 +204,10 @@ form.addEventListener("submit", async (e) => {
     sexo,
     esperanza,
     grupo,
+    notas,
     estadoEspiritual,
     privilegiosCongregacion,
+    mesesAuxiliar
   };
 
   try {
@@ -251,6 +269,7 @@ async function editarPublicador(id) {
       pub.fechaNacimiento || "";
     document.getElementById("fechaBautismo").value = pub.fechaBautismo || "";
     document.getElementById("sexo").value = pub.sexo || "";
+    document.getElementById("notas").value = pub.notas || "";
     document
       .querySelector(`input[name="esperanza"][value="${pub.esperanza}"]`)
       ?.click();
@@ -262,6 +281,28 @@ async function editarPublicador(id) {
     document.querySelectorAll(".estadoEspiritual").forEach((cb) => {
       const valor = cb.value.toLowerCase().replace(" ", "");
       cb.checked = normalizados.includes(valor);
+    });
+
+    // Precursorado por mes
+    const cb = document.getElementById("precAuxiliarMes");
+    if (cb) {
+      cb.checked = pub.mesesAuxiliar?.length > 0;
+      toggleMesesAuxiliar(cb);
+    }
+    const hoy = new Date();
+    (pub.mesesAuxiliar || []).forEach((item) => {
+      try {
+        const [anio, mes] = item.split("-");
+        const fecha = new Date(Number(anio), Number(mes) - 1, 1);
+        const dias = (hoy - fecha) / (1000 * 60 * 60 * 24);
+        if (dias >= 0 && dias <= 120) {
+          const idMes = `mes-${Number(mes)}`; // 🔥 corregido
+          const cb = document.getElementById(idMes);
+          if (cb) cb.checked = true;
+        }
+      } catch (e) {
+        console.error("Error procesando mes:", item, e);
+      }
     });
 
     // Privilegios de congregación
@@ -278,8 +319,8 @@ async function editarPublicador(id) {
     );
     modal.show();
   } catch (err) {
-    console.error("Error al editar publicador:", err);
-    alert("❌ Ocurrió un error al cargar los datos del publicador.");
+    mostrarBanner("❌ Ocurrió un error al cargar los datos del publicador.", danger)
+    alert();
   }
 }
 
@@ -788,4 +829,17 @@ async function descargarPublicadoresPorCampos() {
 
   // 🔹 Descargar archivo
   XLSX.writeFile(wb, "Pub-por-privilegios.xlsx");
+}
+
+function toggleMesesAuxiliar(el) {
+  const contenedor = document.getElementById("mesesAuxiliar");
+
+  if (el.checked) {
+    contenedor.removeAttribute('hidden');
+  } else {
+    contenedor.setAttribute("hidden", true);
+
+    // limpiar meses
+    document.querySelectorAll(".mes-aux").forEach((m) => (m.checked = false));
+  }
 }

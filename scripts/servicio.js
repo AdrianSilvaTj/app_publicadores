@@ -59,10 +59,13 @@ async function iniciarPublicadores() {
 
 function getClaseFila(pub, grupo) {
   icons = "";
+  const mes = document.getElementById("mes").value;
+  const anio = document.getElementById("anio").value;
+  let fecha = `${anio}-${mes}`;
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
   if ((pub.estadoEspiritual || []).includes("Precursor auxiliar"))
     icons += "🟡";
-  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar mes"))
+  if ((pub.mesesAuxiliar || []).includes(fecha))
     icons += "🟢";
   if ((pub.estadoEspiritual || []).includes("Inactivo")) icons += "⚫";
   return icons;
@@ -297,6 +300,17 @@ async function guardarServicioGrupo(grupo) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
+    // correcciones
+    if (data.participo) {
+      data.notas = data.notas
+        .replace("No participó", "")
+        .replace("no participó", "")
+        .replace("No participo", "")
+        .replace("no participo", "");
+      data.notas === '.' && (data.notas = '');
+    }
+    (data.horas > 0 || data.cursos > 0) && (data.participo = true);
+    (data.horas > 0 && !pub.estadoEspiritual.includes("Precursor regular")) && (data.auxiliar = true);
     if (!data.participo && !data.notas.toLowerCase().includes("no participó")) {
       data.notas += (data.notas ? " " : "") + "No participó.";
     }

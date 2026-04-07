@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <link href="style.css" rel="stylesheet" />
+    <link href="styles/publicadores.css" rel="stylesheet" />
   </head>
 
   <body>
@@ -38,14 +39,7 @@
             <span class="me-2 d-none d-sm-inline">➕ Crear</span>
             <span class="d-inline d-sm-none">➕</span>
           </button>
-          <!-- <button
-            class="btn btn-primary d-flex align-items-center"
-            onclick="descargarListadoPublicadores()"
-            title="Descargar listado"
-          >
-            <span class="me-2 d-none d-sm-inline">📄 Descargar listado</span>
-            <span class="d-inline d-sm-none">📄</span>
-          </button> -->
+          
           <div class="dropdown">
             <button
               class="btn btn-primary dropdown-toggle d-flex align-items-center py-2"
@@ -132,7 +126,7 @@
         aria-labelledby="modalPublicadorLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <form id="formPublicador" data-edicion-id="">
               <div class="modal-header main">
@@ -233,112 +227,123 @@
                   </div>
                 </div>
 
-                <!-- Privilegios -->
+                <!-- Estado espiritual -->
                 <div class="mt-2">
                   <h5>Estado espiritual</h5>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="noBautizado"
-                          value="No bautizado"
-                        />
-                        <label class="form-check-label" for="noBautizado"
-                          >No bautizado</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="anciano"
-                          value="Anciano"
-                        />
-                        <label class="form-check-label" for="anciano"
-                          >Anciano</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="siervo"
-                          value="Siervo ministerial"
-                        />
-                        <label class="form-check-label" for="siervo"
-                          >Siervo ministerial</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="precRegular"
-                          value="Precursor regular"
-                        />
-                        <label class="form-check-label" for="precRegular"
-                          >Precursor regular</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="precAuxiliar"
-                          value="Precursor auxiliar"
-                        />
-                        <label class="form-check-label" for="precAuxiliar"
-                          >Precursor auxiliar indefinido</label
-                        >
-                      </div>
+                  <div class="cont-checkboxes">
+                    <div class="form-check mb-0">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="noBautizado"
+                        value="No bautizado"
+                      />
+                      <label class="form-check-label" for="noBautizado"
+                        >No bautizado</label
+                      >
                     </div>
-                    <div class="col-md-6">
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="precAuxiliarMes"
-                          value="Precursor auxiliar mes"
-                        />
-                        <label class="form-check-label" for="precAuxiliarMes"
-                          >Precursor auxiliar este mes</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="precEspecial"
-                          value="Precursor especial"
-                        />
-                        <label class="form-check-label" for="precEspecial"
-                          >Precursor especial</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="misionero"
-                          value="Misionero-campo"
-                        />
-                        <label class="form-check-label" for="misionero"
-                          >Misionero que participa en el campo</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input estadoEspiritual"
-                          type="checkbox"
-                          id="inactivo"
-                          value="Inactivo"
-                        />
-                        <label class="form-check-label" for="inactivo"
-                          >Inactivo</label
-                        >
-                      </div>
+                    <div class="form-check mb-0">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="anciano"
+                        value="Anciano"
+                      />
+                      <label class="form-check-label" for="anciano"
+                        >Anciano</label
+                      >
+                    </div>
+                    <div class="form-check mb-0">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="siervo"
+                        value="Siervo ministerial"
+                      />
+                      <label class="form-check-label" for="siervo"
+                        >Siervo ministerial</label
+                      >
+                    </div>
+                    <div class="form-check mb-0">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="precRegular"
+                        value="Precursor regular"
+                      />
+                      <label class="form-check-label" for="precRegular"
+                        >Precursor regular</label
+                      >
+                    </div>
+                    <div class="form-check mb-0">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="precAuxiliar"
+                        value="Precursor auxiliar"
+                      />
+                      <label class="form-check-label" for="precAuxiliar"
+                        >Precursor auxiliar indefinido</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="precEspecial"
+                        value="Precursor especial"
+                      />
+                      <label class="form-check-label" for="precEspecial"
+                        >Precursor especial</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="misionero"
+                        value="Misionero-campo"
+                      />
+                      <label class="form-check-label" for="misionero"
+                        ><small>Misionero que participa en el campo</small></label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input estadoEspiritual"
+                        type="checkbox"
+                        id="inactivo"
+                        value="Inactivo"
+                      />
+                      <label class="form-check-label" for="inactivo"
+                        >Inactivo</label
+                      >
+                    </div>
+                  </div>
+                  <div class="form-check mb-0">
+                    <input
+                      class="form-check-input estadoEspiritual"
+                      type="checkbox"
+                      id="precAuxiliarMes"
+                      value="Precursor auxiliar mes"
+                      onchange="toggleMesesAuxiliar(this)"
+                    />
+                    <label class="form-check-label" for="precAuxiliarMes"
+                      >Precursor auxiliar por mes</label
+                    >
+                    <div id="mesesAuxiliar" class="cont-meses" hidden>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-1" value="1"> Enero</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-2" value="2"> Febrero</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-3" value="3"> Marzo</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-4" value="4"> Abril</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-5" value="5"> Mayo</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-6" value="6"> Junio</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-7" value="7"> Julio</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-8" value="8"> Agosto</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-9" value="9"> <small>Septiembre</small></div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-10" value="10">  Octubre</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-11" value="11">  Noviembre</div>
+                      <div class="form-check"><input type="checkbox" class="mes-aux" id="mes-12" value="12">  Diciembre</div>
                     </div>
                   </div>
                 </div>
@@ -346,128 +351,133 @@
                 <!-- Privilegios de Congregación -->
                 <div class="mt-2">
                   <h5>Privilegios de congregación</h5>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="asignaciones"
-                        /><label class="form-check-label" for="asignaciones"
-                          >Asignaciones estudiantiles</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="acomodador"
-                        /><label class="form-check-label" for="acomodador"
-                          >Acomodador y micrófonos</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="pdteFds"
-                        /><label class="form-check-label" for="pdteFds"
-                          >Pdte. fin de semana</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="oracion"
-                        /><label class="form-check-label" for="oracion"
-                          >Oración</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="lecturaLibro"
-                        /><label class="form-check-label" for="lecturaLibro"
-                          >Lectura del libro</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="lecturaAtalaya"
-                        /><label class="form-check-label" for="lecturaAtalaya"
-                          >Lectura Atalaya</label
-                        >
-                      </div>
+                  <div class="cont-checkboxes">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="asignaciones"
+                      /><label class="form-check-label" for="asignaciones"
+                        >Asignaciones estudiantiles</label
+                      >
                     </div>
-                    <div class="col-md-6">
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="consejAux"
-                        /><label class="form-check-label" for="consejAux"
-                          >Consejero sala auxiliar</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="pdteVida"
-                        /><label class="form-check-label" for="pdteVida"
-                          >Pdte. Vida y Ministerio</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="tesoros"
-                        /><label class="form-check-label" for="tesoros"
-                          >Tesoros de la Biblia</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="perlas"
-                        /><label class="form-check-label" for="perlas"
-                          >Busquemos perlas</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="nuestraVida"
-                        /><label class="form-check-label" for="nuestraVida"
-                          >Nuestra vida cristiana</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="estudioLibro"
-                        /><label class="form-check-label" for="estudioLibro"
-                          >Conducción estudio del libro</label
-                        >
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input privilegios"
-                          type="checkbox"
-                          id="capitan"
-                        /><label class="form-check-label" for="capitan"
-                          >Capitán grupo</label
-                        >
-                      </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="acomodador"
+                      /><label class="form-check-label" for="acomodador"
+                        >Acomodador y micrófonos</label
+                      >
                     </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="pdteFds"
+                      /><label class="form-check-label" for="pdteFds"
+                        >Pdte. fin de semana</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="oracion"
+                      /><label class="form-check-label" for="oracion"
+                        >Oración</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="lecturaLibro"
+                      /><label class="form-check-label" for="lecturaLibro"
+                        >Lectura del libro</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="lecturaAtalaya"
+                      /><label class="form-check-label" for="lecturaAtalaya"
+                        >Lectura Atalaya</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="consejAux"
+                      /><label class="form-check-label" for="consejAux"
+                        >Consejero sala auxiliar</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="pdteVida"
+                      /><label class="form-check-label" for="pdteVida"
+                        >Pdte. Vida y Ministerio</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="tesoros"
+                      /><label class="form-check-label" for="tesoros"
+                        >Tesoros de la Biblia</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="perlas"
+                      /><label class="form-check-label" for="perlas"
+                        >Busquemos perlas</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="nuestraVida"
+                      /><label class="form-check-label" for="nuestraVida"
+                        >Nuestra vida cristiana</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="estudioLibro"
+                      /><label class="form-check-label" for="estudioLibro"
+                        >Conducción estudio del libro</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input privilegios"
+                        type="checkbox"
+                        id="capitan"
+                      /><label class="form-check-label" for="capitan"
+                        >Capitán grupo</label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label for="nombre" class="form-label"
+                      >Notas</label
+                    >
+                    <textarea class="form-control" rows="5"
+                      id="notas"></textarea>
                   </div>
                 </div>
                 <div class="modal-footer p-0 pt-2">
