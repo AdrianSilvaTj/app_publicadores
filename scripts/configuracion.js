@@ -416,6 +416,8 @@ async function cargarServicioDesdeExcel(filasExcel) {
     const docId = `${publicadorId}_${grupo}_${anio}_${mes}`;
     const ref = db.collection("servicio").doc(docId);
     const participo = String(row.participo).toLowerCase() === "si";
+    let notas = row.notas + " " + (!participo ? "No participó." : "");
+    notas = notas.trim()
 
     const data = {
       publicadorId,
@@ -426,7 +428,7 @@ async function cargarServicioDesdeExcel(filasExcel) {
       cursos: Number(row.cursos) || 0,
       auxiliar,
       horas,
-      notas: !participo ? "No participó" : "",
+      notas,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
