@@ -56,6 +56,25 @@ h2, h3 {
   margin: 2rem;
 }
 
+.tarjetas-principal {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.aviso-item + .aviso-item {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+@media (min-width: 1000px) {
+  .tarjetas-principal {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .banner {
   position: fixed;
   top: 56px;

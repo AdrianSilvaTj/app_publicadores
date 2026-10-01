@@ -17,9 +17,19 @@
   <!-- CONTENIDO DE LA SECCIÓN -->
   <div class="marginBody">
     <h1>👋 Bienvenido</h1>
-    <section class="card card-shadow mt-4" aria-labelledby="tituloTotales">
+    <div class="tarjetas-principal">
+      <section class="card card-shadow" aria-labelledby="tituloAvisos">
+        <div class="card-header group-header-color">
+          <h2 id="tituloAvisos" class="h5 mb-0">🛑 Avisos y recordatorios importantes</h2>
+        </div>
+        <div id="listaAvisos" class="card-body">
+          <p class="text-center text-muted mb-0">Cargando avisos...</p>
+        </div>
+      </section>
+
+    <section class="card card-shadow" aria-labelledby="tituloTotales">
       <div class="card-header group-header-color">
-        <h2 id="tituloTotales" class="h5 mb-0">Totales de publicadores</h2>
+        <h2 id="tituloTotales" class="h5 mb-0">📊 Totales de publicadores</h2>
       </div>
       <div class="table-responsive">
         <table class="table table-striped table-hover mb-0">
@@ -33,9 +43,9 @@
       </div>
     </section>
 
-    <section class="card card-shadow mt-4" aria-labelledby="tituloHistorialEstados">
+    <section class="card card-shadow" aria-labelledby="tituloHistorialEstados">
       <div class="card-header group-header-color">
-        <h2 id="tituloHistorialEstados" class="h5 mb-0">📋 Últimos cambios de estado</h2>
+        <h2 id="tituloHistorialEstados" class="h5 mb-0">📋 Últimas acciones realizadas</h2>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -48,6 +58,7 @@
         </table>
       </div>
     </section>
+    </div>
   </div>
 
   <script src="main.js"></script>
@@ -60,6 +71,7 @@
       }
       await cargarTotalesPublicadores();
       await cargarHistorialEstadosPublicadores();
+      await cargarAvisos();
     });
 
     async function cargarTotalesPublicadores() {
@@ -112,6 +124,47 @@
       } catch (error) {
         console.error("Error al cargar totales de publicadores:", error);
         tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger">No se pudieron cargar los totales.</td></tr>';
+      }
+    }
+
+    async function cargarAvisos() {
+      const contenedor = document.getElementById("listaAvisos");
+      try {
+        const snapshot = await db.collection("Avisos").get();
+        if (snapshot.empty) {
+          contenedor.innerHTML = '<p class="text-center text-muted mb-0">No hay avisos por el momento.</p>';
+          return;
+        }
+
+        contenedor.replaceChildren(...snapshot.docs.map((documento) => {
+          const aviso = documento.data();
+          const elemento = document.createElement("article");
+          elemento.className = "aviso-item";
+          const titulo = document.createElement("h3");
+          titulo.className = "h6 mb-1";
+          titulo.textContent = aviso.titulo || aviso.nombre || "Aviso";
+          elemento.appendChild(titulo);
+
+          const mensaje = aviso.mensaje || aviso.descripcion || aviso.contenido || aviso.texto;
+          if (mensaje) {
+            const texto = document.createElement("p");
+            texto.className = "mb-1";
+            texto.textContent = mensaje;
+            elemento.appendChild(texto);
+          }
+
+          const fecha = aviso.fecha?.toDate?.() || (aviso.fecha ? new Date(aviso.fecha) : null);
+          if (fecha && !Number.isNaN(fecha.getTime())) {
+            const fechaTexto = document.createElement("small");
+            fechaTexto.className = "text-muted";
+            fechaTexto.textContent = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeZone: "America/Bogota" }).format(fecha);
+            elemento.appendChild(fechaTexto);
+          }
+          return elemento;
+        }));
+      } catch (error) {
+        console.error("Error al cargar avisos:", error);
+        contenedor.innerHTML = '<p class="text-center text-danger mb-0">No se pudieron cargar los avisos.</p>';
       }
     }
 
