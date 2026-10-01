@@ -11,17 +11,15 @@ function obtenerPublicador(id) {
 function obtenerSeccionesNVC(reunion) {
   let secciones = `
     <div class="row g-0">
-      <span class="col-12 borde-celda"><b>Canción intermedia:</b> ${reunion.cancionInt}</span>
+      <span class="col-12 borde-celda"><b>Canción intermedia:</b> ${escaparHtml(reunion.cancionInt)}</span>
     </div>
   `;
   reunion.nvc.secciones.forEach((sec) => {
     secciones += `
       <div class="row g-0">
-        <span class="col-md-6 borde-celda"><b>Título:</b></br>${
-          sec.nvcTitulo
-        }</span>
+        <span class="col-md-6 borde-celda"><b>Título:</b></br>${escaparHtml(sec.nvcTitulo)}</span>
         <span class="col-md-6 borde-celda"><b>Encargado:</b></br>
-          ${obtenerPublicador(sec.nvcEncargado)?.nombre}</span>
+          ${escaparHtml(obtenerPublicador(sec.nvcEncargado)?.nombre)}</span>
       </div>
     `;
   });
@@ -29,15 +27,15 @@ function obtenerSeccionesNVC(reunion) {
     <div class="row g-0">
       <span class="col-md-6 borde-celda">
         <b>Estudio bíblico de la congregación (Conductor):</b></br>
-        ${obtenerPublicador(reunion.nvc.estudioLibro)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.nvc.estudioLibro)?.nombre)}</span>
       <span class="col-md-6 borde-celda"><b>Lector:</b></br>
-        ${obtenerPublicador(reunion.nvc.lectorEstudioLibro)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.nvc.lectorEstudioLibro)?.nombre)}</span>
     </div>
     <div class="row g-0">
       <span class="col-md-6 borde-celda"><b>Canción final:</b></br>
-        ${reunion.cancionFin}</span>
+        ${escaparHtml(reunion.cancionFin)}</span>
       <span class="col-md-6 borde-celda"><b>Oración final:</b></br>
-        ${obtenerPublicador(reunion.oracionFin)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.oracionFin)?.nombre)}</span>
     </div>
   `;
 
@@ -49,16 +47,14 @@ function obtenerSeccionesSMM(reunion) {
   reunion.smm.forEach((sec) => {
     secciones += `
       <div class="row g-0">
-        <span class="col-md-4 borde-celda"><b>Título:</b></br>${
-          sec.smmTitulo
-        }</span>
+        <span class="col-md-4 borde-celda"><b>Título:</b></br>${escaparHtml(sec.smmTitulo)}</span>
         <span class="col-md-4 borde-celda"><b>Encargado (Principal):</b></br>
-          ${obtenerPublicador(sec.smmEncargado)?.nombre}</span>
+          ${escaparHtml(obtenerPublicador(sec.smmEncargado)?.nombre)}</span>
     `;
     sec.smmAyudante &&
       (secciones += `
         <span class="col-md-4 borde-celda"><b>Ayudante (Principal):</b></br>
-          ${obtenerPublicador(sec.smmAyudante)?.nombre}</span>
+          ${escaparHtml(obtenerPublicador(sec.smmAyudante)?.nombre)}</span>
       `);
     secciones += "</div>";
     sec.smmAuxEnc &&
@@ -66,12 +62,12 @@ function obtenerSeccionesSMM(reunion) {
       <div class="row g-0">
         <span class="col-md-4 borde-celda"></span>
         <span class="col-md-4 borde-celda"><b>Encargado (Auxiliar):</b></br>
-          ${obtenerPublicador(sec.smmAuxEnc)?.nombre}</span>
+          ${escaparHtml(obtenerPublicador(sec.smmAuxEnc)?.nombre)}</span>
       `);
     sec.smmAuxAyud &&
       (secciones += `
         <span class="col-md-4 borde-celda"><b>Ayudante (Auxiliar):</b></br>
-          ${obtenerPublicador(sec.smmAuxAyud)?.nombre}</span>
+          ${escaparHtml(obtenerPublicador(sec.smmAuxAyud)?.nombre)}</span>
       `);
     (sec.smmAuxEnc || sec.smmAuxAyud) && (secciones += "</div>");
   });
@@ -81,34 +77,30 @@ function obtenerSeccionesSMM(reunion) {
 function renderDetalleReunion(reunion) {
   return `
     <div class="row g-0">
-      <span class="col-md-6 borde-celda"><b>Canción inicial:</b></br>${
-        reunion.cancionIni
-      }</span>
+      <span class="col-md-6 borde-celda"><b>Canción inicial:</b></br>${escaparHtml(reunion.cancionIni)}</span>
       <span class="col-md-6 borde-celda"><b>Presidente:</b></br>
-        ${obtenerPublicador(reunion.presidente)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.presidente)?.nombre)}</span>
     </div>
     <div class="row g-0">
       <span class="col-md-6 borde-celda"><b>Oración inicial:</b></br>
-        ${obtenerPublicador(reunion.oracionIni)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.oracionIni)?.nombre)}</span>
       <span class="col-md-6 borde-celda"><b>Consejero sala auxiliar:</b></br>
-        ${obtenerPublicador(reunion.consejAux)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.consejAux)?.nombre)}</span>
     </div>
     <h5 class="mt-2" style="background-color: #575a5d; color: white; height: 30px;">
       💎 Tesoros de la Biblia</h5>
     <div class="row g-0">
-      <span class="col-md-6 borde-celda"><b>Título:</b></br>${
-        reunion.tesoros.tesorosTitulo
-      }</span>
+      <span class="col-md-6 borde-celda"><b>Título:</b></br>${escaparHtml(reunion.tesoros.tesorosTitulo)}</span>
       <span class="col-md-6 borde-celda"><b>Encargado:</b></br>
-        ${obtenerPublicador(reunion.tesoros.tesorosEnc)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.tesoros.tesorosEnc)?.nombre)}</span>
     </div>
     <div class="row g-0">
       <span class="col-md-4 borde-celda"><b>Busquemos perlas escondidas:</b></br>
-        ${obtenerPublicador(reunion.tesoros.perlasEnc)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.tesoros.perlasEnc)?.nombre)}</span>
       <span class="col-md-4 borde-celda"><b>Lectura de la Biblia (Principal)</b></br>
-        ${obtenerPublicador(reunion.tesoros.lecturaEnc)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.tesoros.lecturaEnc)?.nombre)}</span>
       <span class="col-md-4 borde-celda"><b>Lectura de la Biblia (Auxiliar)</b></br>
-        ${obtenerPublicador(reunion.tesoros.lecturaAuxEnc)?.nombre}</span>
+        ${escaparHtml(obtenerPublicador(reunion.tesoros.lecturaAuxEnc)?.nombre)}</span>
     </div>
     <h5 class="mt-2" style="background-color: #be8900;color: white; height: 30px;">
       🌾 Seamos mejores maestros</h5>
@@ -171,12 +163,8 @@ async function renderReuniones() {
             "DD-MM-YYYY"
           )}</strong>
           <div>
-            <button class="btn btn-sm btn-outline-primary" onclick="editarReunion('${
-              reunion.id
-            }')">✏️ Editar</button>
-            <button class="btn btn-sm btn-outline-danger" onclick="eliminarReunion('${
-              reunion.id
-            }')">🗑 Eliminar</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="editarReunion('${escaparHtml(reunion.id)}')">✏️ Editar</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="eliminarReunion('${escaparHtml(reunion.id)}')">🗑 Eliminar</button>
           </div>
         </div>
         <div class="card-body p-0">
@@ -200,10 +188,10 @@ function agregarSeccionSMM(titulo = null, encargado = null, ayudante = null) {
   // Obtener el índice de la nueva sección
   const secciones = divSMM.querySelectorAll(".bloqueSmm");
   const indice = secciones.length;
-  let tituloValue = titulo ? `value="${titulo}"` : "";
-  let encargadoValue = encargado ? `value="${encargado.nombre}"` : "";
+  let tituloValue = titulo ? `value="${escaparHtml(titulo)}"` : "";
+  let encargadoValue = encargado ? `value="${escaparHtml(encargado.nombre)}"` : "";
   let encargadoId = encargado ? `data-id="${encargado.id}"` : "";
-  let ayudanteValue = ayudante ? `value="${ayudante.nombre}"` : "";
+  let ayudanteValue = ayudante ? `value="${escaparHtml(ayudante.nombre)}"` : "";
   let ayudanteId = ayudante ? `data-id="${ayudante.id}"` : "";
 
   nuevaSeccion.innerHTML = `
@@ -259,9 +247,9 @@ function agregarAuxiliar(id, encargado = null, ayudante = null) {
   const contenedor = document.getElementById(`auxiliares${id}`);
   if (!contenedor) return;
 
-  let encargadoValue = encargado ? `value="${encargado.nombre}"` : "";
+  let encargadoValue = encargado ? `value="${escaparHtml(encargado.nombre)}"` : "";
   let encargadoId = encargado ? `data-id="${encargado.id}"` : "";
-  let ayudanteValue = ayudante ? `value="${ayudante.nombre}"` : "";
+  let ayudanteValue = ayudante ? `value="${escaparHtml(ayudante.nombre)}"` : "";
   let ayudanteId = ayudante ? `data-id="${ayudante.id}"` : "";
   const fila = document.createElement("div");
   fila.className = "row g-2 mt-2";
@@ -312,8 +300,8 @@ function agregarSeccionNVC(titulo = null, encargado = null) {
   // Obtener el índice de la nueva sección
   const secciones = divNVC.querySelectorAll(".bloqueNvc");
   const indice = secciones.length;
-  let tituloValue = titulo ? `value="${titulo}"` : "";
-  let encargadoValue = encargado ? `value="${encargado.nombre}"` : "";
+  let tituloValue = titulo ? `value="${escaparHtml(titulo)}"` : "";
+  let encargadoValue = encargado ? `value="${escaparHtml(encargado.nombre)}"` : "";
   let encargadoId = encargado ? `data-id="${encargado.id}"` : "";
 
   nuevaSeccion.innerHTML = `
@@ -377,7 +365,7 @@ function renderPublicadoresEnModal(publicadoresFiltr) {
     }
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${pub.nombre}</td>
+      <td>${escaparHtml(pub.nombre)}</td>
       <td>${pub.grupo}</td>
       <td>${asignStr}</td>
       `;
@@ -616,10 +604,15 @@ async function eliminarReunion(id) {
     alert("La reunión no existe");
     return;
   }
-  const confirmar = confirm(
+  const confirmar = await confirmarAccion(
     `⚠️ ¿Estás seguro?\n\nSe eliminará la reunión del: ` +
       `${dateTimeStrToAnother(reunion.fecha, "YYYY-MM-DD", "DD-MM-YYYY")}\n\n` +
-      `Esta acción no se puede deshacer.`
+      `Esta acción no se puede deshacer.`,
+    {
+      titulo: "Eliminar reunión",
+      textoConfirmar: "Eliminar",
+      claseConfirmar: "btn-danger",
+    },
   );
   if (!confirmar) return;
   try {

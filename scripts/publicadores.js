@@ -1,20 +1,24 @@
 async function iniciarPublicadores() {
-  const selectGrupo = document.getElementById("grupo");
+  const filtroGrupo = document.getElementById("filtroGrupoPublicadores");
   const config = await cargarConfiguracionGlobal();
-  const grupos = config.cantidadGrupos;
-  for (let i = 1; i <= grupos; i++) {
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = i;
-    selectGrupo.appendChild(opt);
+  if (!config) {
+    mostrarBanner("⚠️ Primero configura la congregación", "warning", false, 4000);
+    return;
   }
-  renderPublicadoresPorGrupo(grupos);
+  const grupos = Number(config.cantidadGrupos) || 0;
+  filtroGrupo.replaceChildren(new Option("Todos", "todos"));
+  for (let i = 1; i <= grupos; i++) {
+    filtroGrupo.add(new Option(`Grupo ${i}`, String(i)));
+  }
+  filtroGrupo.add(new Option("No publicadores", "0"));
+  filtroGrupo.addEventListener("change", () => renderPublicadoresPorGrupo(grupos));
+  await renderPublicadoresPorGrupo(grupos);
 }
 
 function getClaseFila(pub, grupo) {
   let hoy = new Date
   let fecha = `${hoy.getFullYear()}-${hoy.getMonth() + 1}`;
-  icons = "";
+  let icons = "";
   if (pub.superGrupo == true) icons += "🔶";
   if (pub.auxGrupo == true) icons += "🔷";
   if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
@@ -38,7 +42,7 @@ function renderFila(pub, index, grupoNumero) {
   return `
     <tr data-id="${id}" data-grupo="${grupoNumero}">
       <td class="d-none checkbox-col"><input type="checkbox" class="form-check-input"></td>
-      <td>${index + 1}. ${iconos + " " + nombre}</td>
+      <td>${index + 1}. ${iconos} ${escaparHtml(nombre)}</td>
       <td>
         <div class="dropdown text-end">
           <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -49,7 +53,7 @@ function renderFila(pub, index, grupoNumero) {
             <li><button class="dropdown-item" onclick="asignarSuperGrupo('${id}', ${grupoNumero})">🔶 Superintendente de grupo</button></li>
             <li><button class="dropdown-item" onclick="asignarAuxGrupo('${id}', ${grupoNumero})">🔷 Auxiliar de grupo</button></li>
             <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item text-danger" onclick="eliminarPublicador('${id}', '${nombre}')">🗑️ Eliminar</button></li>
+            <li><button class="dropdown-item text-danger" onclick="eliminarPublicador('${id}', ${escaparHtml(JSON.stringify(nombre))})">🗑️ Eliminar</button></li>
           </ul>
         </div>
       </td>
@@ -71,10 +75,15 @@ async function renderPublicadoresPorGrupo(grupos) {
     console.log("✅ Datos cargados desde localStorage.");
   } else {
     // Si no hay cache, cargar y guardar
-    publicadores = await actualizarColecciones(["publicadores"]);
+    publicadores = await actualizarColecciones(["publicadores"], true);
   }
 
-  for (let g = 1; g <= grupos; g++) {
+  const filtroGrupo = document.getElementById("filtroGrupoPublicadores")?.value || "todos";
+  const gruposVisibles = filtroGrupo === "todos"
+    ? Array.from({ length: grupos }, (_, index) => index + 1)
+    : [Number(filtroGrupo)].filter((grupo) => grupo > 0);
+
+  for (const g of gruposVisibles) {
     const grupoPublicadores = ordenarPublicadoresGrupo(
       publicadores.filter((p) => Number(p.grupo) === g),
       g
@@ -112,16 +121,17 @@ async function renderPublicadoresPorGrupo(grupos) {
     contenedor.appendChild(card);
   }
 
-  // Tabla No publicadores
-  const grupoPublicadores = ordenarPublicadoresGrupo(
-    publicadores.filter((p) => Number(p.grupo) === 0),
-    0
-  );
-  const tablaId = `tablaGrupo0`;
-  const card = document.createElement("div");
-  card.className = "col-12";
+  if (filtroGrupo === "todos" || filtroGrupo === "0") {
+    // Tabla No publicadores
+    const grupoPublicadores = ordenarPublicadoresGrupo(
+      publicadores.filter((p) => Number(p.grupo) === 0),
+      0
+    );
+    const tablaId = `tablaGrupo0`;
+    const card = document.createElement("div");
+    card.className = "col-12";
 
-  card.innerHTML = `
+    card.innerHTML = `
     <div class="card card-shadow">
       <div class="card-header d-flex justify-content-between align-items-center group-header-color">
         <strong>No publicadores</strong>
@@ -145,7 +155,8 @@ async function renderPublicadoresPorGrupo(grupos) {
       </div>
     </div>
   `;
-  contenedor.appendChild(card);
+    contenedor.appendChild(card);
+  }
   cerrarBanner();
 }
 
@@ -349,8 +360,9 @@ document.querySelectorAll(".estadoEspiritual").forEach((cb) => {
 });
 
 async function eliminarPublicador(id, nombre = "el publicador") {
-  const confirmado = confirm(
-    `¿Estás seguro de que deseas eliminar a ${nombre}? Esta acción no se puede deshacer.`
+  const confirmado = await confirmarAccion(
+    `¿Estás seguro de que deseas eliminar a ${nombre}? Esta acción no se puede deshacer.`,
+    { titulo: "Eliminar publicador", textoConfirmar: "Eliminar", claseConfirmar: "btn-danger" },
   );
 
   if (!confirmado) return;
@@ -385,8 +397,9 @@ async function eliminarPublicador(id, nombre = "el publicador") {
 }
 
 async function asignarSuperGrupo(id, grupo) {
-  const confirmado = confirm(
-    `¿Asignar este publicador como 🧑‍🏫 Superintendente del grupo ${grupo}?`
+  const confirmado = await confirmarAccion(
+    `¿Asignar este publicador como 🧑‍🏫 Superintendente del grupo ${grupo}?`,
+    { titulo: "Asignar superintendente", textoConfirmar: "Asignar" },
   );
 
   if (!confirmado) return;
@@ -434,8 +447,9 @@ async function asignarSuperGrupo(id, grupo) {
 }
 
 async function asignarAuxGrupo(id, grupo) {
-  const confirmado = confirm(
-    `¿Asignar este publicador como 🤝 Auxiliar del grupo ${grupo}?`
+  const confirmado = await confirmarAccion(
+    `¿Asignar este publicador como 🤝 Auxiliar del grupo ${grupo}?`,
+    { titulo: "Asignar auxiliar", textoConfirmar: "Asignar" },
   );
 
   if (!confirmado) return;
@@ -556,8 +570,9 @@ async function moverPublicadoresDeGrupo(grupoOrigen) {
     return;
   }
 
-  const confirmacion = confirm(
-    `¿Mover ${checkboxes.length} publicadores al grupo ${nuevoGrupo}?`
+  const confirmacion = await confirmarAccion(
+    `¿Mover ${checkboxes.length} publicadores al grupo ${nuevoGrupo}?`,
+    { titulo: "Mover publicadores", textoConfirmar: "Mover" },
   );
   if (!confirmacion) return;
 

@@ -104,11 +104,16 @@ async function cargarMenuYScripts() {
   await cargarScript("main.js");
   await cargarScript("scripts/auth.js");
 
-  auth.onAuthStateChanged((user) => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
+  const user = await new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      unsubscribe();
+      resolve(currentUser);
+    });
   });
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
   // ✅ 5. Script por página
   switch (pagina) {
@@ -171,6 +176,111 @@ function mostrarBanner(
 function cerrarBanner() {
   const banner = document.getElementById("bannerEstado");
   if (banner) banner.classList.add("d-none");
+}
+
+function mostrarAvisoPersistente(mensaje, tipo = "warning") {
+  let aviso = document.getElementById("bannerPersistente");
+  if (!aviso) {
+    aviso = document.createElement("div");
+    aviso.id = "bannerPersistente";
+    aviso.className = "alert banner-persistente";
+    aviso.setAttribute("role", "alert");
+    document.body.appendChild(aviso);
+  }
+
+  aviso.className = `alert alert-${tipo} banner-persistente`;
+  aviso.replaceChildren();
+
+  const texto = document.createElement("div");
+  texto.className = "banner-persistente-texto";
+  texto.textContent = mensaje;
+
+  const cerrar = document.createElement("button");
+  cerrar.type = "button";
+  cerrar.className = "btn-close flex-shrink-0";
+  cerrar.setAttribute("aria-label", "Cerrar aviso");
+  cerrar.addEventListener("click", () => aviso.remove());
+
+  aviso.append(texto, cerrar);
+}
+
+function confirmarAccion(mensaje, opciones = {}) {
+  if (document.getElementById("dialogoConfirmacion")) {
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.id = "dialogoConfirmacion";
+    overlay.className = "confirmacion-overlay";
+    overlay.setAttribute("role", "presentation");
+
+    const dialogo = document.createElement("section");
+    dialogo.className = "confirmacion-dialogo";
+    dialogo.setAttribute("role", "alertdialog");
+    dialogo.setAttribute("aria-modal", "true");
+
+    const titulo = document.createElement("h2");
+    titulo.className = "h5 mb-3";
+    titulo.textContent = opciones.titulo || "Confirmar acción";
+    titulo.id = "tituloConfirmacion";
+    dialogo.setAttribute("aria-labelledby", titulo.id);
+
+    const detalle = document.createElement("p");
+    detalle.className = "confirmacion-mensaje";
+    detalle.textContent = mensaje;
+    detalle.id = "mensajeConfirmacion";
+    dialogo.setAttribute("aria-describedby", detalle.id);
+
+    const acciones = document.createElement("div");
+    acciones.className = "d-flex justify-content-end gap-2 mt-4";
+
+    const cancelar = document.createElement("button");
+    cancelar.type = "button";
+    cancelar.className = "btn btn-outline-secondary";
+    cancelar.textContent = opciones.textoCancelar || "Cancelar";
+
+    const aceptar = document.createElement("button");
+    aceptar.type = "button";
+    aceptar.className = `btn ${opciones.claseConfirmar || "btn-primary"}`;
+    aceptar.textContent = opciones.textoConfirmar || "Confirmar";
+
+    const finalizar = (resultado) => {
+      document.removeEventListener("keydown", manejarTeclado);
+      overlay.remove();
+      resolve(resultado);
+    };
+    const manejarTeclado = (event) => {
+      if (event.key === "Escape") finalizar(false);
+      if (event.key === "Enter" && dialogo.contains(document.activeElement)) {
+        finalizar(document.activeElement === aceptar);
+      }
+    };
+
+    cancelar.addEventListener("click", () => finalizar(false));
+    aceptar.addEventListener("click", () => finalizar(true));
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) finalizar(false);
+    });
+    document.addEventListener("keydown", manejarTeclado);
+
+    acciones.append(cancelar, aceptar);
+    dialogo.append(titulo, detalle, acciones);
+    overlay.appendChild(dialogo);
+    document.body.appendChild(overlay);
+    cancelar.focus();
+  });
+}
+
+// Convierte valores externos en texto seguro para insertar dentro de HTML.
+function escaparHtml(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[caracter]);
 }
 
 /**
@@ -244,6 +354,7 @@ function guardarEstadoVista() {
  * @returns {Promise<void>}
  */
 async function actualizarColecciones(colecciones, noReload = false) {
+  const resultados = {};
   for (const item of colecciones) {
     const nombreColeccion = typeof item === "string" ? item : item.nombre;
     const filtros = typeof item === "object" ? item.filtros : null;
@@ -267,6 +378,7 @@ async function actualizarColecciones(colecciones, noReload = false) {
         id: doc.id,
         ...doc.data(),
       }));
+      resultados[nombreColeccion] = data;
 
       localStorage.setItem(`firebase_${nombreColeccion}`, JSON.stringify(data));
 
@@ -280,6 +392,7 @@ async function actualizarColecciones(colecciones, noReload = false) {
     } catch (err) {
       console.error(`Error al actualizar ${nombreColeccion}:`, err);
       mostrarBanner(`❌ Error al actualizar "${nombreColeccion}"`, "danger");
+      resultados[nombreColeccion] = [];
     }
   }
 
@@ -288,6 +401,9 @@ async function actualizarColecciones(colecciones, noReload = false) {
     guardarEstadoVista();
     location.reload();
   }
+  return colecciones.length === 1
+    ? resultados[typeof colecciones[0] === "string" ? colecciones[0] : colecciones[0].nombre]
+    : resultados;
 }
 
 async function obtenerDataColeccion(coleccion) {
@@ -299,8 +415,7 @@ async function obtenerDataColeccion(coleccion) {
     console.log("✅ Datos cargados desde localStorage.");
     data = JSON.parse(cache);
   } else {
-    // Si no hay cache, cargar y guardar
-    data = await actualizarColecciones([coleccion]);
+    data = await actualizarColecciones([coleccion], true);
   }
   return data;
 }

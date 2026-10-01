@@ -17,7 +17,21 @@
   <!-- CONTENIDO DE LA SECCIÓN -->
   <div class="marginBody">
     <h1>👋 Bienvenido</h1>
-    <p>...</p>
+    <section class="card card-shadow mt-4" aria-labelledby="tituloTotales">
+      <div class="card-header group-header-color">
+        <h2 id="tituloTotales" class="h5 mb-0">Totales de publicadores</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead class="table-light">
+            <tr><th scope="col">Categoría</th><th scope="col" class="text-end">Total</th></tr>
+          </thead>
+          <tbody id="totalesPublicadores">
+            <tr><td colspan="2" class="text-center">Cargando totales...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
   <script src="main.js"></script>
@@ -28,7 +42,61 @@
       if (config) {
         document.querySelector("h1").innerText = `👋 Bienvenido a Cong. ${config.nombreCongregacion}`;
       }
+      await cargarTotalesPublicadores();
     });
+
+    async function cargarTotalesPublicadores() {
+      const tbody = document.getElementById("totalesPublicadores");
+      try {
+        const publicadores = await obtenerDataColeccion("publicadores");
+        const registros = publicadores.filter((pub) => Number(pub.grupo) > 0);
+        const activos = registros.filter(
+          (pub) => !(pub.estadoEspiritual || []).includes("Inactivo")
+        );
+        const inactivos = registros.filter((pub) =>
+          (pub.estadoEspiritual || []).includes("Inactivo")
+        );
+        const ahora = new Date();
+        const mesActual = `${ahora.getFullYear()}-${ahora.getMonth() + 1}`;
+        const totales = [
+          ["Publicadores activos", activos.length, "🟢", "total-activos"],
+          ["Publicadores inactivos", inactivos.length, "⚫", "total-inactivos"],
+          ["Ancianos", activos.filter((pub) => (pub.estadoEspiritual || []).includes("Anciano")).length, "🟠", "total-ancianos"],
+          ["Siervos ministeriales", activos.filter((pub) => (pub.estadoEspiritual || []).includes("Siervo ministerial")).length, "🔵", "total-siervos"],
+          ["Precursores regulares", activos.filter((pub) => (pub.estadoEspiritual || []).includes("Precursor regular")).length, "🔴", "total-regulares"],
+          ["Precursores auxiliares indefinidos", activos.filter((pub) => (pub.estadoEspiritual || []).includes("Precursor auxiliar")).length, "🟡", "total-auxiliares"],
+          ["Precursores auxiliares este mes", activos.filter((pub) => (pub.mesesAuxiliar || []).includes(mesActual)).length, "🟢", "total-auxiliares-mes"],
+        ];
+
+        tbody.replaceChildren(...totales.map(([categoria, total, icono, estilo]) => {
+          const fila = document.createElement("tr");
+          fila.className = "fila-total";
+          const nombre = document.createElement("th");
+          nombre.scope = "row";
+          const indicador = document.createElement("span");
+          indicador.className = `indicador-total ${estilo}`;
+          indicador.setAttribute("aria-hidden", "true");
+          const icon = document.createElement("span");
+          icon.className = "icono-total";
+          icon.textContent = icono;
+          const etiqueta = document.createElement("span");
+          etiqueta.textContent = categoria;
+          indicador.append(icon);
+          nombre.append(indicador, etiqueta);
+          const valor = document.createElement("td");
+          valor.className = "text-end";
+          const cifra = document.createElement("span");
+          cifra.className = `cifra-total ${estilo}`;
+          cifra.textContent = total;
+          valor.appendChild(cifra);
+          fila.append(nombre, valor);
+          return fila;
+        }));
+      } catch (error) {
+        console.error("Error al cargar totales de publicadores:", error);
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger">No se pudieron cargar los totales.</td></tr>';
+      }
+    }
   </script>
 </body>
 </html>

@@ -21,7 +21,7 @@ async function cargarAncianos() {
       console.log("✅ Datos cargados desde localStorage.");
     } else {
       // Si no hay cache, cargar y guardar
-      publicadores = await actualizarColecciones(["publicadores"]);
+      publicadores = await actualizarColecciones(["publicadores"], true);
     }
 
     publicadores = publicadores.filter((pub) =>
@@ -227,11 +227,14 @@ async function guardarPublicadoresImportados() {
   try {
     mostrarBanner("Subiendo publicadores a Firebase...", "info", true);
 
-    const batchSize = 50; // Control por lotes si necesitas
-    const promesas = publicadores.map((pub) =>
-      db.collection("publicadores").add(pub)
-    );
-    await Promise.all(promesas);
+    const batchSize = 400;
+    for (let inicio = 0; inicio < publicadores.length; inicio += batchSize) {
+      const lote = db.batch();
+      publicadores.slice(inicio, inicio + batchSize).forEach((pub) => {
+        lote.set(db.collection("publicadores").doc(), pub);
+      });
+      await lote.commit();
+    }
 
     mostrarBanner(
       `✅ ${publicadores.length} publicadores guardados en Firebase`,
@@ -241,6 +244,7 @@ async function guardarPublicadoresImportados() {
     );
 
     localStorage.removeItem("import_publicadores"); // limpiar
+    localStorage.removeItem("firebase_publicadores");
     document.getElementById("archivoExcel").value = ""; // reset file input
   } catch (err) {
     console.error("❌ Error al guardar en Firebase:", err);
@@ -249,8 +253,9 @@ async function guardarPublicadoresImportados() {
 }
 
 async function reiniciarPublicadores() {
-  const confirmar = confirm(
-    "⚠️ ¿Estás seguro de que deseas eliminar TODOS los publicadores? Esta acción no se puede deshacer."
+  const confirmar = await confirmarAccion(
+    "⚠️ ¿Estás seguro de que deseas eliminar TODOS los publicadores? Esta acción no se puede deshacer.",
+    { titulo: "Eliminar todos los publicadores", textoConfirmar: "Eliminar todo", claseConfirmar: "btn-danger" },
   );
 
   if (!confirmar) return;
@@ -473,8 +478,9 @@ async function guardarServicioImportados() {
 }
 
 async function reiniciarServicio() {
-  const confirmar = confirm(
-    "⚠️ ¿Estás seguro de que deseas eliminar TODOS los registros de servicio?"
+  const confirmar = await confirmarAccion(
+    "⚠️ ¿Estás seguro de que deseas eliminar TODOS los registros de servicio?",
+    { titulo: "Eliminar todo el servicio", textoConfirmar: "Eliminar todo", claseConfirmar: "btn-danger" },
   );
   if (!confirmar) return;
 

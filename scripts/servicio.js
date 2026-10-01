@@ -4,7 +4,17 @@ let ventanaTarjetas = null;
 
 async function iniciarPublicadores() {
   const config = await cargarConfiguracionGlobal();
-  const grupos = config.cantidadGrupos;
+  if (!config) {
+    mostrarBanner("⚠️ Primero configura la congregación", "warning", false, 4000);
+    return;
+  }
+  const grupos = Number(config.cantidadGrupos) || 0;
+  const filtroGrupo = document.getElementById("filtroGrupoServicio");
+  filtroGrupo.replaceChildren(new Option("Todos", "todos"));
+  for (let grupo = 1; grupo <= grupos; grupo++) {
+    filtroGrupo.add(new Option(`Grupo ${grupo}`, String(grupo)));
+  }
+  filtroGrupo.addEventListener("change", () => renderPublicadoresPorGrupo(grupos, false));
 
   // 📅 Ir al mes anterior al actual
   const hoy = new Date();
@@ -20,6 +30,12 @@ async function iniciarPublicadores() {
 
   const selectMes = document.getElementById("mes");
   const selectAnio = document.getElementById("anio");
+
+  document.getElementById("tablasGrupos").addEventListener("input", (event) => {
+    if (!event.target.matches(".svc-horas")) return;
+    const participo = event.target.closest("tr")?.querySelector(".svc-participo");
+    if (participo) participo.checked = Number(event.target.value) >= 1;
+  });
 
   if (selectMes && selectAnio) {
     selectMes.value = mes;
@@ -58,7 +74,7 @@ async function iniciarPublicadores() {
 }
 
 function getClaseFila(pub, grupo) {
-  icons = "";
+  let icons = "";
   const mes = document.getElementById("mes").value;
   const anio = document.getElementById("anio").value;
   let fecha = `${anio}-${mes}`;
@@ -76,9 +92,14 @@ function editarFilaServicio(btn) {
 
   tr.querySelectorAll("input").forEach((input) => {
     if (input.type === "checkbox") {
-      input.disabled = false;
+      input.disabled = input.matches(".svc-auxiliar") && input.dataset.precursor !== "true";
     } else {
-      input.readOnly = false;
+      if (input.matches(".svc-horas")) {
+        input.disabled = input.dataset.precursor !== "true";
+        input.readOnly = false;
+      } else {
+        input.readOnly = false;
+      }
     }
   });
 }
@@ -89,18 +110,27 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   const registro =
     grupoPubsServicio.find((reg) => reg.publicadorId == id) || {};
   const nombre = pub.nombre || "Sin nombre";
+  const fechaServicio = `${document.getElementById("anio").value}-${document.getElementById("mes").value}`;
+  const estados = pub.estadoEspiritual || [];
+  const esPrecursor = esPrecursorConHorasObligatorias(
+    pub,
+    Number(document.getElementById("mes").value),
+    Number(document.getElementById("anio").value),
+  );
+  const esAuxiliar = estados.includes("Precursor auxiliar") ||
+    (pub.mesesAuxiliar || []).includes(fechaServicio);
 
   const tieneRegistro = Object.keys(registro).length > 0;
 
   return `
   <tr data-id="${id}" data-grupo="${grupoNumero}">
-    <td>
+    <td class="servicio-nombre">
       <span style="width:200px; cursor:pointer" onclick="verTarjetaPublicador('${id}')">
-        ${index + 1}. ${iconos + " " + nombre}
+        ${index + 1}. ${iconos} ${escaparHtml(nombre)}
       </span>
     </td>
 
-    <td class="text-center">
+    <td class="text-center" data-label="Participó">
       <input
         type="checkbox"
         class="form-check-input svc-participo"
@@ -109,46 +139,49 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
       >
     </td>
 
-    <td>
+    <td data-label="Cursos">
       <input
         type="number"
         class="form-control form-control-sm svc-cursos"
         style="width:60px"
-        value="${registro.cursos ?? ""}"
+        value="${escaparHtml(registro.cursos ?? "")}"
         ${tieneRegistro ? "readonly" : ""}
       >
     </td>
 
-    <td class="text-center">
+    <td class="text-center" data-label="Auxiliar">
       <input
         type="checkbox"
         class="form-check-input svc-auxiliar"
-        ${registro.auxiliar ? "checked" : ""}
-        ${tieneRegistro ? "disabled" : ""}
+        data-precursor="${esPrecursor}"
+        ${registro.auxiliar || esAuxiliar ? "checked" : ""}
+        ${tieneRegistro || !esPrecursor ? "disabled" : ""}
       >
     </td>
 
-    <td>
+    <td data-label="Horas">
       <input
         type="number"
         class="form-control form-control-sm svc-horas"
+        data-precursor="${esPrecursor}"
         style="width:60px"
-        value="${registro.horas ?? ""}"
+        value="${escaparHtml(registro.horas ?? "")}"
         ${tieneRegistro ? "readonly" : ""}
+        ${!esPrecursor ? "disabled" : ""}
       >
     </td>
 
-    <td>
+    <td data-label="Notas">
       <input
         type="text"
         class="form-control form-control-sm svc-notas"
         style="width:200px"
-        value="${registro.notas ?? ""}"
+        value="${escaparHtml(registro.notas ?? "")}"
         ${tieneRegistro ? "readonly" : ""}
       >
     </td>
 
-    <td>
+    <td class="servicio-acciones">
       <div class="dropdown d-inline ms-1">
         <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">⋮</button>
         <ul class="dropdown-menu">
@@ -175,7 +208,7 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   `;
 }
 
-async function renderPublicadoresPorGrupo(grupos) {
+async function renderPublicadoresPorGrupo(grupos, actualizarDatos = true) {
   const mes = Number(document.getElementById("mes").value);
   const anio = Number(document.getElementById("anio").value);
   const contenedor = document.getElementById("tablasGrupos");
@@ -183,11 +216,12 @@ async function renderPublicadoresPorGrupo(grupos) {
   let publicadoresCache = localStorage.getItem("firebase_publicadores");
   let publicadores = [];
   let pubsServicio = [];
-  let actualizarCole = [{ nombre: "servicio", filtros: { mes, anio } }];
-
   mostrarBanner("Cargando información...", "info", true);
-  !publicadoresCache && actualizarCole.push("publicadores");
-  await actualizarColecciones(actualizarCole, true);
+  if (actualizarDatos) {
+    const colecciones = [{ nombre: "servicio", filtros: { mes, anio } }];
+    if (!publicadoresCache) colecciones.push("publicadores");
+    await actualizarColecciones(colecciones, true);
+  }
   const pubsServicioCache = localStorage.getItem("firebase_servicio");
   !publicadoresCache &&
     (publicadoresCache = localStorage.getItem("firebase_publicadores"));
@@ -197,7 +231,12 @@ async function renderPublicadoresPorGrupo(grupos) {
     console.log("✅ Datos cargados desde localStorage.");
   }
 
-  for (let g = 1; g <= grupos; g++) {
+  const filtroGrupo = document.getElementById("filtroGrupoServicio")?.value || "todos";
+  const gruposVisibles = filtroGrupo === "todos"
+    ? Array.from({ length: grupos }, (_, index) => index + 1)
+    : [Number(filtroGrupo)].filter((grupo) => grupo > 0);
+
+  for (const g of gruposVisibles) {
     const grupoPublicadores = ordenarPublicadoresGrupo(
       publicadores.filter((p) => Number(p.grupo) === g),
       g,
@@ -222,7 +261,8 @@ async function renderPublicadoresPorGrupo(grupos) {
           </div>
         </div>
         <div class="card-body p-0">
-          <table class="table table-hover mb-0" id="${tablaId}">
+            <div class="table-responsive servicio-tabla-wrap">
+            <table class="table table-hover mb-0 tabla-servicio-grupo" id="${tablaId}">
             <thead class="table-light text-center">
               <tr>
                 <th class="pe-0">Nombre</th>
@@ -247,6 +287,7 @@ async function renderPublicadoresPorGrupo(grupos) {
                 .join("")}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     `;
@@ -257,6 +298,49 @@ async function renderPublicadoresPorGrupo(grupos) {
   // 👇 RESTAURAR POSICIÓN
   restaurarPosicionVista();
   cerrarBanner();
+  mostrarPrecursoresSinHoras(gruposVisibles, publicadores, pubsServicio, mes, anio);
+}
+
+function esPrecursorConHorasObligatorias(publicador, mes, anio) {
+  const estados = publicador.estadoEspiritual || [];
+  const fecha = `${anio}-${mes}`;
+  return estados.includes("Precursor regular") ||
+    estados.includes("Precursor auxiliar") ||
+    (publicador.mesesAuxiliar || []).includes(fecha);
+}
+
+function mostrarPrecursoresSinHoras(grupos, publicadores, servicio, mes, anio) {
+  const avisos = [];
+
+  grupos.forEach((grupo) => {
+    const registrosGrupo = servicio.filter((registro) => Number(registro.grupo) === grupo);
+    if (registrosGrupo.length === 0) return;
+
+    const precursoresPendientes = publicadores.filter((publicador) => {
+      if (Number(publicador.grupo) !== grupo || !esPrecursorConHorasObligatorias(publicador, mes, anio)) {
+        return false;
+      }
+      const registro = registrosGrupo.find((item) => item.publicadorId === publicador.id);
+      return !registro || !(Number(registro.horas) > 0);
+    });
+
+    if (precursoresPendientes.length > 0) {
+      const nombres = precursoresPendientes
+        .map((publicador) => publicador.nombre || "Sin nombre")
+        .join(", ");
+      avisos.push(`Grupo ${grupo}: ${nombres}`);
+    }
+  });
+
+  if (avisos.length > 0) {
+    mostrarAvisoPrecursores(
+      `Faltan horas por agregar a estos precursores:\n${avisos.join("\n")}`,
+    );
+  }
+}
+
+function mostrarAvisoPrecursores(mensaje) {
+  mostrarAvisoPersistente(`⚠️ ${mensaje}`, "warning");
 }
 
 async function actualizarYRecargar() {
@@ -280,10 +364,12 @@ async function guardarServicioGrupo(grupo) {
   mostrarBanner("Guardando...", "info", true);
 
   const batch = db.batch();
+  const pendientes = [];
+  let registrosValidos = 0;
 
   filas.forEach((tr) => {
     const publicadorId = tr.dataset.id;
-    let pub = publicadores.find((pub) => pub.id == publicadorId);
+    const publicador = publicadores.find((pub) => pub.id == publicadorId);
     const docId = `${publicadorId}_${grupo}_${anio}_${mes}`;
     const ref = db.collection("servicio").doc(docId);
 
@@ -300,6 +386,15 @@ async function guardarServicioGrupo(grupo) {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
+    if (
+      publicador &&
+      esPrecursorConHorasObligatorias(publicador, mes, anio) &&
+      data.horas <= 0
+    ) {
+      pendientes.push(publicador.nombre || "Sin nombre");
+      return;
+    }
+
     // correcciones
     if (data.participo) {
       data.notas = data.notas
@@ -309,26 +404,45 @@ async function guardarServicioGrupo(grupo) {
         .replace("no participo", "");
       data.notas === '.' && (data.notas = '');
     }
-    (data.horas > 0 || data.cursos > 0) && (data.participo = true);
-    (data.horas > 0 && !pub.estadoEspiritual.includes("Precursor regular")) && (data.auxiliar = true);
+    if (data.horas >= 1) data.participo = true;
+    else if (publicador && esPrecursorConHorasObligatorias(publicador, mes, anio)) {
+      data.participo = false;
+    } else if (data.cursos > 0) {
+      data.participo = true;
+    }
+    (data.horas > 0 && !(publicador?.estadoEspiritual || []).includes("Precursor regular")) && (data.auxiliar = true);
     if (!data.participo && !data.notas.toLowerCase().includes("no participó")) {
       data.notas += (data.notas ? " " : "") + "No participó.";
     }
     if (
-      (pub.estadoEspiritual || []).includes("Inactivo") &&
+      (publicador?.estadoEspiritual || []).includes("Inactivo") &&
       !data.notas.toLowerCase().includes("inactivo")
     ) {
       data.notas += (data.notas ? " " : "") + "Inactivo.";
     }
 
     batch.set(ref, data, { merge: true });
+    registrosValidos++;
   });
 
-  await batch.commit();
+  if (registrosValidos > 0) {
+    await batch.commit();
+    await actualizarColecciones([{ nombre: "servicio", filtros: { mes, anio } }], true);
+  }
 
-  await actualizarColecciones([{ nombre: "servicio", filtros: { mes, anio } }]);
-
-  mostrarBanner("✅ Servicio guardado correctamente", "success", false, 3000);
+  const config = await cargarConfiguracionGlobal();
+  await renderPublicadoresPorGrupo(Number(config?.cantidadGrupos) || 0, false);
+  if (pendientes.length > 0) {
+    const nombresPendientes = pendientes.join(", ");
+    const guardados = registrosValidos > 0
+      ? `Se guardaron los demás registros (${registrosValidos}).\n`
+      : "No se guardó ningún registro.\n";
+    mostrarAvisoPrecursores(
+      `${guardados}Agrega las horas para estos precursores: ${nombresPendientes}`,
+    );
+  } else {
+    mostrarBanner("✅ Servicio guardado correctamente", "success", false, 3000);
+  }
 }
 
 async function limpiarServicioGrupo(grupo) {
@@ -339,9 +453,14 @@ async function limpiarServicioGrupo(grupo) {
     return alert("Selecciona mes y año");
   }
 
-  const confirmar = confirm(
+  const confirmar = await confirmarAccion(
     `⚠️ ¿Estás seguro?\n\nSe eliminarán TODOS los registros de servicio:\n` +
       `Grupo ${grupo} - ${mes}/${anio}\n\nEsta acción no se puede deshacer.`,
+    {
+      titulo: "Eliminar registros de servicio",
+      textoConfirmar: "Eliminar",
+      claseConfirmar: "btn-danger",
+    },
   );
 
   if (!confirmar) return;
@@ -584,7 +703,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
           <td class="text-center">${reg.cursos || ""}</td>
           <td class="text-center">${reg.auxiliar ? "✓" : ""}</td>
           <td class="text-center">${reg.horas || ""}</td>
-          <td>${reg.notas || ""}</td>
+          <td>${escaparHtml(reg.notas || "")}</td>
         </tr>
       `;
     })
@@ -606,7 +725,7 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
       <!-- Nombre -->
       <div class="fila nombre">
         <span class="label">Nombre:</span>
-        <span id="nombre-pub" class="valor">${pub.nombre || ""}</span>
+        <span id="nombre-pub" class="valor">${escaparHtml(pub.nombre || "")}</span>
       </div>
 
       <!-- Fechas + Sexo / Esperanza -->
