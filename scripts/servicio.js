@@ -208,7 +208,11 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   `;
 }
 
-async function renderPublicadoresPorGrupo(grupos, actualizarDatos = true) {
+async function renderPublicadoresPorGrupo(
+  grupos,
+  actualizarDatos = true,
+  mostrarAvisoPendientes = true,
+) {
   const mes = Number(document.getElementById("mes").value);
   const anio = Number(document.getElementById("anio").value);
   const contenedor = document.getElementById("tablasGrupos");
@@ -298,7 +302,9 @@ async function renderPublicadoresPorGrupo(grupos, actualizarDatos = true) {
   // 👇 RESTAURAR POSICIÓN
   restaurarPosicionVista();
   cerrarBanner();
-  mostrarPrecursoresSinHoras(gruposVisibles, publicadores, pubsServicio, mes, anio);
+  if (mostrarAvisoPendientes) {
+    mostrarPrecursoresSinHoras(gruposVisibles, publicadores, pubsServicio, mes, anio);
+  }
 }
 
 function esPrecursorConHorasObligatorias(publicador, mes, anio) {
@@ -307,6 +313,124 @@ function esPrecursorConHorasObligatorias(publicador, mes, anio) {
   return estados.includes("Precursor regular") ||
     estados.includes("Precursor auxiliar") ||
     (publicador.mesesAuxiliar || []).includes(fecha);
+}
+
+async function verificarCincoMesesSinParticipacion(publicador, mes, anio) {
+  const periodos = Array.from({ length: 5 }, (_, indice) => {
+    const fecha = new Date(anio, mes - 2 - indice, 1);
+    return { anio: fecha.getFullYear(), mes: fecha.getMonth() + 1 };
+  });
+  const snapshot = await db
+    .collection("servicio")
+    .where("publicadorId", "==", publicador.id)
+    .get();
+  const informes = snapshot.docs.map((documento) => documento.data());
+
+  return periodos.every(({ anio: anioAnterior, mes: mesAnterior }) =>
+    informes.some(
+      (informe) =>
+        Number(informe.anio) === anioAnterior &&
+        Number(informe.mes) === mesAnterior &&
+        informe.participo === false,
+    ),
+  );
+}
+
+async function actualizarEstadosPublicadores(publicadores, informesGuardados, grupo, mes, anio) {
+  const errores = [];
+
+  const cambiosEvaluados = await Promise.all(informesGuardados.map(async (informe) => {
+    const publicador = publicadores.find((item) => item.id === informe.publicadorId);
+    if (!publicador) return null;
+
+    const estadoActual = Array.isArray(publicador.estadoEspiritual)
+      ? publicador.estadoEspiritual
+      : [];
+    const estaInactivo = estadoActual.includes("Inactivo");
+
+    if (informe.participo && estaInactivo) {
+      return {
+        publicador,
+        estadoNuevo: estadoActual.filter((estado) => estado !== "Inactivo"),
+        descripcion: `${publicador.nombre || "Sin nombre"}: pasa a estar Activo`,
+        estadoAnterior: "Inactivo",
+        estadoFinal: "Activo",
+      };
+    }
+
+    if (!informe.participo && !estaInactivo) {
+      try {
+        const cincoMesesInactivo = await verificarCincoMesesSinParticipacion(
+          publicador,
+          mes,
+          anio,
+        );
+        if (cincoMesesInactivo) {
+          return {
+            publicador,
+            estadoNuevo: [...estadoActual, "Inactivo"],
+            descripcion: `${publicador.nombre || "Sin nombre"}: pasa a ser Inactivo`,
+            estadoAnterior: "Activo",
+            estadoFinal: "Inactivo",
+          };
+        }
+      } catch (error) {
+        console.error(`No se pudo verificar el historial de ${publicador.nombre}:`, error);
+        errores.push(publicador.nombre || "Sin nombre");
+      }
+    }
+    return null;
+  }));
+  const cambios = cambiosEvaluados.filter(Boolean);
+
+  const accionesRegistradas = [];
+  for (let inicio = 0; inicio < cambios.length; inicio += 200) {
+    const loteCambios = cambios.slice(inicio, inicio + 200);
+    const batch = db.batch();
+    loteCambios.forEach((cambio) => {
+      batch.update(
+        db.collection("publicadores").doc(cambio.publicador.id),
+        { estadoEspiritual: cambio.estadoNuevo },
+      );
+      const logRef = db.collection("historialEstadosPublicadores").doc();
+      batch.set(logRef, {
+        publicadorId: cambio.publicador.id,
+        nombre: cambio.publicador.nombre || "Sin nombre",
+        grupo,
+        estadoAnterior: cambio.estadoAnterior,
+        estadoNuevo: cambio.estadoFinal,
+        descripcion: cambio.descripcion,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    try {
+      await batch.commit();
+      accionesRegistradas.push(...loteCambios);
+    } catch (error) {
+      console.error("No se pudieron guardar algunos cambios de estado:", error);
+      errores.push(...loteCambios.map((cambio) => cambio.publicador.nombre || "Sin nombre"));
+    }
+  }
+
+  if (accionesRegistradas.length > 0) {
+    const cache = localStorage.getItem("firebase_publicadores");
+    if (cache) {
+      const publicadoresCache = JSON.parse(cache);
+      accionesRegistradas.forEach((cambio) => {
+        const publicadorCache = publicadoresCache.find(
+          (item) => item.id === cambio.publicador.id,
+        );
+        if (publicadorCache) publicadorCache.estadoEspiritual = cambio.estadoNuevo;
+      });
+      localStorage.setItem("firebase_publicadores", JSON.stringify(publicadoresCache));
+    }
+  }
+
+  return {
+    acciones: accionesRegistradas.map((cambio) => cambio.descripcion),
+    errores: [...new Set(errores)],
+  };
 }
 
 function mostrarPrecursoresSinHoras(grupos, publicadores, servicio, mes, anio) {
@@ -339,8 +463,9 @@ function mostrarPrecursoresSinHoras(grupos, publicadores, servicio, mes, anio) {
   }
 }
 
-function mostrarAvisoPrecursores(mensaje) {
-  mostrarAvisoPersistente(`⚠️ ${mensaje}`, "warning");
+function mostrarAvisoPrecursores(mensaje, tipo = "warning") {
+  const icono = tipo === "warning" ? "⚠️ " : "✅ ";
+  mostrarAvisoPersistente(`${icono}${mensaje}`, tipo);
 }
 
 async function actualizarYRecargar() {
@@ -365,6 +490,7 @@ async function guardarServicioGrupo(grupo) {
 
   const batch = db.batch();
   const pendientes = [];
+  const informesGuardados = [];
   let registrosValidos = 0;
 
   filas.forEach((tr) => {
@@ -422,24 +548,45 @@ async function guardarServicioGrupo(grupo) {
     }
 
     batch.set(ref, data, { merge: true });
+    informesGuardados.push({ publicadorId, participo: data.participo });
     registrosValidos++;
   });
 
+  let resultadoEstados = { acciones: [], errores: [] };
   if (registrosValidos > 0) {
     await batch.commit();
     await actualizarColecciones([{ nombre: "servicio", filtros: { mes, anio } }], true);
+    resultadoEstados = await actualizarEstadosPublicadores(
+      publicadores,
+      informesGuardados,
+      grupo,
+      mes,
+      anio,
+    );
   }
 
   const config = await cargarConfiguracionGlobal();
-  await renderPublicadoresPorGrupo(Number(config?.cantidadGrupos) || 0, false);
+  await renderPublicadoresPorGrupo(Number(config?.cantidadGrupos) || 0, false, false);
+  const mensajesPersistentes = [];
+  if (resultadoEstados.acciones.length > 0) {
+    mensajesPersistentes.push("Acciones realizadas:", ...resultadoEstados.acciones);
+  }
   if (pendientes.length > 0) {
-    const nombresPendientes = pendientes.join(", ");
-    const guardados = registrosValidos > 0
-      ? `Se guardaron los demás registros (${registrosValidos}).\n`
-      : "No se guardó ningún registro.\n";
-    mostrarAvisoPrecursores(
-      `${guardados}Agrega las horas para estos precursores: ${nombresPendientes}`,
+    mensajesPersistentes.push(
+      `Horas pendientes (estos registros no se guardaron): ${pendientes.join(", ")}`,
     );
+  }
+  if (resultadoEstados.errores.length > 0) {
+    mensajesPersistentes.push(
+      `No se pudo evaluar o guardar el cambio de estado para: ${resultadoEstados.errores.join(", ")}`,
+    );
+  }
+
+  if (mensajesPersistentes.length > 0) {
+    const tipoAviso = pendientes.length > 0 || resultadoEstados.errores.length > 0
+      ? "warning"
+      : "success";
+    mostrarAvisoPrecursores(mensajesPersistentes.join("\n"), tipoAviso);
   } else {
     mostrarBanner("✅ Servicio guardado correctamente", "success", false, 3000);
   }

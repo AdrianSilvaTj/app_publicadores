@@ -32,6 +32,22 @@
         </table>
       </div>
     </section>
+
+    <section class="card card-shadow mt-4" aria-labelledby="tituloHistorialEstados">
+      <div class="card-header group-header-color">
+        <h2 id="tituloHistorialEstados" class="h5 mb-0">📋 Últimos cambios de estado</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr><th scope="col">Fecha y hora</th><th scope="col">Acción</th></tr>
+          </thead>
+          <tbody id="historialEstadosPublicadores">
+            <tr><td colspan="2" class="text-center">Cargando historial...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
   <script src="main.js"></script>
@@ -43,6 +59,7 @@
         document.querySelector("h1").innerText = `👋 Bienvenido a Cong. ${config.nombreCongregacion}`;
       }
       await cargarTotalesPublicadores();
+      await cargarHistorialEstadosPublicadores();
     });
 
     async function cargarTotalesPublicadores() {
@@ -95,6 +112,42 @@
       } catch (error) {
         console.error("Error al cargar totales de publicadores:", error);
         tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger">No se pudieron cargar los totales.</td></tr>';
+      }
+    }
+
+    async function cargarHistorialEstadosPublicadores() {
+      const tbody = document.getElementById("historialEstadosPublicadores");
+      try {
+        const snapshot = await db
+          .collection("historialEstadosPublicadores")
+          .orderBy("createdAt", "desc")
+          .limit(20)
+          .get();
+
+        if (snapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">Aún no hay cambios de estado registrados.</td></tr>';
+          return;
+        }
+
+        const formatoFecha = new Intl.DateTimeFormat("es-CO", {
+          dateStyle: "short",
+          timeStyle: "short",
+          timeZone: "America/Bogota",
+        });
+        tbody.replaceChildren(...snapshot.docs.map((documento) => {
+          const registro = documento.data();
+          const fila = document.createElement("tr");
+          const fecha = document.createElement("td");
+          const instante = registro.createdAt?.toDate?.();
+          fecha.textContent = instante ? formatoFecha.format(instante) : "—";
+          const accion = document.createElement("td");
+          accion.textContent = registro.descripcion || "Cambio de estado";
+          fila.append(fecha, accion);
+          return fila;
+        }));
+      } catch (error) {
+        console.error("Error al cargar el historial de estados:", error);
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger">No se pudo cargar el historial.</td></tr>';
       }
     }
   </script>
