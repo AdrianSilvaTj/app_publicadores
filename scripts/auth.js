@@ -1,15 +1,6 @@
 // Asegúrate de haber inicializado Firebase previamente
 const auth = firebase.auth();
 
-// Verifica si hay sesión activa
-function verificarSesionActiva() {
-    auth.onAuthStateChanged(user => {
-        if (!user) {
-            window.location.href = "login.html";
-        }
-    });
-}
-
 // Cerrar sesión
 function cerrarSesion() {
     auth.signOut().then(() => {
@@ -17,7 +8,6 @@ function cerrarSesion() {
         window.location.href = "login.html";
     });
 }
-
 
 // Recuperar contraseña
 function recordarClave() {
@@ -28,12 +18,11 @@ function recordarClave() {
         .catch(err => alert("❌ Error: " + err.message));
 }
 
-// mostrar al usuario logeado en la interfaz
-// auth.onAuthStateChanged(user => {
-//   if (user) {
-//     document.getElementById("usuarioActivo").textContent = user.email;
-//   }
-// });
-
-
-
+// Verifica si hay sesión activa
+function verificarSesionActiva() {
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+}

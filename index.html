@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#212529" />
   <title>Publicadores</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="style.css" rel="stylesheet" />
+  <link href="style.css?v=20261002" rel="stylesheet" />
 </head>
 <body>
   <!-- NAVBAR -->
@@ -45,7 +49,10 @@
 
     <section class="card card-shadow" aria-labelledby="tituloHistorialEstados">
       <div class="card-header group-header-color">
-        <h2 id="tituloHistorialEstados" class="h5 mb-0">📋 Últimas acciones realizadas</h2>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h2 id="tituloHistorialEstados" class="h5 mb-0">📋 Últimas acciones realizadas</h2>
+            <a class="btn btn-sm btn-outline-primary" href="historial-acciones.html">Ver todas</a>
+          </div>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -62,16 +69,21 @@
   </div>
 
   <script src="main.js"></script>
+  <script src="scripts/pwa-install.js" defer></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      await cargarMenuYScripts()
-      const config = await cargarConfiguracionGlobal();
-      if (config) {
-        document.querySelector("h1").innerText = `👋 Bienvenido a Cong. ${config.nombreCongregacion}`;
+      try {
+        await cargarMenuYScripts();
+        const config = await cargarConfiguracionGlobal();
+        if (config) {
+          document.querySelector("h1").innerText = `👋 Bienvenido a Cong. ${config.nombreCongregacion}`;
+        }
+        await cargarTotalesPublicadores();
+        await cargarHistorialEstadosPublicadores();
+        await cargarAvisos();
+      } finally {
+        cerrarBanner();
       }
-      await cargarTotalesPublicadores();
-      await cargarHistorialEstadosPublicadores();
-      await cargarAvisos();
     });
 
     async function cargarTotalesPublicadores() {
@@ -190,7 +202,9 @@
         tbody.replaceChildren(...snapshot.docs.map((documento) => {
           const registro = documento.data();
           const fila = document.createElement("tr");
+          fila.classList = ["col-9"];
           const fecha = document.createElement("td");
+          fecha.classList = ["col-3"];
           const instante = registro.createdAt?.toDate?.();
           fecha.textContent = instante ? formatoFecha.format(instante) : "—";
           const accion = document.createElement("td");

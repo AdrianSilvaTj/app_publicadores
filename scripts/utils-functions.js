@@ -35,27 +35,6 @@ function obtenerAnioServicio(mes, anio) {
 
   return mesNumero >= 9 ? anioNumero + 1 : anioNumero;
 }
-/**
- * Replaces an item in an array based on a matching field value.
- *
- * @param {Object[]} arr - The array to search and update.
- * @param {string} search_field - The key in each object to compare.
- * @param {*} search_value - The value to match against the field.
- * @param {Object} newValue - The new item to replace the matched one.
- * @returns {Object[] | null} The modified array or null if not found.
- *
- * @example
- * const users = [{ id: 1 }, { id: 2 }];
- * replaceInArray(users, 'id', 2, { id: 2, name: 'John' });
- */
-function replaceInArray(arr, search_field, search_value, newValue) {
-  const index = arr.findIndex((item) => item?.[search_field] === search_value);
-
-  if (index === -1) return null;
-
-  arr[index] = newValue;
-  return arr;
-}
 
 /**
  * Sorts an array of objects based on a specific object property.
@@ -96,4 +75,26 @@ function orderArray(array, field, order = "asc") {
 
     return 0;
   });
+}
+
+/**
+ * Replaces an item in an array based on a matching field value.
+ *
+ * @param {Object[]} arr - The array to search and update.
+ * @param {string} search_field - The key in each object to compare.
+ * @param {*} search_value - The value to match against the field.
+ * @param {Object} newValue - The new item to replace the matched one.
+ * @returns {Object[] | null} The modified array or null if not found.
+ *
+ * @example
+ * const users = [{ id: 1 }, { id: 2 }];
+ * replaceInArray(users, 'id', 2, { id: 2, name: 'John' });
+ */
+function replaceInArray(arr, search_field, search_value, newValue) {
+  const index = arr.findIndex((item) => item?.[search_field] === search_value);
+
+  if (index === -1) return null;
+
+  arr[index] = newValue;
+  return arr;
 }

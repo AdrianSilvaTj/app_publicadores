@@ -1,6 +1,7 @@
 async function iniciarAnalisisCongregacion() {
   const tbody = document.getElementById("listaPrecursoresRegulares");
   const selector = document.getElementById("anioServicioAnalisis");
+  mostrarBanner("Cargando...", "info", true);
   try {
     const [publicadores, servicio, configuracion] = await Promise.all([
       consultarFirebase("publicadores"),
@@ -36,7 +37,7 @@ async function iniciarAnalisisCongregacion() {
     const objetivoAnual = (Number(configuracion?.horasMensualesPrecursoresRegulares) || 0) * 12;
     const umbralAlerta = objetivoAnual * 0.95;
 
-    const render = () => {
+    function render() {
       const anioServicio = Number(selector.value);
       const totales = new Map(regulares.map((pub) => [String(pub.id), 0]));
       servicio.forEach((registro) => {
@@ -84,9 +85,11 @@ async function iniciarAnalisisCongregacion() {
     };
     selector.addEventListener("change", render);
     render();
+    cerrarBanner();
   } catch (error) {
     console.error("Error al cargar el análisis de congregación:", error);
     tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">No se pudo cargar el análisis.</td></tr>';
+    cerrarBanner();
     mostrarBanner("❌ Error al cargar el análisis de la congregación", "danger");
   }
 }

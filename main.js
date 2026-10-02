@@ -41,6 +41,7 @@ function cargarScript(src) {
  */
 
 async function cargarMenuYScripts() {
+  mostrarBanner("Cargando...", "info", true);
   const path = window.location.pathname;
   let pagina = path.substring(path.lastIndexOf("/") + 1).split(".")[0];
   const menu = document.getElementById("menu");
@@ -136,6 +137,9 @@ async function cargarMenuYScripts() {
     case "analisis-congregacion":
       await cargarScript("scripts/servicio.js");
       await cargarScript("scripts/analisis-congregacion.js?v=2");
+      break;
+    case "historial-acciones":
+      await cargarScript("scripts/historial-acciones.js");
       break;
     case "configuracion":
       await cargarScript("scripts/configuracion.js");

@@ -25,6 +25,148 @@ const MONTH_NAMES = [
 ];
 
 /**
+ * Adds a specified number of days to a date.
+ * @param {Date} date - The original date.
+ * @param {number} days - The number of days to add.
+ * @returns {Date} - The new Date object with the added days.
+ */
+function addDays(date, days) {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + days);
+  return newDate;
+}
+
+/**
+ * Adds a specified number of hours to a date.
+ * @param {Date} date - The original date.
+ * @param {number} hours - The number of hours to add.
+ * @returns {Date} - The new Date object with the added hours.
+ */
+function addHours(date, hours) {
+  const newDate = new Date(date);
+  newDate.setHours(newDate.getHours() + hours);
+  return newDate;
+}
+
+function cargarAniosSelect(selectId, anioInicio = 2020, anioFin = 2050) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  for (let anio = anioInicio; anio <= anioFin; anio++) {
+    const option = document.createElement("option");
+    option.value = anio;
+    option.textContent = anio;
+    select.appendChild(option);
+  }
+
+  // Seleccionar año actual si está dentro del rango
+  const anioActual = new Date().getFullYear();
+  if (anioActual >= anioInicio && anioActual <= anioFin) {
+    select.value = anioActual;
+  }
+}
+
+function cargarMesesSelect(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  const meses = [
+    { id: 1, nombre: "Enero" },
+    { id: 2, nombre: "Febrero" },
+    { id: 3, nombre: "Marzo" },
+    { id: 4, nombre: "Abril" },
+    { id: 5, nombre: "Mayo" },
+    { id: 6, nombre: "Junio" },
+    { id: 7, nombre: "Julio" },
+    { id: 8, nombre: "Agosto" },
+    { id: 9, nombre: "Septiembre" },
+    { id: 10, nombre: "Octubre" },
+    { id: 11, nombre: "Noviembre" },
+    { id: 12, nombre: "Diciembre" },
+  ];
+
+  select.innerHTML = "";
+
+  meses.forEach((mes) => {
+    const option = document.createElement("option");
+    option.value = mes.id;
+    option.textContent = mes.nombre;
+    select.appendChild(option);
+  });
+
+  // Seleccionar mes actual
+  select.value = new Date().getMonth() + 1;
+}
+
+/**
+ * Converts a date string from one format to another.
+ * @param {string} dateString - The input date string.
+ * @param {string} inputFormat - The format of the input date string (e.g., 'DD/MM/YYYY').
+ * @param {string} outputFormat - The desired format for the output string (e.g., 'YYYY-MM-DD').
+ * @returns {string | null} - The formatted date string, or null if the input is invalid.
+ */
+function dateTimeStrToAnother(dateString, inputFormat, outputFormat) {
+  const date = stringToDateTime(dateString, inputFormat);
+  if (!date) {
+    throw new Error("Invalid date string or format");
+  }
+  return dateTimeToString(date, outputFormat);
+}
+
+/**
+ * Formats a Date object into a string based on the provided format.
+ * @param {Date} date - The Date object to be formatted.
+ * @param {string} format - The desired format for the output string (e.g., 'YYYY-MM-DD HH:mm:SS').
+ * @returns {string} - The formatted date string.
+ */
+function dateTimeToString(date, format) {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    throw new Error("Invalid Date object");
+  }
+
+  const components = {
+    YYYY: date.getFullYear().toString(),
+    MM: (date.getMonth() + 1).toString().padStart(2, "0"),
+    DD: date.getDate().toString().padStart(2, "0"),
+    HH: date.getHours().toString().padStart(2, "0"),
+    mm: date.getMinutes().toString().padStart(2, "0"),
+    SS: date.getSeconds().toString().padStart(2, "0"),
+  };
+
+  let formattedDate = format;
+  for (const key in components) {
+    formattedDate = formattedDate.replace(key, components[key]);
+  }
+
+  return formattedDate;
+}
+
+/**
+ * Formats the value of an input date control to a 'YYYY-MM-DD' string.
+ * @param {string | Date} date - The date value to be formatted.
+ * @returns {string} - The formatted date string in 'YYYY-MM-DD' format.
+ */
+function formatInputDateControl(date) {
+  return new Date(date).toISOString().split("T")[0];
+}
+
+/**
+ * Adds a specified number of hours to a date.
+ * @param {Date} date - The original date.
+ * @param {number} hours - The number of hours to add.
+ * @returns {Date} - The new Date object with the added hours.
+ */
+function getDaysDifference(startDate, endDate) {
+  if (!startDate || !endDate) {
+    return 0;
+  }
+  const timeDifference = endDate.getTime() - startDate.getTime();
+  return timeDifference / (1000 * 60 * 60 * 24);
+}
+
+/**
  * Parses a date string into a Date object based on the provided format.
  * @param {string} dateString - The date string to be parsed.
  * @param {string} format - The format of the date string (e.g., 'YYYY-MM-DD HH:mm:SS').
@@ -114,146 +256,4 @@ function stringToDateTime(dateString, format) {
   }
 
   return new Date(year, month, day, hour, minutes, seconds);
-}
-
-/**
- * Formats a Date object into a string based on the provided format.
- * @param {Date} date - The Date object to be formatted.
- * @param {string} format - The desired format for the output string (e.g., 'YYYY-MM-DD HH:mm:SS').
- * @returns {string} - The formatted date string.
- */
-function dateTimeToString(date, format) {
-  if (!(date instanceof Date) || isNaN(date.getTime())) {
-    throw new Error("Invalid Date object");
-  }
-
-  const components = {
-    YYYY: date.getFullYear().toString(),
-    MM: (date.getMonth() + 1).toString().padStart(2, "0"),
-    DD: date.getDate().toString().padStart(2, "0"),
-    HH: date.getHours().toString().padStart(2, "0"),
-    mm: date.getMinutes().toString().padStart(2, "0"),
-    SS: date.getSeconds().toString().padStart(2, "0"),
-  };
-
-  let formattedDate = format;
-  for (const key in components) {
-    formattedDate = formattedDate.replace(key, components[key]);
-  }
-
-  return formattedDate;
-}
-
-/**
- * Converts a date string from one format to another.
- * @param {string} dateString - The input date string.
- * @param {string} inputFormat - The format of the input date string (e.g., 'DD/MM/YYYY').
- * @param {string} outputFormat - The desired format for the output string (e.g., 'YYYY-MM-DD').
- * @returns {string | null} - The formatted date string, or null if the input is invalid.
- */
-function dateTimeStrToAnother(dateString, inputFormat, outputFormat) {
-  const date = stringToDateTime(dateString, inputFormat);
-  if (!date) {
-    throw new Error("Invalid date string or format");
-  }
-  return dateTimeToString(date, outputFormat);
-}
-
-/**
- * Formats the value of an input date control to a 'YYYY-MM-DD' string.
- * @param {string | Date} date - The date value to be formatted.
- * @returns {string} - The formatted date string in 'YYYY-MM-DD' format.
- */
-function formatInputDateControl(date) {
-  return new Date(date).toISOString().split("T")[0];
-}
-
-/**
- * Adds a specified number of hours to a date.
- * @param {Date} date - The original date.
- * @param {number} hours - The number of hours to add.
- * @returns {Date} - The new Date object with the added hours.
- */
-function getDaysDifference(startDate, endDate) {
-  if (!startDate || !endDate) {
-    return 0;
-  }
-  const timeDifference = endDate.getTime() - startDate.getTime();
-  return timeDifference / (1000 * 60 * 60 * 24);
-}
-
-/**
- * Adds a specified number of hours to a date.
- * @param {Date} date - The original date.
- * @param {number} hours - The number of hours to add.
- * @returns {Date} - The new Date object with the added hours.
- */
-function addHours(date, hours) {
-  const newDate = new Date(date);
-  newDate.setHours(newDate.getHours() + hours);
-  return newDate;
-}
-
-/**
- * Adds a specified number of days to a date.
- * @param {Date} date - The original date.
- * @param {number} days - The number of days to add.
- * @returns {Date} - The new Date object with the added days.
- */
-function addDays(date, days) {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() + days);
-  return newDate;
-}
-
-function cargarAniosSelect(selectId, anioInicio = 2020, anioFin = 2050) {
-  const select = document.getElementById(selectId);
-  if (!select) return;
-
-  select.innerHTML = "";
-
-  for (let anio = anioInicio; anio <= anioFin; anio++) {
-    const option = document.createElement("option");
-    option.value = anio;
-    option.textContent = anio;
-    select.appendChild(option);
-  }
-
-  // Seleccionar año actual si está dentro del rango
-  const anioActual = new Date().getFullYear();
-  if (anioActual >= anioInicio && anioActual <= anioFin) {
-    select.value = anioActual;
-  }
-}
-
-function cargarMesesSelect(selectId) {
-  const select = document.getElementById(selectId);
-  if (!select) return;
-
-  const meses = [
-    { id: 1, nombre: "Enero" },
-    { id: 2, nombre: "Febrero" },
-    { id: 3, nombre: "Marzo" },
-    { id: 4, nombre: "Abril" },
-    { id: 5, nombre: "Mayo" },
-    { id: 6, nombre: "Junio" },
-    { id: 7, nombre: "Julio" },
-    { id: 8, nombre: "Agosto" },
-    { id: 9, nombre: "Septiembre" },
-    { id: 10, nombre: "Octubre" },
-    { id: 11, nombre: "Noviembre" },
-    { id: 12, nombre: "Diciembre" },
-  ];
-
-  select.innerHTML = "";
-
-  meses.forEach((mes) => {
-    const option = document.createElement("option");
-    option.value = mes.id;
-    option.textContent = mes.nombre;
-    select.appendChild(option);
-  });
-
-  // Seleccionar mes actual
-  select.value = new Date().getMonth() + 1;
 }
