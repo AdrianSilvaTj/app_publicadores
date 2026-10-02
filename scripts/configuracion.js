@@ -149,6 +149,81 @@ async function cargarConfiguracion() {
   }
 }
 
+async function migrarCamposHistoricosServicio() {
+  try {
+    mostrarBanner("Consultando informes de servicio...", "info", true);
+    const [servicioSnapshot, publicadoresSnapshot] = await Promise.all([
+      db.collection("servicio").get(),
+      db.collection("publicadores").get(),
+    ]);
+    const publicadoresPorId = new Map(
+      publicadoresSnapshot.docs.map((doc) => [doc.id, doc.data()]),
+    );
+
+    let batch = db.batch();
+    let operacionesEnLote = 0;
+    let migrados = 0;
+    let yaCompletos = 0;
+    const confirmarLote = async () => {
+      if (!operacionesEnLote) return;
+      await batch.commit();
+      batch = db.batch();
+      operacionesEnLote = 0;
+    };
+
+    for (const doc of servicioSnapshot.docs) {
+      const informe = doc.data();
+      const actualizacion = {};
+      const publicador = publicadoresPorId.get(String(informe.publicadorId));
+      const estados = publicador?.estadoEspiritual || [];
+
+      if (typeof informe.activo !== "boolean") {
+        const inactivoEseMes =
+          informe.participo === false && /\binactivo\b/i.test(String(informe.notas || ""));
+        actualizacion.activo = !inactivoEseMes;
+      }
+
+      if (!Object.prototype.hasOwnProperty.call(informe, "privilegio")) {
+        let privilegio = null;
+        if (informe.auxiliar === true && publicador) {
+          privilegio = estados.includes("Precursor auxiliar")
+            ? "auxiliar"
+            : "auxiliar_mes";
+        } else if (
+          publicador &&
+          estados.includes("Precursor regular") &&
+          Number(informe.horas) > 0
+        ) {
+          privilegio = "regular";
+        }
+        actualizacion.privilegio = privilegio;
+      }
+
+      if (!Object.keys(actualizacion).length) {
+        yaCompletos++;
+        continue;
+      }
+
+      batch.set(doc.ref, actualizacion, { merge: true });
+      operacionesEnLote++;
+      migrados++;
+      if (operacionesEnLote === 400) await confirmarLote();
+    }
+
+    await confirmarLote();
+    localStorage.removeItem("firebase_servicio");
+    mostrarBanner(
+      `✅ Migración terminada: ${migrados} registros actualizados, ${yaCompletos} ya estaban completos.`,
+      "success",
+      false,
+      8000,
+    );
+  } catch (error) {
+    console.error("Error migrando campos históricos del servicio:", error);
+    mostrarBanner("❌ No se pudo completar la migración de servicio", "danger");
+  }
+}
+
 // 4. Inicialización
 cargarAncianos().then(() => {
   cargarConfiguracion();

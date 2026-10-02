@@ -76,17 +76,54 @@ async function iniciarPublicadores() {
   }, 300);
 }
 
-function getClaseFila(pub, grupo) {
+function obtenerPrivilegioActual(publicador, mes, anio) {
+  const estados = publicador?.estadoEspiritual || [];
+  if (estados.includes("Precursor auxiliar")) return "auxiliar";
+  const fecha = `${anio}-${mes}`;
+  if ((publicador?.mesesAuxiliar || []).includes(fecha)) return "auxiliar_mes";
+  if (estados.includes("Precursor regular")) return "regular";
+  return null;
+}
+
+function obtenerPrivilegioRegistro(publicador, registro, mes, anio) {
+  if (Object.prototype.hasOwnProperty.call(registro || {}, "privilegio")) {
+    return registro.privilegio || null;
+  }
+  return obtenerPrivilegioActual(publicador, mes, anio);
+}
+
+function obtenerActivoRegistro(publicador, registro) {
+  if (typeof registro?.activo === "boolean") return registro.activo;
+  return !(publicador?.estadoEspiritual || []).includes("Inactivo");
+}
+
+function obtenerPrivilegioServicio(publicador, informe) {
+  if (!publicador) return null;
+  const estados = publicador.estadoEspiritual || [];
+  if (informe.auxiliar) {
+    return estados.includes("Precursor auxiliar") ? "auxiliar" : "auxiliar_mes";
+  }
+  if (estados.includes("Precursor regular") && Number(informe.horas) > 0) {
+    return "regular";
+  }
+  return null;
+}
+
+function getClaseFila(pub, registroSeleccionado = null) {
   let icons = "";
-  const mes = document.getElementById("mes").value;
-  const anio = document.getElementById("anio").value;
-  let fecha = `${anio}-${mes}`;
-  if ((pub.estadoEspiritual || []).includes("Precursor regular")) icons += "🔴";
-  if ((pub.estadoEspiritual || []).includes("Precursor auxiliar"))
-    icons += "🟡";
-  if ((pub.mesesAuxiliar || []).includes(fecha))
-    icons += "🟢";
-  if ((pub.estadoEspiritual || []).includes("Inactivo")) icons += "⚫";
+  const mes = Number(document.getElementById("mes").value);
+  const anio = Number(document.getElementById("anio").value);
+  const registros = registroSeleccionado
+    ? [registroSeleccionado]
+    : JSON.parse(localStorage.getItem("firebase_servicio") || "[]");
+  const registro = registros.find((item) =>
+    item.publicadorId == pub.id && Number(item.mes) === mes && Number(item.anio) === anio,
+  ) || {};
+  const privilegio = obtenerPrivilegioRegistro(pub, registro, mes, anio);
+  if (privilegio === "regular") icons += "🔴";
+  if (privilegio === "auxiliar") icons += "🟡";
+  if (privilegio === "auxiliar_mes") icons += "🟢";
+  if (!obtenerActivoRegistro(pub, registro)) icons += "⚫";
   return icons;
 }
 
@@ -109,24 +146,23 @@ function editarFilaServicio(btn) {
 
 function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   const id = pub.id;
-  const iconos = getClaseFila(pub, grupoNumero);
   const registro =
     grupoPubsServicio.find((reg) => reg.publicadorId == id) || {};
+  const iconos = getClaseFila(pub, registro);
   const nombre = pub.nombre || "Sin nombre";
   const mesSeleccionado = Number(document.getElementById("mes").value);
   const anioSeleccionado = Number(document.getElementById("anio").value);
   const anioServicio = obtenerAnioServicio(mesSeleccionado, anioSeleccionado);
-  const fechaServicio = `${anioSeleccionado}-${mesSeleccionado}`;
   const estados = pub.estadoEspiritual || [];
-  const esPrecursor = esPrecursorConHorasObligatorias(
-    pub,
-    Number(document.getElementById("mes").value),
-    Number(document.getElementById("anio").value),
-  );
-  const esAuxiliar = estados.includes("Precursor auxiliar") ||
-    (pub.mesesAuxiliar || []).includes(fechaServicio);
-
   const tieneRegistro = Object.keys(registro).length > 0;
+  const privilegio = obtenerPrivilegioRegistro(
+    pub,
+    registro,
+    mesSeleccionado,
+    anioSeleccionado,
+  );
+  const esPrecursor = Boolean(privilegio);
+  const esAuxiliar = ["auxiliar", "auxiliar_mes"].includes(privilegio);
 
   return `
   <tr data-id="${id}" data-grupo="${grupoNumero}">
@@ -160,8 +196,8 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
         type="checkbox"
         class="form-check-input svc-auxiliar"
         data-precursor="${esPrecursor}"
-        ${registro.auxiliar || esAuxiliar ? "checked" : ""}
-        ${tieneRegistro || !esPrecursor ? "disabled" : ""}
+        ${esAuxiliar ? "checked" : ""}
+        ${tieneRegistro || !esAuxiliar ? "disabled" : ""}
       >
     </td>
 
@@ -251,7 +287,12 @@ async function renderPublicadoresPorGrupo(
       publicadores.filter((p) => Number(p.grupo) === g),
       g,
     );
-    let grupoPubsServicio = pubsServicio.filter((p) => Number(p.grupo) === g);
+    const grupoPubsServicio = pubsServicio.filter(
+      (registro) =>
+        Number(registro.grupo) === g &&
+        Number(registro.mes) === mes &&
+        Number(registro.anio) === anio,
+    );
     const tablaId = `tablaGrupo${g}`;
 
     const card = document.createElement("div");
@@ -443,14 +484,27 @@ function mostrarPrecursoresSinHoras(grupos, publicadores, servicio, mes, anio) {
   const avisos = [];
 
   grupos.forEach((grupo) => {
-    const registrosGrupo = servicio.filter((registro) => Number(registro.grupo) === grupo);
-    if (registrosGrupo.length === 0) return;
+    const registrosGrupo = servicio.filter(
+      (registro) =>
+        Number(registro.grupo) === grupo &&
+        Number(registro.mes) === mes &&
+        Number(registro.anio) === anio,
+    );
 
     const precursoresPendientes = publicadores.filter((publicador) => {
-      if (Number(publicador.grupo) !== grupo || !esPrecursorConHorasObligatorias(publicador, mes, anio)) {
+      const registro = registrosGrupo.find((item) => item.publicadorId === publicador.id);
+      const privilegio = obtenerPrivilegioRegistro(
+        publicador,
+        registro || {},
+        mes,
+        anio,
+      );
+      if (
+        Number(publicador.grupo) !== grupo ||
+        !["regular", "auxiliar", "auxiliar_mes"].includes(privilegio)
+      ) {
         return false;
       }
-      const registro = registrosGrupo.find((item) => item.publicadorId === publicador.id);
       return !registro || !(Number(registro.horas) > 0);
     });
 
@@ -552,6 +606,11 @@ async function guardarServicioGrupo(grupo) {
     ) {
       data.notas += (data.notas ? " " : "") + "Inactivo.";
     }
+
+    data.activo = !(
+      data.participo === false && /\binactivo\b/i.test(data.notas)
+    );
+    data.privilegio = obtenerPrivilegioServicio(publicador, data);
 
     batch.set(ref, data, { merge: true });
     informesGuardados.push({ publicadorId, participo: data.participo });
@@ -768,7 +827,7 @@ async function descargarListadoPublicadores() {
         (pub) =>
           new Paragraph({
             children: [
-              new TextRun(`${pub.nombre || ""} ${getClaseFila(pub, g)}`),
+              new TextRun(`${pub.nombre || ""} ${getClaseFila(pub)}`),
             ],
           }),
       ),
