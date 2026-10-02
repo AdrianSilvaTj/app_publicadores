@@ -6,6 +6,9 @@ const selects = {
   superServicio: document.getElementById("superServicio"),
   superAtalaya: document.getElementById("superAtalaya"),
   auxAtalaya: document.getElementById("auxAtalaya"),
+  superReunionVidaMinisterio: document.getElementById("superReunionVidaMinisterio"),
+  encargadoAudioVideo: document.getElementById("encargadoAudioVideo"),
+  encargadoCuentas: document.getElementById("encargadoCuentas"),
 };
 
 // 2. Cargar publicadores con privilegio "Anciano"
@@ -24,19 +27,22 @@ async function cargarAncianos() {
       publicadores = await actualizarColecciones(["publicadores"], true);
     }
 
-    publicadores = publicadores.filter((pub) =>
+    const ancianos = publicadores.filter((pub) =>
       (pub.estadoEspiritual || []).includes("Anciano")
     );
-    publicadores.forEach((doc) => {
+    const varonesBautizados = publicadores.filter((pub) =>
+      pub.sexo === "M" && !(pub.estadoEspiritual || []).includes("No bautizado")
+    );
+    const agregarOpciones = (selectsDestino, lista) => lista.forEach((doc) => {
       const option = document.createElement("option");
       option.value = doc.id; // guardamos el ID del publicador
       option.textContent = doc.nombre;
-
-      // Agregar la misma opción a todos los selects
-      Object.values(selects).forEach((select) => {
+      selectsDestino.forEach((select) => {
         select.appendChild(option.cloneNode(true));
       });
     });
+    agregarOpciones([selects.coordinador, selects.secretario, selects.superServicio, selects.superAtalaya, selects.auxAtalaya, selects.superReunionVidaMinisterio], ancianos);
+    agregarOpciones([selects.encargadoAudioVideo, selects.encargadoCuentas], varonesBautizados);
     cerrarBanner();
   } catch (err) {
     console.error("Error al cargar ancianos:", err);
@@ -56,12 +62,16 @@ formConfig.addEventListener("submit", async (e) => {
       .getElementById("numeroCongregacion")
       .value.trim(),
     cantidadGrupos: parseInt(document.getElementById("cantidadGrupos").value),
+    horasMensualesPrecursoresRegulares: Number(document.getElementById("horasMensualesPrecursoresRegulares").value) || 0,
     organigrama: {
       coordinador: selects.coordinador.value,
       secretario: selects.secretario.value,
       superServicio: selects.superServicio.value,
       superAtalaya: selects.superAtalaya.value,
       auxAtalaya: selects.auxAtalaya.value,
+      superReunionVidaMinisterio: selects.superReunionVidaMinisterio.value,
+      encargadoAudioVideo: selects.encargadoAudioVideo.value,
+      encargadoCuentas: selects.encargadoCuentas.value,
     },
     actualizado: new Date(),
   };
@@ -105,6 +115,7 @@ async function cargarConfiguracion() {
     document.getElementById("numeroCongregacion").value =
       data.numeroCongregacion || "";
     document.getElementById("cantidadGrupos").value = data.cantidadGrupos || "";
+    document.getElementById("horasMensualesPrecursoresRegulares").value = data.horasMensualesPrecursoresRegulares ?? "";
 
     if (data.organigrama) {
       document.getElementById("coordinador").value =
@@ -117,6 +128,12 @@ async function cargarConfiguracion() {
         data.organigrama.superAtalaya || "";
       document.getElementById("auxAtalaya").value =
         data.organigrama.auxAtalaya || "";
+      document.getElementById("superReunionVidaMinisterio").value =
+        data.organigrama.superReunionVidaMinisterio || "";
+      document.getElementById("encargadoAudioVideo").value =
+        data.organigrama.encargadoAudioVideo || "";
+      document.getElementById("encargadoCuentas").value =
+        data.organigrama.encargadoCuentas || "";
     }
 
     mostrarBanner(

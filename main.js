@@ -63,10 +63,14 @@ async function cargarMenuYScripts() {
               pagina === "reuniones" && "active"
             }" href="reuniones.html">📅 Reuniones</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link  ${
-              pagina === "servicio" && "active"
-            }" href="servicio.html">💼 Servicio</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle ${
+              ["servicio", "analisis-congregacion"].includes(pagina) ? "active" : ""
+            }" href="#" id="menuServicio" role="button" data-bs-toggle="dropdown" aria-expanded="false">💼 Servicio</a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuServicio" style="background-color: darkgray;">
+              <li><a class="dropdown-item ${pagina === "servicio" ? "active" : ""}" href="servicio.html">◾ Informes</a></li>
+              <li><a class="dropdown-item ${pagina === "analisis-congregacion" ? "active" : ""}" href="analisis-congregacion.html">◾ Análisis de la congregación</a></li>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link ${
@@ -128,6 +132,10 @@ async function cargarMenuYScripts() {
       break;
     case "servicio":
       await cargarScript("scripts/servicio.js");
+      break;
+    case "analisis-congregacion":
+      await cargarScript("scripts/servicio.js");
+      await cargarScript("scripts/analisis-congregacion.js?v=2");
       break;
     case "configuracion":
       await cargarScript("scripts/configuracion.js");

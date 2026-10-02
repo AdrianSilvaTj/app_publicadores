@@ -42,13 +42,17 @@
               required
             />
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <label for="numeroCongregacion" class="form-label"
               >Número de congregación</label
             >
             <input type="number" id="numeroCongregacion" class="form-control" />
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
+            <label for="horasMensualesPrecursoresRegulares" class="form-label">Horas mensuales P. regulares</label>
+            <input type="number" id="horasMensualesPrecursoresRegulares" class="form-control" min="0" step="1" />
+          </div>
+          <div class="col-md-2">
             <label for="cantidadGrupos" class="form-label"
               >Cantidad de grupos <span class="text-danger">*</span></label
             >
@@ -107,6 +111,18 @@
             <select id="auxAtalaya" class="form-select" required>
               <option value="">Selecciona un anciano...</option>
             </select>
+          </div>
+          <div class="col-md-6">
+            <label for="superReunionVidaMinisterio" class="form-label">Superintendente Reunión V. y M. Cristianos</label>
+            <select id="superReunionVidaMinisterio" class="form-select"><option value="">Selecciona un anciano...</option></select>
+          </div>
+          <div class="col-md-6">
+            <label for="encargadoAudioVideo" class="form-label">Encargado Audio y Video</label>
+            <select id="encargadoAudioVideo" class="form-select"><option value="">Selecciona un varón bautizado...</option></select>
+          </div>
+          <div class="col-md-6">
+            <label for="encargadoCuentas" class="form-label">Encargado Cuentas</label>
+            <select id="encargadoCuentas" class="form-select"><option value="">Selecciona un varón bautizado...</option></select>
           </div>
         </div>
 

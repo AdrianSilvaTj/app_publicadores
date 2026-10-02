@@ -69,7 +69,10 @@ async function iniciarPublicadores() {
       groupSelect.appendChild(option);
     }
     const selectAnioDesc = document.getElementById("anio-descarga");
-    selectAnioDesc.value = anio;
+    selectAnioDesc.value = obtenerAnioServicio(
+      Number(document.getElementById("mes").value),
+      Number(document.getElementById("anio").value),
+    );
   }, 300);
 }
 
@@ -110,7 +113,10 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   const registro =
     grupoPubsServicio.find((reg) => reg.publicadorId == id) || {};
   const nombre = pub.nombre || "Sin nombre";
-  const fechaServicio = `${document.getElementById("anio").value}-${document.getElementById("mes").value}`;
+  const mesSeleccionado = Number(document.getElementById("mes").value);
+  const anioSeleccionado = Number(document.getElementById("anio").value);
+  const anioServicio = obtenerAnioServicio(mesSeleccionado, anioSeleccionado);
+  const fechaServicio = `${anioSeleccionado}-${mesSeleccionado}`;
   const estados = pub.estadoEspiritual || [];
   const esPrecursor = esPrecursorConHorasObligatorias(
     pub,
@@ -125,7 +131,7 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
   return `
   <tr data-id="${id}" data-grupo="${grupoNumero}">
     <td class="servicio-nombre">
-      <span style="width:200px; cursor:pointer" onclick="verTarjetaPublicador('${id}')">
+      <span style="width:200px; cursor:pointer" onclick="verTarjetaPublicador('${id}', ${anioServicio})">
         ${index + 1}. ${iconos} ${escaparHtml(nombre)}
       </span>
     </td>
@@ -196,7 +202,7 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
           <li>
             <button
               class="dropdown-item"
-              onclick="verTarjetaPublicador('${id}')"
+              onclick="verTarjetaPublicador('${id}', ${anioServicio})"
             >
               👁 Ver tarjeta
             </button>
@@ -994,13 +1000,15 @@ async function renderTarjetaPublicador(publicadorId, anioServicio) {
   `;
 }
 
-async function verTarjetaPublicador(id) {
+async function verTarjetaPublicador(id, anioServicioSeleccionado = null) {
   const width = 900;
   const height = 900;
-  const mes = Number(document.getElementById("mes").value);
-  let anioServicio = Number(document.getElementById("anio").value);
-
-  if (mes >= 9 && mes <= 12) anioServicio += 1;
+  let anioServicio = anioServicioSeleccionado;
+  if (anioServicio == null) {
+    const mes = Number(document.getElementById("mes").value);
+    const anio = Number(document.getElementById("anio").value);
+    anioServicio = obtenerAnioServicio(mes, anio);
+  }
 
   const left = (screen.width - width) / 2;
   const top = (screen.height - height) / 2;
@@ -1187,7 +1195,7 @@ async function verTarjetasGrupo(grupo, anioServicio) {
 
           html2pdf().set({
             margin: 10,
-            filename: "Tarjetas Grupo ${grupo} ${anioServicio + 1}.pdf",
+            filename: "Tarjetas Grupo ${grupo} ${anioServicio}.pdf",
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: {
               scale: 2,
@@ -1240,7 +1248,8 @@ function obtenerVentanaTarjetas(width = 1000, height = 900) {
 }
 
 function descargarTarjetas() {
-  const anioServicio = Number(document.getElementById("anio-descarga").value);
+  const anioFinal = Number(document.getElementById("anio-descarga").value);
+  const anioServicio = obtenerAnioServicio(8, anioFinal);
   const grupo = Number(document.getElementById("grupo-descarga").value);
 
   if (!anioServicio || !grupo) {

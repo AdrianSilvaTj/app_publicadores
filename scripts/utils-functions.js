@@ -13,6 +13,28 @@ const NAMES = {
   "estudioLibro": "Estudio libro",
   "capitan": "Capitán serv."
 }
+
+/**
+ * Obtiene el año de servicio al que pertenece un mes y año calendario.
+ * El año de servicio va de septiembre a agosto y se identifica por el año
+ * calendario en que termina (por ejemplo, septiembre de 2025 pertenece a 2026).
+ *
+ * @param {number|string} mes Mes calendario, del 1 al 12.
+ * @param {number|string} anio Año calendario.
+ * @returns {number|null} Año de servicio o null si los datos no son válidos.
+ */
+function obtenerAnioServicio(mes, anio) {
+  const mesNumero = Number(mes);
+  const anioNumero = Number(anio);
+  if (
+    !Number.isInteger(mesNumero) || mesNumero < 1 || mesNumero > 12 ||
+    !Number.isInteger(anioNumero)
+  ) {
+    return null;
+  }
+
+  return mesNumero >= 9 ? anioNumero + 1 : anioNumero;
+}
 /**
  * Replaces an item in an array based on a matching field value.
  *
