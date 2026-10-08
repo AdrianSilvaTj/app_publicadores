@@ -305,6 +305,7 @@ async function guardarServicioGrupo(grupo) {
     return alert("Selecciona mes y año");
   }
 
+  document.getElementById("bannerPersistente")?.remove();
   mostrarBanner("Guardando...", "info", true);
 
   const batch = db.batch();
@@ -621,38 +622,68 @@ function mostrarPrecursoresSinHoras(grupos, publicadores, servicio, mes, anio) {
 async function mostrarTotales() {
   let publicadores = await obtenerDataColeccion("publicadores");
   publicadores = publicadores.filter((p) => p.grupo > 0);
-  const servicio = await obtenerDataColeccion("servicio");
-
-  // Filtros base
-  const activos = publicadores.filter(
-    (p) => !(p.estadoEspiritual || []).includes("Inactivo"),
+  const mes = Number(document.getElementById("mes")?.value);
+  const anio = Number(document.getElementById("anio")?.value);
+  const servicioMes = (await obtenerDataColeccion("servicio")).filter(
+    (registro) => Number(registro.mes) === mes && Number(registro.anio) === anio,
   );
-  const inactivosId = publicadores
-    .filter((p) => (p.estadoEspiritual || []).includes("Inactivo"))
-    .map((p) => p.id);
-  const informes = servicio.filter((s) => s.participo);
-  const irregulares = servicio.filter(
-    (s) => !s.participo && !inactivosId.includes(s.publicadorId),
+  const registroPorPublicador = new Map(
+    servicioMes.map((registro) => [String(registro.publicadorId), registro]),
   );
-  const auxiliares = servicio.filter((s) => s.auxiliar);
-
-  const regularesId = publicadores
-    .filter((p) => (p.estadoEspiritual || []).includes("Precursor regular"))
-    .map((p) => p.id);
-
-  const regulares = servicio.filter((s) =>
-    regularesId.includes(s.publicadorId),
+  const publicadorPorId = new Map(
+    publicadores.map((publicador) => [String(publicador.id), publicador]),
   );
+
+  // Usa el estado guardado en el informe del mes; los helpers recurren al
+  // estado actual del publicador en informes históricos sin esos campos.
+  const activos = publicadores.filter((publicador) =>
+    obtenerActivoRegistro(
+      publicador,
+      registroPorPublicador.get(String(publicador.id)),
+    ),
+  );
+  const registrosActivos = servicioMes.filter((registro) => {
+    const publicador = publicadorPorId.get(String(registro.publicadorId));
+    return publicador && obtenerActivoRegistro(publicador, registro);
+  });
+  const informes = registrosActivos.filter((registro) => registro.participo);
+  const irregulares = registrosActivos.filter((registro) => !registro.participo);
+  const auxiliares = registrosActivos.filter((registro) =>
+    ["auxiliar", "auxiliar_mes"].includes(
+      obtenerPrivilegioRegistro(
+        publicadorPorId.get(String(registro.publicadorId)),
+        registro,
+        mes,
+        anio,
+      ),
+    ),
+  );
+  const regulares = registrosActivos.filter(
+    (registro) =>
+      obtenerPrivilegioRegistro(
+        publicadorPorId.get(String(registro.publicadorId)),
+        registro,
+        mes,
+        anio,
+      ) === "regular",
+  );
+  const privilegioDeRegistro = (registro) =>
+    obtenerPrivilegioRegistro(
+      publicadorPorId.get(String(registro.publicadorId)),
+      registro,
+      mes,
+      anio,
+    );
 
   // Cálculos generales
   const totalActivos = activos.length;
-  const promedioAsistencia = servicio.length
-    ? Math.round((informes.length / servicio.length) * 100)
+  const promedioAsistencia = registrosActivos.length
+    ? Math.round((informes.length / registrosActivos.length) * 100)
     : 0;
 
   // Publicadores
-  const publicadoresServicio = servicio.filter(
-    (s) => !s.auxiliar && !regularesId.includes(s.publicadorId),
+  const publicadoresServicio = registrosActivos.filter(
+    (registro) => !privilegioDeRegistro(registro),
   );
 
   const totalPubli = publicadoresServicio.filter((s) => s.participo).length;
