@@ -1,0 +1,17 @@
+﻿.tareas-page { max-width: 1320px; }
+.tarea-card { height: 100%; overflow-wrap: anywhere; }
+.tarea-card .card-header { background-color: var(--bs-light); }
+.tarea-descripcion { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tarea-notas { max-height: 12rem; overflow-y: auto; }
+.tarea-recordatorio { font-size: .9rem; }
+.tarea-estado { text-transform: capitalize; }
+.tarea-estado-pendiente { color: #664d03; background: #fff3cd; }
+.tarea-estado-en-curso { color: #084298; background: #cfe2ff; }
+.tarea-estado-realizada { color: #0f5132; background: #d1e7dd; }
+.tarea-estado-cancelada { color: #41464b; background: #e2e3e5; }
+#listaRecordatoriosTarea, #listaNotasTarea { padding-left: 0; }
+#listaNotasTarea li { overflow-wrap: anywhere; }
+@media (max-width: 575.98px) {
+  .tareas-page { padding-left: .75rem; padding-right: .75rem; }
+  #nuevaTarea { width: 100%; }
+}
