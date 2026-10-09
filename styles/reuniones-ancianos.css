@@ -1,0 +1,47 @@
+.reunion-ancianos-card {
+  height: 100%;
+  overflow-wrap: anywhere;
+}
+
+.reunion-ancianos-contenido {
+  color: #343a40;
+  line-height: 1.6;
+  white-space: normal;
+}
+
+.reunion-ancianos-contenido > :last-child {
+  margin-bottom: 0;
+}
+
+.editor-reunion-ancianos {
+  min-height: 18rem;
+  overflow-wrap: anywhere;
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.editor-reunion-ancianos:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+  outline: 0;
+}
+
+.editor-reunion-ancianos ul,
+.editor-reunion-ancianos ol,
+.reunion-ancianos-contenido ul,
+.reunion-ancianos-contenido ol {
+  padding-left: 1.5rem;
+}
+
+#colorTextoAncianos {
+  border: 0;
+  height: 1.25rem;
+  padding: 0;
+  width: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .editor-reunion-ancianos {
+    min-height: 14rem;
+  }
+}

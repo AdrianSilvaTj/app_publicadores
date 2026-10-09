@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#212529" />
+  <title>Crear reunión de ancianos</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="style.css?v=20261002" rel="stylesheet" />
+  <link href="styles/reuniones-ancianos.css" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px"></nav>
+  <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
+
+  <div class="marginBody">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <h3 id="tituloEditorReunionAncianos" class="mb-0">Crear reunión de ancianos</h3>
+      <a class="btn btn-outline-secondary" href="reuniones-ancianos.html">Volver a reuniones</a>
+    </div>
+    <form id="formReunionAncianos" class="card card-shadow p-3 p-md-4">
+      <div id="estadoEditorAncianos" class="alert d-none mb-3" role="alert"></div>
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="fechaReunionAncianos">Fecha</label>
+          <input class="form-control" id="fechaReunionAncianos" name="fecha" type="date" required />
+        </div>
+        <div class="col-12 col-md-8">
+          <label class="form-label" for="temaReunionAncianos">Tema</label>
+          <input class="form-control" id="temaReunionAncianos" name="tema" type="text" maxlength="180" required />
+        </div>
+      </div>
+
+      <label class="form-label" id="etiquetaEditorAncianos">Contenido</label>
+      <div class="editor-toolbar btn-toolbar flex-wrap gap-2 mb-2" role="toolbar" aria-label="Formato del texto">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Estilos de texto">
+          <button class="btn btn-outline-secondary" type="button" data-editor-command="bold" aria-label="Negrita" title="Negrita"><strong>N</strong></button>
+          <button class="btn btn-outline-secondary" type="button" data-editor-command="italic" aria-label="Cursiva" title="Cursiva"><em>C</em></button>
+          <button class="btn btn-outline-secondary" type="button" data-editor-command="underline" aria-label="Subrayado" title="Subrayado"><u>S</u></button>
+        </div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Listas">
+          <button class="btn btn-outline-secondary" type="button" data-editor-command="insertUnorderedList" title="Viñetas">• Viñetas</button>
+          <button class="btn btn-outline-secondary" type="button" data-editor-command="insertOrderedList" title="Lista numerada">1. Lista</button>
+        </div>
+        <label class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2" for="colorTextoAncianos">Color
+          <input id="colorTextoAncianos" type="color" value="#212529" aria-label="Color de texto" />
+        </label>
+        <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="removeFormat">Quitar formato</button>
+      </div>
+      <div id="editorReunionAncianos" class="editor-reunion-ancianos form-control" contenteditable="true" role="textbox" aria-labelledby="etiquetaEditorAncianos" aria-multiline="true"></div>
+      <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+        <a class="btn btn-outline-secondary" href="reuniones-ancianos.html">Cancelar</a>
+        <button id="guardarReunionAncianos" class="btn btn-primary" type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="main.js"></script>
+  <script src="scripts/pwa-install.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const menuCargado = await cargarMenuYScripts();
+        if (!menuCargado) return;
+        await inicializarEditorReunionAncianos();
+      } finally {
+        cerrarBanner();
+      }
+    });
+  </script>
+</body>
+</html>
