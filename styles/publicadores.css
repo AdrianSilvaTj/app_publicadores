@@ -8,3 +8,19 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
+.leyenda-publicadores > div { flex: 0 1 auto; max-width: 100%; }
+.leyenda-publicadores .badge { white-space: normal; }
+@media (max-width: 575.98px) {
+  .leyenda-publicadores {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem 0.5rem !important;
+  }
+  .leyenda-publicadores > div { min-width: 0; }
+  .leyenda-publicadores .badge {
+    display: block;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+}

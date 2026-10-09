@@ -419,6 +419,7 @@ async function editarPublicador(id) {
 
     // Rellenar campos
     document.getElementById("nombre").value = pub.nombre || "";
+    document.getElementById("emailPublicador").value = pub.email || "";
     document.getElementById("fechaNacimiento").value =
       pub.fechaNacimiento || "";
     document.getElementById("fechaBautismo").value = pub.fechaBautismo || "";
@@ -839,6 +840,7 @@ form.addEventListener("submit", async (e) => {
   const idEdicion = form.getAttribute("data-edicion-id");
 
   const nombre = document.getElementById("nombre").value.trim();
+  const email = document.getElementById("emailPublicador").value.trim().toLowerCase();
   const fechaNacimiento =
     document.getElementById("fechaNacimiento").value || null;
   const fechaBautismo = document.getElementById("fechaBautismo").value || null;
@@ -874,6 +876,7 @@ form.addEventListener("submit", async (e) => {
 
   const data = {
     nombre,
+    email: email || null,
     fechaNacimiento,
     fechaBautismo,
     sexo,

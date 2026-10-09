@@ -110,6 +110,7 @@ async function cargarConfiguracion() {
       data.numeroCongregacion || "";
     document.getElementById("cantidadGrupos").value = data.cantidadGrupos || "";
     document.getElementById("horasMensualesPrecursoresRegulares").value = data.horasMensualesPrecursoresRegulares ?? "";
+    document.getElementById("envioRecordatoriosCorreo").checked = data.envioRecordatoriosCorreo !== false;
 
     if (data.organigrama) {
       document.getElementById("coordinador").value =
@@ -491,6 +492,7 @@ formConfig.addEventListener("submit", async (e) => {
       .value.trim(),
     cantidadGrupos: parseInt(document.getElementById("cantidadGrupos").value),
     horasMensualesPrecursoresRegulares: Number(document.getElementById("horasMensualesPrecursoresRegulares").value) || 0,
+    envioRecordatoriosCorreo: document.getElementById("envioRecordatoriosCorreo").checked,
     organigrama: {
       coordinador: selects.coordinador.value,
       secretario: selects.secretario.value,

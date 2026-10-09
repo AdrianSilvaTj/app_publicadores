@@ -419,3 +419,50 @@ h2, h3 {
     grid-template-columns: 1fr 1fr;
   }
 }
+@media (max-width: 575.98px) {
+  .pwa-install-banner {
+    left: 0.65rem;
+    right: 0.65rem;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .pwa-install-copy,
+  .pwa-install-actions {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .pwa-install-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pwa-install-actions .btn {
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .marginBody {
+    width: 100%;
+    margin: 0;
+    padding: 1rem 0.75rem;
+    box-sizing: border-box;
+  }
+
+  .pwa-install-banner {
+    left: 0.65rem !important;
+    right: auto !important;
+    width: calc(100vw - 1.3rem) !important;
+    max-width: calc(100vw - 1.3rem) !important;
+    box-sizing: border-box;
+  }
+
+  .pwa-install-copy span {
+    overflow-wrap: anywhere;
+  }
+}

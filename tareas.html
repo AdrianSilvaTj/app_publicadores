@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="style.css?v=20261002" rel="stylesheet" />
+  <link href="style.css?v=20261009-mobile" rel="stylesheet" />
   <link href="styles/tareas.css" rel="stylesheet" />
 </head>
 <body>
@@ -22,15 +22,15 @@
         <h1 class="h3 mb-1">Tareas</h1>
         <p class="text-muted mb-0">Organiza responsabilidades, fechas y recordatorios.</p>
       </div>
-      <button id="nuevaTarea" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalTarea">ï¼‹ Crear tarea</button>
+      <button id="nuevaTarea" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalTarea">+ Crear tarea</button>
     </div>
 
     <div id="estadoNotificaciones" class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2" role="status">
-      <span id="textoEstadoNotificaciones">Activa las notificaciones para recibir avisos mientras DigitCong estÃ© abierto.</span>
+      <span id="textoEstadoNotificaciones">Activa las notificaciones para recibir avisos mientras DigitCong esté abierto.</span>
       <button id="activarNotificaciones" class="btn btn-outline-primary btn-sm" type="button">Activar notificaciones</button>
     </div>
     <div id="avisoPushPendiente" class="alert alert-warning small" role="note">
-      Los recordatorios se mostrarÃ¡n cuando la app estÃ© abierta. Para enviarlos con la app cerrada hace falta configurar el envÃ­o push en Firebase y su clave VAPID.
+      Para recibir correos con la app cerrada, configura el activador gratuito de Google Apps Script. Google revisa los avisos cada cinco minutos; la entrega puede demorarse.
     </div>
 
     <section class="card card-shadow p-3 mb-3" aria-label="Filtros de tareas">
@@ -79,18 +79,26 @@
             <input id="idTarea" type="hidden" />
             <div class="row g-3">
               <div class="col-12">
-                <label class="form-label" for="tituloTarea">TÃ­tulo</label>
+                <label class="form-label" for="tituloTarea">Título</label>
                 <input class="form-control" id="tituloTarea" maxlength="160" required />
               </div>
               <div class="col-12">
-                <label class="form-label" for="descripcionTarea">DescripciÃ³n</label>
+                <label class="form-label" for="descripcionTarea">Descripción</label>
                 <textarea class="form-control" id="descripcionTarea" rows="3" maxlength="2000"></textarea>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="responsablesTarea">Responsable(s)</label>
-                <input class="form-control" id="responsablesTarea" maxlength="240" placeholder="Nombres separados por coma" list="listaPublicadoresTarea" />
+                <div class="input-group">
+                  <input class="form-control" id="responsablesTarea" maxlength="240" placeholder="Nombres separados por coma" list="listaPublicadoresTarea" />
+                  <button class="btn btn-outline-secondary" id="buscarPublicadorTarea" type="button" aria-label="Buscar publicador" title="Seleccionar publicador">&#128269;</button>
+                </div>
                 <datalist id="listaPublicadoresTarea"></datalist>
                 <div class="form-text">Puedes escribir una persona o varias, separadas por coma.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="correosResponsablesTarea">Correo(s) de responsable(s) para recordatorios</label>
+                <input class="form-control" id="correosResponsablesTarea" type="text" inputmode="email" maxlength="600" placeholder="correo@ejemplo.com, otro@ejemplo.com" autocomplete="email" />
+                <div class="form-text">Escribe los correos con los que ingresan a DigitCong, separados por comas.</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="estadoTarea">Estado</label>
@@ -103,7 +111,7 @@
                 <input class="form-control" id="fechaPropuestaTarea" type="date" />
               </div>
               <div class="col-12 col-md-6" id="grupoFechaRealizadaTarea">
-                <label class="form-label" for="fechaRealizadaTarea">Fecha de realizaciÃ³n</label>
+                <label class="form-label" for="fechaRealizadaTarea">Fecha de realización</label>
                 <input class="form-control" id="fechaRealizadaTarea" type="date" />
               </div>
               <div class="col-12">
@@ -117,22 +125,38 @@
               <div class="col-12" id="seccionNotasTarea">
                 <label class="form-label" for="nuevaNotaTarea">Notas y actualizaciones</label>
                 <div class="input-group">
-                  <input class="form-control" id="nuevaNotaTarea" maxlength="500" placeholder="Escribe una actualizaciÃ³n" />
-                  <button class="btn btn-outline-secondary" id="agregarNotaTarea" type="button">AÃ±adir nota</button>
+                  <input class="form-control" id="nuevaNotaTarea" maxlength="500" placeholder="Escribe una actualización" />
+                  <button class="btn btn-outline-secondary" id="agregarNotaTarea" type="button">Añadir nota</button>
                 </div>
                 <ul id="listaNotasTarea" class="list-group list-group-flush mt-2"></ul>
-                <div id="notaSoloAlEditar" class="form-text">Guarda la tarea antes de aÃ±adir notas.</div>
+                <div id="notaSoloAlEditar" class="form-text">Guarda la tarea antes de añadir notas.</div>
               </div>
             </div>
           </div>
           <div class="modal-footer d-flex justify-content-between">
-            <button class="btn btn-outline-danger d-none" id="eliminarTarea" type="button">ðŸ—‘ Eliminar</button>
+            <button class="btn btn-outline-danger d-none" id="eliminarTarea" type="button">?? Eliminar</button>
             <div class="d-flex gap-2 ms-auto">
               <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
               <button class="btn btn-primary" id="guardarTarea" type="submit">Guardar tarea</button>
             </div>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalSeleccionPublicadorTarea" tabindex="-1" aria-labelledby="tituloSelectorPublicadorTarea" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header main">
+          <h2 class="modal-title h5" id="tituloSelectorPublicadorTarea">Seleccionar publicador</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label" for="buscadorPublicadorTarea">Buscar por nombre o correo</label>
+          <input class="form-control mb-3" id="buscadorPublicadorTarea" type="search" autocomplete="off" placeholder="Escribe para buscar..." />
+          <div id="resultadosPublicadoresTarea" class="list-group" aria-live="polite"></div>
+        </div>
       </div>
     </div>
   </div>

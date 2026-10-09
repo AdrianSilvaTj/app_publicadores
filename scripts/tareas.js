@@ -2,6 +2,7 @@ const COLECCION_TAREAS = "tareas";
 const CLAVE_RECORDATORIOS_PROCESADOS = "digitCongRecordatoriosProcesados";
 const ESTADOS_TAREA = ["pendiente", "en curso", "realizada", "cancelada"];
 let tareasActuales = [];
+let publicadoresTarea = [];
 let recordatoriosBorrador = [];
 let notasTareaActual = [];
 let temporizadorRecordatorios = null;
@@ -9,6 +10,9 @@ let temporizadorRecordatorios = null;
 async function inicializarTareas() {
   document.getElementById("formTarea")?.addEventListener("submit", guardarTarea);
   document.getElementById("nuevaTarea")?.addEventListener("click", prepararNuevaTarea);
+  document.getElementById("buscarPublicadorTarea")?.addEventListener("click", abrirSelectorPublicadorTarea);
+  document.getElementById("buscadorPublicadorTarea")?.addEventListener("input", renderizarSelectorPublicadorTarea);
+  document.getElementById("resultadosPublicadoresTarea")?.addEventListener("click", seleccionarPublicadorTarea);
   document.getElementById("agregarRecordatorioTarea")?.addEventListener("click", agregarRecordatorioBorrador);
   document.getElementById("agregarNotaTarea")?.addEventListener("click", agregarNotaTarea);
   document.getElementById("eliminarTarea")?.addEventListener("click", eliminarTareaActual);
@@ -53,8 +57,8 @@ async function cargarResponsablesTarea() {
   const datalist = document.getElementById("listaPublicadoresTarea");
   try {
     const snapshot = await db.collection("publicadores").get();
-    const nombres = [...new Set(snapshot.docs.map((doc) => {
-      const datos = doc.data();
+    publicadoresTarea = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const nombres = [...new Set(publicadoresTarea.map((datos) => {
       return [datos.nombre, datos.apellido].filter(Boolean).join(" ").trim();
     }).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
     datalist.replaceChildren(...nombres.map((nombre) => new Option(nombre, nombre)));
@@ -63,6 +67,50 @@ async function cargarResponsablesTarea() {
   }
 }
 
+function abrirSelectorPublicadorTarea() {
+  document.getElementById("buscadorPublicadorTarea").value = "";
+  renderizarSelectorPublicadorTarea();
+  const modal = document.getElementById("modalSeleccionPublicadorTarea");
+  modal.addEventListener("shown.bs.modal", () => document.getElementById("buscadorPublicadorTarea").focus(), { once: true });
+  bootstrap.Modal.getOrCreateInstance(modal).show();
+}
+
+function renderizarSelectorPublicadorTarea() {
+  const contenedor = document.getElementById("resultadosPublicadoresTarea");
+  if (!contenedor) return;
+  const consulta = document.getElementById("buscadorPublicadorTarea").value.trim().toLocaleLowerCase("es");
+  const encontrados = publicadoresTarea
+    .filter((pub) => `${pub.nombre || ""} ${pub.apellido || ""} ${pub.email || ""}`.toLocaleLowerCase("es").includes(consulta))
+    .sort((a, b) => `${a.nombre || ""} ${a.apellido || ""}`.localeCompare(`${b.nombre || ""} ${b.apellido || ""}`, "es"));
+  if (!encontrados.length) {
+    contenedor.innerHTML = '<div class="list-group-item text-muted">No se encontraron publicadores.</div>';
+    return;
+  }
+  contenedor.innerHTML = encontrados.map((pub) => {
+    const nombre = [pub.nombre, pub.apellido].filter(Boolean).join(" ").trim() || "Sin nombre";
+    return `<button type="button" class="list-group-item list-group-item-action" data-publicador-tarea-id="${escaparTarea(pub.id)}"><span class="d-block fw-semibold">${escaparTarea(nombre)}</span><span class="small text-muted">${pub.email ? escaparTarea(pub.email) : "Sin correo registrado"}</span></button>`;
+  }).join("");
+}
+
+function seleccionarPublicadorTarea(evento) {
+  const boton = evento.target.closest("[data-publicador-tarea-id]");
+  if (!boton) return;
+  const pub = publicadoresTarea.find((item) => item.id === boton.dataset.publicadorTareaId);
+  if (!pub) return;
+  const nombre = [pub.nombre, pub.apellido].filter(Boolean).join(" ").trim();
+  if (nombre) agregarValorUnico("responsablesTarea", nombre, (valor) => valor.toLocaleLowerCase("es"));
+  const email = (pub.email || "").trim().toLowerCase();
+  if (email) agregarValorUnico("correosResponsablesTarea", email, (valor) => valor.toLowerCase());
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("modalSeleccionPublicadorTarea")).hide();
+  document.getElementById(email ? "correosResponsablesTarea" : "responsablesTarea").focus();
+}
+
+function agregarValorUnico(id, nuevoValor, normalizar) {
+  const input = document.getElementById(id);
+  const valores = input.value.split(/[;,]/).map((valor) => valor.trim()).filter(Boolean);
+  if (!valores.some((valor) => normalizar(valor) === normalizar(nuevoValor))) valores.push(nuevoValor);
+  input.value = valores.join(", ");
+}
 function renderizarTareas() {
   const filtroEstado = document.getElementById("filtroEstadoTarea").value;
   const filtroResponsable = document.getElementById("filtroResponsableTarea").value;
@@ -134,6 +182,7 @@ function prepararEdicionTarea(id) {
   document.getElementById("tituloTarea").value = tarea.titulo || "";
   document.getElementById("descripcionTarea").value = tarea.descripcion || "";
   document.getElementById("responsablesTarea").value = (tarea.responsables || []).join(", ");
+  document.getElementById("correosResponsablesTarea").value = (tarea.correosResponsables || []).join(", ");
   document.getElementById("estadoTarea").value = ESTADOS_TAREA.includes(tarea.estado) ? tarea.estado : "pendiente";
   document.getElementById("fechaPropuestaTarea").value = tarea.fechaPropuesta || "";
   document.getElementById("fechaRealizadaTarea").value = tarea.fechaRealizada || "";
@@ -155,10 +204,18 @@ async function guardarTarea(evento) {
   const estado = document.getElementById("estadoTarea").value;
   const anterior = tareasActuales.find((t) => t.id === id);
   const fechaRealizadaInput = document.getElementById("fechaRealizadaTarea").value;
+  const correosResponsables = [...new Set(document.getElementById("correosResponsablesTarea").value.split(/[;,]/).map((correo) => correo.trim().toLowerCase()).filter(Boolean))];
+  const correosInvalidos = correosResponsables.filter((correo) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo));
+  if (correosInvalidos.length) {
+    mostrarBanner("Revisa las direcciones de correo separadas por coma.", "warning", false, 4500);
+    document.getElementById("correosResponsablesTarea").focus();
+    return;
+  }
   const datos = {
     titulo: document.getElementById("tituloTarea").value.trim(),
     descripcion: document.getElementById("descripcionTarea").value.trim(),
     responsables: [...new Set(document.getElementById("responsablesTarea").value.split(",").map((n) => n.trim()).filter(Boolean))],
+    correosResponsables,
     estado,
     fechaPropuesta: document.getElementById("fechaPropuestaTarea").value || null,
     fechaRealizada: estado === "realizada" ? (fechaRealizadaInput || anterior?.fechaRealizada || fechaHoyTarea()) : (anterior?.fechaRealizada || null),
