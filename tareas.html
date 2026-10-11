@@ -17,12 +17,16 @@
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
 
   <div class="marginBody">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 mb-1">Tareas</h1>
         <p class="text-muted mb-0">Organiza responsabilidades, fechas y recordatorios.</p>
       </div>
-      <button id="nuevaTarea" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalTarea">+ Crear tarea</button>
+      <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modalTarea">
+        <span class="me-2 d-none d-sm-inline" data-bs-toggle="modal" data-bs-target="#modalTarea">➕ Crear</span>
+        <span class="d-inline d-sm-none" data-bs-toggle="modal" data-bs-target="#modalTarea">➕</span>
+
+      </button>
     </div>
 
     <div id="estadoNotificaciones" class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2" role="status">
@@ -129,12 +133,11 @@
                 <div id="notaSoloAlEditar" class="form-text">Guarda la tarea antes de añadir notas.</div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer d-flex justify-content-between">
-            <button class="btn btn-outline-danger d-none" id="eliminarTarea" type="button">&#128465; Eliminar</button>
-            <div class="d-flex gap-2 ms-auto">
-              <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
-              <button class="btn btn-primary" id="guardarTarea" type="submit">Guardar tarea</button>
+            <div class="modal-actions d-flex justify-content-between">
+              <div class="d-flex gap-2 ms-auto">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">❌ Cancelar</button>
+                <button class="btn btn-success" id="guardarTarea" type="submit">💾 Guardar</button>
+              </div>
             </div>
           </div>
         </form>

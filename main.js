@@ -69,7 +69,7 @@ async function cargarMenuYScripts() {
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle ${["reuniones-ancianos", "crear-reunion-ancianos", "tareas"].includes(pagina) ? "active" : ""}" href="#" id="menuHerramientas" role="button" data-bs-toggle="dropdown" aria-expanded="false">&#129520; Herramientas</a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuHerramientas">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuHerramientas" style="background-color: darkgray;">
               <li><a class="dropdown-item ${["reuniones-ancianos", "crear-reunion-ancianos"].includes(pagina) ? "active" : ""}" href="reuniones-ancianos.html">&#128101; Reuniones ancianos</a></li>
               <li><a class="dropdown-item ${pagina === "tareas" ? "active" : ""}" href="tareas.html">&#9989; Tareas</a></li>
             </ul>

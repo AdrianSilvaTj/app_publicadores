@@ -11,7 +11,32 @@
 .tarea-estado-cancelada { color: #41464b; background: #e2e3e5; }
 #listaRecordatoriosTarea, #listaNotasTarea { padding-left: 0; }
 #listaNotasTarea li { overflow-wrap: anywhere; }
+#modalTarea .modal-content > form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+#modalTarea .modal-content > form > .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+#modalTarea .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 1rem 0 0 0 !important
+}
 @media (max-width: 575.98px) {
   .tareas-page { padding-left: .75rem; padding-right: .75rem; }
   #nuevaTarea { width: 100%; }
+  #modalTarea .modal-actions {
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+  #eliminarTarea {
+    flex: 0 0 auto;
+  }
 }

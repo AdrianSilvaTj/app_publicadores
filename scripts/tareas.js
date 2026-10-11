@@ -169,7 +169,6 @@ function crearTarjetaTarea(tarea) {
 function prepararNuevaTarea() {
   limpiarFormularioTarea();
   document.getElementById("tituloModalTarea").textContent = "Crear tarea";
-  document.getElementById("eliminarTarea").classList.add("d-none");
   document.getElementById("seccionNotasTarea").classList.add("d-none");
 }
 
@@ -187,7 +186,6 @@ function prepararEdicionTarea(id) {
   document.getElementById("fechaPropuestaTarea").value = tarea.fechaPropuesta || "";
   document.getElementById("fechaRealizadaTarea").value = tarea.fechaRealizada || "";
   document.getElementById("grupoFechaRealizadaTarea").classList.toggle("d-none", tarea.estado !== "realizada");
-  document.getElementById("eliminarTarea").classList.remove("d-none");
   document.getElementById("seccionNotasTarea").classList.remove("d-none");
   document.getElementById("notaSoloAlEditar").classList.add("d-none");
   recordatoriosBorrador = Array.isArray(tarea.recordatorios) ? tarea.recordatorios.map((r) => ({ ...r })) : [];
@@ -477,7 +475,6 @@ function limpiarFormularioTarea() {
   document.getElementById("formTarea")?.reset();
   document.getElementById("idTarea").value = "";
   document.getElementById("grupoFechaRealizadaTarea").classList.add("d-none");
-  document.getElementById("eliminarTarea").classList.add("d-none");
   document.getElementById("seccionNotasTarea").classList.remove("d-none");
   document.getElementById("notaSoloAlEditar").classList.remove("d-none");
   recordatoriosBorrador = [];
