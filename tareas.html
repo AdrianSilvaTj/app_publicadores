@@ -16,7 +16,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px"></nav>
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
 
-  <div class="marginBody tareas-page">
+  <div class="marginBody">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 mb-1">Tareas</h1>
@@ -26,11 +26,8 @@
     </div>
 
     <div id="estadoNotificaciones" class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2" role="status">
-      <span id="textoEstadoNotificaciones">Activa las notificaciones para recibir avisos mientras DigitCong esté abierto.</span>
+      <span id="textoEstadoNotificaciones">Activa las notificaciones para recibir avisos mientras DigitCong estÃ¡ abierto.</span>
       <button id="activarNotificaciones" class="btn btn-outline-primary btn-sm" type="button">Activar notificaciones</button>
-    </div>
-    <div id="avisoPushPendiente" class="alert alert-warning small" role="note">
-      Para recibir correos con la app cerrada, configura el activador gratuito de Google Apps Script. Google revisa los avisos cada cinco minutos; la entrega puede demorarse.
     </div>
 
     <section class="card card-shadow p-3 mb-3" aria-label="Filtros de tareas">
@@ -79,11 +76,11 @@
             <input id="idTarea" type="hidden" />
             <div class="row g-3">
               <div class="col-12">
-                <label class="form-label" for="tituloTarea">Título</label>
+                <label class="form-label" for="tituloTarea">TÃ­tulo</label>
                 <input class="form-control" id="tituloTarea" maxlength="160" required />
               </div>
               <div class="col-12">
-                <label class="form-label" for="descripcionTarea">Descripción</label>
+                <label class="form-label" for="descripcionTarea">DescripciÃ³n</label>
                 <textarea class="form-control" id="descripcionTarea" rows="3" maxlength="2000"></textarea>
               </div>
               <div class="col-12 col-md-6">
@@ -111,7 +108,7 @@
                 <input class="form-control" id="fechaPropuestaTarea" type="date" />
               </div>
               <div class="col-12 col-md-6" id="grupoFechaRealizadaTarea">
-                <label class="form-label" for="fechaRealizadaTarea">Fecha de realización</label>
+                <label class="form-label" for="fechaRealizadaTarea">Fecha de realizaciÃ³n</label>
                 <input class="form-control" id="fechaRealizadaTarea" type="date" />
               </div>
               <div class="col-12">
@@ -125,16 +122,16 @@
               <div class="col-12" id="seccionNotasTarea">
                 <label class="form-label" for="nuevaNotaTarea">Notas y actualizaciones</label>
                 <div class="input-group">
-                  <input class="form-control" id="nuevaNotaTarea" maxlength="500" placeholder="Escribe una actualización" />
-                  <button class="btn btn-outline-secondary" id="agregarNotaTarea" type="button">Añadir nota</button>
+                  <input class="form-control" id="nuevaNotaTarea" maxlength="500" placeholder="Escribe una actualizaciÃ³n" />
+                  <button class="btn btn-outline-secondary" id="agregarNotaTarea" type="button">AÃ±adir nota</button>
                 </div>
                 <ul id="listaNotasTarea" class="list-group list-group-flush mt-2"></ul>
-                <div id="notaSoloAlEditar" class="form-text">Guarda la tarea antes de añadir notas.</div>
+                <div id="notaSoloAlEditar" class="form-text">Guarda la tarea antes de aÃ±adir notas.</div>
               </div>
             </div>
           </div>
           <div class="modal-footer d-flex justify-content-between">
-            <button class="btn btn-outline-danger d-none" id="eliminarTarea" type="button">?? Eliminar</button>
+            <button class="btn btn-outline-danger d-none" id="eliminarTarea" type="button">&#128465; Eliminar</button>
             <div class="d-flex gap-2 ms-auto">
               <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
               <button class="btn btn-primary" id="guardarTarea" type="submit">Guardar tarea</button>

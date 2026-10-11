@@ -185,7 +185,7 @@ function mostrarBanner(
 
   // Construir contenido
   banner.innerHTML = conSpinner
-    ? `<span class="spinner-emoji">&#128192;</span> ${mensaje}`
+    ? `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${mensaje}`
     : mensaje;
 
   banner.classList.remove("d-none");

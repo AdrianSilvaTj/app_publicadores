@@ -417,6 +417,43 @@ async function guardarServicioGrupo(grupo) {
   }
 }
 
+async function eliminarRegistroServicio(publicadorId, grupo, nombre) {
+  const mes = Number(document.getElementById("mes").value);
+  const anio = Number(document.getElementById("anio").value);
+  const confirmar = await confirmarAccion(
+    `¿Eliminar el registro de servicio de ${nombre} para ${mes}/${anio}? Esta acción no se puede deshacer.`,
+    {
+      titulo: "Eliminar registro de servicio",
+      textoConfirmar: "Eliminar",
+      claseConfirmar: "btn-danger",
+    },
+  );
+  if (!confirmar) return;
+
+  try {
+    mostrarBanner("Eliminando registro...", "info", true);
+    const docId = `${publicadorId}_${grupo}_${anio}_${mes}`;
+    await db.collection("servicio").doc(docId).delete();
+
+    const cache = localStorage.getItem("firebase_servicio");
+    if (cache) {
+      const registros = JSON.parse(cache).filter((registro) =>
+        !(String(registro.publicadorId) === String(publicadorId) &&
+          Number(registro.grupo) === grupo && Number(registro.mes) === mes &&
+          Number(registro.anio) === anio),
+      );
+      localStorage.setItem("firebase_servicio", JSON.stringify(registros));
+    }
+
+    const config = await cargarConfiguracionGlobal();
+    await renderPublicadoresPorGrupo(Number(config?.cantidadGrupos) || 0);
+    mostrarBanner("Registro de servicio eliminado", "success", false, 3000);
+  } catch (error) {
+    console.error("Error eliminando el registro de servicio:", error);
+    mostrarBanner("No se pudo eliminar el registro de servicio", "danger", false, 4000);
+  }
+}
+
 async function iniciarPublicadores() {
   const config = await cargarConfiguracionGlobal();
   if (!config) {
@@ -880,7 +917,7 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
               class="dropdown-item"
               onclick="editarFilaServicio(this)"
             >
-              ✏️ Editar
+              ✏️ Editar informe
             </button>
           </li>
           <li>
@@ -889,6 +926,15 @@ function renderFilaServicio(pub, index, grupoNumero, grupoPubsServicio) {
               onclick="verTarjetaPublicador('${id}', ${anioServicio})"
             >
               👁 Ver tarjeta
+            </button>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button
+              class="dropdown-item text-danger"
+              onclick="eliminarRegistroServicio('${id}', ${grupoNumero}, ${escaparHtml(JSON.stringify(nombre))})"
+            >
+              🗑️ Eliminar informe
             </button>
           </li>
         </ul>
