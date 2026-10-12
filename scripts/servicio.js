@@ -1305,7 +1305,7 @@ async function verTarjetaPublicador(id, anioServicioSeleccionado = null) {
       <title>Registro de Publicador</title>
 
       <!-- CSS PROPIO (SIN BOOTSTRAP) -->
-      <link rel="stylesheet" href="styles/tarjeta.css">
+      <link rel="stylesheet" href="../styles/tarjeta.css">
 
       <!-- html2pdf -->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -1433,7 +1433,7 @@ async function verTarjetasGrupo(grupo, anioServicio) {
       <meta charset="UTF-8" />
       <title>Tarjetas Grupo ${grupo}</title>
 
-      <link rel="stylesheet" href="styles/tarjeta.css">
+      <link rel="stylesheet" href="../styles/tarjeta.css">
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     </head>

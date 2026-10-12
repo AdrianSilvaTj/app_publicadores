@@ -11,14 +11,14 @@
     icon: notification.icon || "assets/icon-192.png",
     badge: notification.badge || "assets/icon-192.png",
     tag: notification.tag || "digitcong-recordatorio",
-    data: { url: data.url || "tareas.html" },
+    data: { url: data.url || "pages/tareas.html" },
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const destino = new URL(event.notification.data?.url || "tareas.html", self.location.origin).href;
+  const destino = new URL(event.notification.data?.url || "pages/tareas.html", self.registration.scope).href;
   event.waitUntil((async () => {
     const ventanas = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const ventana of ventanas) {

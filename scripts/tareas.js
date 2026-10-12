@@ -393,7 +393,7 @@ async function activarNotificacionesTarea() {
 async function registrarServiceWorkerTareas() {
   if (!("serviceWorker" in navigator) || !window.isSecureContext) return null;
   try {
-    return await navigator.serviceWorker.register("service-worker.js");
+    return await navigator.serviceWorker.register("../service-worker.js");
   } catch (error) {
     console.warn("No se pudo registrar el service worker:", error);
     return null;
@@ -441,7 +441,7 @@ async function comprobarRecordatoriosTarea() {
   const registro = await registrarServiceWorkerTareas();
   for (const { tarea, recordatorio } of pendientes) {
     const titulo = `Recordatorio: ${tarea.titulo || "Tarea"}`;
-    const opciones = { body: recordatorio.mensaje || `Responsable: ${(tarea.responsables || []).join(", ") || "Sin asignar"}`, icon: "assets/icon-192.png", badge: "assets/icon-192.png", tag: `tarea-${tarea.id}-${recordatorio.id}`, data: { url: `tareas.html?task=${encodeURIComponent(tarea.id)}` } };
+    const opciones = { body: recordatorio.mensaje || `Responsable: ${(tarea.responsables || []).join(", ") || "Sin asignar"}`, icon: "../assets/icon-192.png", badge: "../assets/icon-192.png", tag: `tarea-${tarea.id}-${recordatorio.id}`, data: { url: `pages/tareas.html?task=${encodeURIComponent(tarea.id)}` } };
     try {
       if (registro?.showNotification) await registro.showNotification(titulo, opciones);
       else new Notification(titulo, opciones);

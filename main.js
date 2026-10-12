@@ -43,39 +43,42 @@ function cargarScript(src) {
 async function cargarMenuYScripts() {
   mostrarBanner("Cargando...", "info", true);
   const path = window.location.pathname;
-  let pagina = path.substring(path.lastIndexOf("/") + 1).split(".")[0];
+  const estaEnPages = path.includes("/pages/");
+  const raiz = estaEnPages ? "../" : "";
+  const carpetaPages = estaEnPages ? "" : "pages/";
+  const pagina = path.substring(path.lastIndexOf("/") + 1).split(".")[0];
   const menu = document.getElementById("menu");
   if (menu) {
     menu.innerHTML = `
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">&#127968; DigitCong</a>
+      <a class="navbar-brand" href="${raiz}index.html">&#127968; DigitCong</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir men&#250;">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link ${pagina === "publicadores" ? "active" : ""}" href="publicadores.html">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102; Publicadores</a>
+            <a class="nav-link ${pagina === "publicadores" ? "active" : ""}" href="${carpetaPages}publicadores.html">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102; Publicadores</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link ${pagina === "reuniones" ? "active" : ""}" href="reuniones.html">&#128197; Reuniones</a>
+            <a class="nav-link ${pagina === "reuniones" ? "active" : ""}" href="${carpetaPages}reuniones.html">&#128197; Reuniones</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle ${["servicio", "analisis-congregacion"].includes(pagina) ? "active" : ""}" href="#" id="menuServicio" role="button" data-bs-toggle="dropdown" aria-expanded="false">&#128188; Servicio</a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuServicio" style="background-color: darkgray;">
-              <li><a class="dropdown-item ${pagina === "servicio" ? "active" : ""}" href="servicio.html">&#128196; Informes</a></li>
-              <li><a class="dropdown-item ${pagina === "analisis-congregacion" ? "active" : ""}" href="analisis-congregacion.html">&#128202; An&#225;lisis de la congregaci&#243;n</a></li>
+              <li><a class="dropdown-item ${pagina === "servicio" ? "active" : ""}" href="${carpetaPages}servicio.html">&#128196; Informes</a></li>
+              <li><a class="dropdown-item ${pagina === "analisis-congregacion" ? "active" : ""}" href="${carpetaPages}analisis-congregacion.html">&#128202; An&#225;lisis de la congregaci&#243;n</a></li>
             </ul>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle ${["reuniones-ancianos", "crear-reunion-ancianos", "tareas"].includes(pagina) ? "active" : ""}" href="#" id="menuHerramientas" role="button" data-bs-toggle="dropdown" aria-expanded="false">&#129520; Herramientas</a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuHerramientas" style="background-color: darkgray;">
-              <li><a class="dropdown-item ${["reuniones-ancianos", "crear-reunion-ancianos"].includes(pagina) ? "active" : ""}" href="reuniones-ancianos.html">&#128101; Reuniones ancianos</a></li>
-              <li><a class="dropdown-item ${pagina === "tareas" ? "active" : ""}" href="tareas.html">&#9989; Tareas</a></li>
+              <li><a class="dropdown-item ${["reuniones-ancianos", "crear-reunion-ancianos"].includes(pagina) ? "active" : ""}" href="${carpetaPages}reuniones-ancianos.html">&#128101; Reuniones ancianos</a></li>
+              <li><a class="dropdown-item ${pagina === "tareas" ? "active" : ""}" href="${carpetaPages}tareas.html">&#9989; Tareas</a></li>
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link ${pagina === "configuracion" ? "active" : ""}" href="configuracion.html">&#9881;&#65039; Configuraci&#243;n</a>
+            <a class="nav-link ${pagina === "configuracion" ? "active" : ""}" href="${carpetaPages}configuracion.html">&#9881;&#65039; Configuraci&#243;n</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="cerrarSesion()">&#128682; Cerrar sesi&#243;n</a>
@@ -102,14 +105,14 @@ async function cargarMenuYScripts() {
   );
 
   // ✅ 3. Tu inicialización de Firebase
-  await cargarScript("scripts/firebase-config.js");
+  await cargarScript(`${raiz}scripts/firebase-config.js`);
 
   // ✅ 4. Scripts globales
-  await cargarScript("main.js");
-  await cargarScript("scripts/auth.js");
+  await cargarScript(`${raiz}main.js`);
+  await cargarScript(`${raiz}scripts/auth.js`);
 
   const user = await new Promise((resolve) => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
     let resuelto = false;
     const finalizar = (currentUser) => {
       if (resuelto) return;
@@ -122,42 +125,42 @@ async function cargarMenuYScripts() {
     unsubscribe = auth.onAuthStateChanged(finalizar, () => finalizar(null));
   });
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = `${carpetaPages}login.html`;
     return false;
   }
 
   // ✅ 5. Script por página
   switch (pagina) {
     case "publicadores":
-      await cargarScript("scripts/publicadores.js");
+      await cargarScript(`${raiz}scripts/publicadores.js`);
       break;
     case "configuracion":
-      await cargarScript("scripts/configuracion.js");
+      await cargarScript(`${raiz}scripts/configuracion.js`);
       break;
     case "reuniones":
-      await cargarScript("scripts/reuniones.js");
+      await cargarScript(`${raiz}scripts/reuniones.js`);
       break;
     case "tareas":
-      await cargarScript("scripts/tareas.js");
+      await cargarScript(`${raiz}scripts/tareas.js`);
       break;
     case "reuniones-ancianos":
-      await cargarScript("scripts/reuniones-ancianos.js");
+      await cargarScript(`${raiz}scripts/reuniones-ancianos.js`);
       break;
     case "crear-reunion-ancianos":
-      await cargarScript("scripts/reuniones-ancianos.js");
+      await cargarScript(`${raiz}scripts/reuniones-ancianos.js`);
       break;
     case "servicio":
-      await cargarScript("scripts/servicio.js");
+      await cargarScript(`${raiz}scripts/servicio.js`);
       break;
     case "analisis-congregacion":
-      await cargarScript("scripts/servicio.js");
-      await cargarScript("scripts/analisis-congregacion.js?v=2");
+      await cargarScript(`${raiz}scripts/servicio.js`);
+      await cargarScript(`${raiz}scripts/analisis-congregacion.js?v=2`);
       break;
     case "historial-acciones":
-      await cargarScript("scripts/historial-acciones.js");
+      await cargarScript(`${raiz}scripts/historial-acciones.js`);
       break;
     case "configuracion":
-      await cargarScript("scripts/configuracion.js");
+      await cargarScript(`${raiz}scripts/configuracion.js`);
       break;
   }
   return true;

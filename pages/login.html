@@ -5,11 +5,11 @@
   <meta name="theme-color" content="#212529">
   <title>Iniciar sesión</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icon-192.png">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="style.css?v=20261002" rel="stylesheet" />
+  <link href="../style.css?v=20261002" rel="stylesheet" />
 </head>
 <body class="bg-light">
   <div id="bannerEstado" class="alert text-center m-0 py-2 d-none banner" role="alert"></div>
@@ -46,9 +46,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="scripts/firebase-config.js"></script>
-  <script src="main.js"></script>
-  <script src="scripts/pwa-install.js" defer></script>
+  <script src="../scripts/firebase-config.js"></script>
+  <script src="../main.js"></script>
+  <script src="../scripts/pwa-install.js" defer></script>
 
   <!-- Login logic -->
   <script>
@@ -65,7 +65,7 @@
         mostrarBanner("Cargando información...", "info", true);
         await auth.signInWithEmailAndPassword(email, password);
         localStorage.setItem('user', email)
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
       } catch (err) {
         mostrarBanner("❌ Error al iniciar sesión: " + err.message, "danger");
       }

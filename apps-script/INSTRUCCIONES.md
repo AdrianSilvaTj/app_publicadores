@@ -7,7 +7,7 @@ Esta integración permite enviar correos cuando una tarea vence aunque DigitCong
 1. Entra en [script.google.com](https://script.google.com) con la cuenta Google desde la que saldrán los correos y crea un proyecto independiente.
 2. Copia el contenido actualizado de `recordatorios.gs` al archivo `Code.gs` del proyecto. Si el activador ya está instalado, basta con guardar el código actualizado; no hace falta instalarlo de nuevo.
 3. En **Configuración del proyecto**, activa la opción para mostrar `appsscript.json` y reemplaza su contenido con el archivo de este directorio. Guarda el proyecto y acepta los permisos adicionales que solicite, incluido el de administrar activadores.
-4. En **Configuración del proyecto → Propiedades del script**, crea `APP_URL` con la dirección pública de DigitCong, por ejemplo `https://tu-dominio.example`. No agregues `/tareas.html` al final.
+4. En **Configuración del proyecto → Propiedades del script**, crea `APP_URL` con la dirección pública de DigitCong, por ejemplo `https://tu-dominio.example`. No agregues `/pages/tareas.html` al final.
 5. En el proyecto Firebase `app-congregacion`, verifica que la cuenta Google que ejecutará el script tenga el rol **Cloud Datastore User**. Si Firestore REST informa que la API no está habilitada, habilita **Cloud Firestore API** en Google Cloud para ese proyecto.
 6. En el editor de Apps Script, selecciona y ejecuta `probarConexionFirestore`. Acepta los permisos solicitados. En **Ejecuciones** o **Registro de ejecución**, debe aparecer `Conexión correcta`.
 7. Ejecuta una sola vez `instalarActivadorRecordatorios` y autoriza el envío de correo. El script creará un activador que revisa Firestore cada cinco minutos.

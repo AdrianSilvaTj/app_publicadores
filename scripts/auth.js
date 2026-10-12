@@ -5,7 +5,7 @@ const auth = firebase.auth();
 function cerrarSesion() {
     auth.signOut().then(() => {
         localStorage.removeItem('user');
-        window.location.href = "login.html";
+        window.location.href = window.location.pathname.includes("/pages/") ? "login.html" : "pages/login.html";
     });
 }
 
@@ -22,7 +22,7 @@ function recordarClave() {
 function verificarSesionActiva() {
     auth.onAuthStateChanged(user => {
         if (!user) {
-            window.location.href = "login.html";
+            window.location.href = window.location.pathname.includes("/pages/") ? "login.html" : "pages/login.html";
         }
     });
 }
