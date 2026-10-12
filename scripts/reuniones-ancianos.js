@@ -158,7 +158,7 @@ async function eliminarReunionAncianos(id, boton) {
   } catch (error) {
     console.error("Error al eliminar la reunión de ancianos:", error);
     boton.disabled = false;
-    boton.textContent = "Eliminar";
+    boton.textContent = "🗑️ Eliminar";
     cerrarBanner();
     mostrarBanner("No se pudo eliminar la reunión. Intenta de nuevo.", "danger", false, 5000);
   }
@@ -267,7 +267,7 @@ async function inicializarEditorReunionAncianos() {
 
   document.title = "Editar reunión de ancianos";
   document.getElementById("tituloEditorReunionAncianos").textContent = "Editar reunión de ancianos";
-  document.getElementById("guardarReunionAncianos").textContent = "Guardar cambios";
+  document.getElementById("guardarReunionAncianos").textContent = "💾 Guardar cambios";
   try {
     const documento = await esperarRespuestaConLimite(
       db.collection(COLECCION_REUNIONES_ANCIANOS).doc(idEdicionReunionAncianos).get(),
@@ -334,6 +334,6 @@ async function guardarReunionAncianos(evento) {
     console.error("Error al guardar la reunión de ancianos:", error);
     mostrarBanner("No se pudo guardar la reunión. Intenta de nuevo.", "danger", false, 5000);
     botonGuardar.disabled = false;
-    botonGuardar.textContent = "Guardar";
+    botonGuardar.textContent = "💾 Guardar";
   }
 }

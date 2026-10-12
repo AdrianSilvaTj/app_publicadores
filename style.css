@@ -25,6 +25,31 @@ h2, h3 {
   max-height: 90vh !important;
 }
 
+.modal-dialog-scrollable .modal-content > :is(form, section) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modal-dialog-scrollable .modal-content > :is(form, section) > .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
+.modal-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .5rem;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  background: transparent;
+}
+
 @keyframes spin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -84,7 +109,7 @@ h2, h3 {
 }
 
 .group-header-color {
-  background-color: antiquewhite;
+  background-color: antiquewhite !important;
 }
 
 .fila-total th,

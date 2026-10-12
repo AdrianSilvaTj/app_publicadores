@@ -153,7 +153,7 @@ function crearTarjetaTarea(tarea) {
   const notas = (tarea.notas || []).slice(-3).reverse().map((nota) => `<li class="list-group-item px-0 py-2"><span>${escaparTarea(nota.texto)}</span><div class="small text-muted">${escaparTarea(formatearFechaHoraTarea(nota.fechaHora))}${nota.autor ? ` · ${escaparTarea(nota.autor)}` : ""}</div></li>`).join("");
   const puedeCompletar = estado === "pendiente" || estado === "en curso";
   return `<article class="col-12 col-lg-6"><section class="card card-shadow tarea-card">
-    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 group-header-color">
       <div><h2 class="h5 mb-1">${escaparTarea(tarea.titulo || "Sin título")}</h2><span class="badge tarea-estado tarea-estado-${estado.replace(" ", "-")}">${escaparTarea(estado)}</span></div>
       <div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}">✎ Editar</button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}">🗑 Eliminar</button></div>
     </div>

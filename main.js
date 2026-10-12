@@ -13,7 +13,7 @@ if (!sessionStorage.getItem("app_abierta")) {
 sessionStorage.setItem("app_abierta", "1");
 
 /**
- * Carga un archivo JavaScript de manera dinÃ¡mica y lo agrega al DOM si no ha sido cargado antes.
+ * Carga un archivo JavaScript de manera dinámica y lo agrega al DOM si no ha sido cargado antes.
  * @param {string} src - La ruta o URL del script a cargar.
  * @returns {Promise<void>} Promesa que se resuelve cuando el script ha sido cargado exitosamente.
  */
@@ -26,18 +26,18 @@ function cargarScript(src) {
     script.src = src;
     script.async = false;
     script.onload = resolve;
-    script.onerror = () => reject(`âŒ Error cargando: ${src}`);
+    script.onerror = () => reject(`❌ Error al cargar: ${src}`);
     document.body.appendChild(script);
   });
 }
 
 /**
- * Carga el menÃº principal dinÃ¡micamente en funciÃ³n de la URL actual,
- * y carga los scripts necesarios por pÃ¡gina incluyendo dependencias globales.
- * TambiÃ©n valida la sesiÃ³n del usuario mediante Firebase Auth.
+ * Carga el menú principal dinámicamente en función de la URL actual,
+ * y carga los scripts necesarios por página incluyendo dependencias globales.
+ * También valida la sesión del usuario mediante Firebase Auth.
  * @async
  * @function
- * @returns {Promise<void>} Promesa que se resuelve cuando todos los scripts estÃ¡n cargados.
+ * @returns {Promise<void>} Promesa que se resuelve cuando todos los scripts están cargados.
  */
 
 async function cargarMenuYScripts() {
@@ -85,12 +85,12 @@ async function cargarMenuYScripts() {
     </div>
     `;
   }
-  // âœ… 1. Bootstrap
+  // ✅ 1. Bootstrap
   await cargarScript(
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
   );
 
-  // âœ… 2. Firebase core
+  // ✅ 2. Firebase core
   await cargarScript(
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"
   );
@@ -101,10 +101,10 @@ async function cargarMenuYScripts() {
     "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"
   );
 
-  // âœ… 3. Tu inicializaciÃ³n de Firebase
+  // ✅ 3. Tu inicialización de Firebase
   await cargarScript("scripts/firebase-config.js");
 
-  // âœ… 4. Scripts globales
+  // ✅ 4. Scripts globales
   await cargarScript("main.js");
   await cargarScript("scripts/auth.js");
 
@@ -126,7 +126,7 @@ async function cargarMenuYScripts() {
     return false;
   }
 
-  // âœ… 5. Script por pÃ¡gina
+  // ✅ 5. Script por página
   switch (pagina) {
     case "publicadores":
       await cargarScript("scripts/publicadores.js");
@@ -167,8 +167,8 @@ async function cargarMenuYScripts() {
  * Muestra un banner de estado fijo arriba
  * @param {string} mensaje - El texto a mostrar (puede incluir HTML)
  * @param {string} tipo - info | success | danger | warning
- * @param {boolean} conSpinner - Si debe girar el emoji ðŸŒ€
- * @param {number} duracion - DuraciÃ³n opcional para ocultarse (en ms)
+ * @param {boolean} conSpinner - Si debe girar el indicador de carga
+ * @param {number} duracion - Duración opcional para ocultarse (en ms)
  */
 function mostrarBanner(
   mensaje,
@@ -198,7 +198,7 @@ function mostrarBanner(
 }
 
 /**
- * Oculta el banner de estado si estÃ¡ presente en el DOM.
+ * Oculta el banner de estado si está presente en el DOM.
  * @function
  */
 function cerrarBanner() {
@@ -250,7 +250,7 @@ function confirmarAccion(mensaje, opciones = {}) {
 
     const titulo = document.createElement("h2");
     titulo.className = "h5 mb-3";
-    titulo.textContent = opciones.titulo || "Confirmar acciÃ³n";
+    titulo.textContent = opciones.titulo || "Confirmar acción";
     titulo.id = "tituloConfirmacion";
     dialogo.setAttribute("aria-labelledby", titulo.id);
 
@@ -312,33 +312,33 @@ function escaparHtml(valor) {
 }
 
 /**
- * Carga la configuraciÃ³n general de la congregaciÃ³n.
- * Intenta recuperar la data desde localStorage primero, y si no existe, la consulta desde Firestore.
- * La configuraciÃ³n se almacena en localStorage para futuras llamadas.
+ * Carga la configuración general de la congregación.
+ * Intenta recuperar los datos desde localStorage primero, y si no existen, los consulta desde Firestore.
+ * La configuración se almacena en localStorage para futuras llamadas.
  * @async
  * @function
- * @returns {Promise<Object|null>} Retorna el objeto de configuraciÃ³n si se encuentra, o `null` si hay error o no existe en Firestore.
+ * @returns {Promise<Object|null>} Retorna el objeto de configuración si se encuentra, o `null` si hay error o no existe en Firestore.
  */
 async function cargarConfiguracionGlobal() {
   const cacheKey = "configuracion_congregacion";
 
-  // 1. Si ya estÃ¡ en localStorage, usarla
+  // 1. Si ya está en localStorage, usarla
   const cache = localStorage.getItem(cacheKey);
   if (cache) {
-    console.log("âœ… ConfiguraciÃ³n cargada desde localStorage");
+    console.log("✅ Configuración cargada desde localStorage");
     return JSON.parse(cache);
   }
 
-  // 2. Si no estÃ¡, pedirla a Firestore
+  // 2. Si no está, pedirla a Firestore
   try {
-    mostrarBanner("Cargando informaciÃ³n...", "info", true);
+    mostrarBanner("Cargando información...", "info", true);
 
     const doc = await db.collection("configuracion").doc("global").get();
     cerrarBanner();
 
     if (!doc.exists) {
       mostrarBanner(
-        "âš ï¸ No hay configuraciÃ³n en Firestore",
+        "⚠️ No hay configuración en Firestore",
         "warning",
         false,
         3000
@@ -350,13 +350,13 @@ async function cargarConfiguracionGlobal() {
 
     // Guardar en localStorage
     localStorage.setItem(cacheKey, JSON.stringify(config));
-    console.log("ðŸ“¦ ConfiguraciÃ³n guardada en localStorage");
+    console.log("📦 Configuración guardada en localStorage");
 
     return config;
   } catch (err) {
     cerrarBanner();
-    console.error("âŒ Error al obtener configuraciÃ³n:", err);
-    mostrarBanner("âŒ Error al obtener configuraciÃ³n", "danger");
+    console.error("❌ Error al obtener configuración:", err);
+    mostrarBanner("❌ Error al obtener configuración", "danger");
     return null;
   }
 }
@@ -374,7 +374,7 @@ function guardarEstadoVista() {
 /**
  * Consulta documentos de colecciones en Firestore,
  * aplicando filtros opcionales, guarda resultados en localStorage
- * y recarga la pÃ¡gina.
+ * y recarga la página.
  *
  * @async
  * @function
@@ -392,7 +392,7 @@ async function actualizarColecciones(colecciones, noReload = false) {
 
       let query = db.collection(nombreColeccion);
 
-      // ðŸ” Aplicar filtros si existen
+      // 🔍 Aplicar filtros si existen
       if (filtros && typeof filtros === "object") {
         Object.entries(filtros).forEach(([campo, valor]) => {
           if (valor !== undefined && valor !== null && valor !== "") {
@@ -412,19 +412,19 @@ async function actualizarColecciones(colecciones, noReload = false) {
 
       cerrarBanner();
       mostrarBanner(
-        `Datos de "${nombreColeccion}" actualizados âœ…`,
+        `Datos de "${nombreColeccion}" actualizados ✅`,
         "success",
         false,
         3000
       );
     } catch (err) {
       console.error(`Error al actualizar ${nombreColeccion}:`, err);
-      mostrarBanner(`âŒ Error al actualizar "${nombreColeccion}"`, "danger");
+      mostrarBanner(`❌ Error al actualizar "${nombreColeccion}"`, "danger");
       resultados[nombreColeccion] = [];
     }
   }
 
-  // ðŸ”„ Recargar una sola vez al final
+  // 🔄 Recargar una sola vez al final
   if (!noReload) {
     guardarEstadoVista();
     location.reload();
@@ -440,7 +440,7 @@ async function obtenerDataColeccion(coleccion) {
   let data = [];
 
   if (cache) {
-    console.log("âœ… Datos cargados desde localStorage.");
+    console.log("✅ Datos cargados desde localStorage.");
     data = JSON.parse(cache);
   } else {
     data = await actualizarColecciones([coleccion], true);
@@ -449,11 +449,11 @@ async function obtenerDataColeccion(coleccion) {
 }
 
 /**
- * Ordena los publicadores de una congregaciÃ³n segÃºn prioridad por rol espiritual y pertenencia a un grupo.
- * Si tienen la misma prioridad, se ordenan alfabÃ©ticamente por nombre.
+ * Ordena los publicadores de una congregación según prioridad por rol espiritual y pertenencia a un grupo.
+ * Si tienen la misma prioridad, se ordenan alfabéticamente por nombre.
  * @function
  * @param {Array<Object>} pubs - Lista de publicadores.
- * @param {number} grupo - NÃºmero identificador del grupo para filtrar relevancia.
+ * @param {number} grupo - Número identificador del grupo para filtrar relevancia.
  * @returns {Array<Object>} Lista de publicadores ordenada por prioridad y nombre.
  */
 function ordenarPublicadoresGrupo(pubs, grupo) {
@@ -480,7 +480,7 @@ function ordenarPublicadoresGrupo(pubs, grupo) {
 
     if (pA !== pB) return pA - pB;
 
-    // Mismo grupo de prioridad â†’ ordenar por nombre
+    // Mismo grupo de prioridad → ordenar por nombre
     return (a.nombre || "").localeCompare(b.nombre || "");
   });
 }
@@ -510,7 +510,7 @@ function restaurarPosicionVista() {
   const estado = JSON.parse(localStorage.getItem("estado_vista_servicio"));
 
   if (!estado) return;
-  // Esperar a que el DOM y las tablas estÃ©n renderizadas
+  // Esperar a que el DOM y las tablas estén renderizadas
   setTimeout(() => {
     window.scrollTo({
       top: estado.scrollY || 0,
@@ -522,10 +522,10 @@ function restaurarPosicionVista() {
 }
 
 /**
- * Consulta una colecciÃ³n de Firestore con filtros opcionales
+ * Consulta una colección de Firestore con filtros opcionales
  * y retorna los datos.
  *
- * @param {string} coleccion - Nombre de la colecciÃ³n
+ * @param {string} coleccion - Nombre de la colección
  * @param {Object} filtros - Filtros opcionales { campo: valor }
  * @returns {Promise<Array<Object>>}
  */
