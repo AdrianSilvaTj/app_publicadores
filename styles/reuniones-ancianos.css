@@ -70,11 +70,41 @@
   padding-left: 1.5rem;
 }
 
-#colorTextoAncianos {
-  border: 0;
-  height: 1.25rem;
+.color-palette-control {
+  flex: 0 0 auto;
+}
+
+.color-palette-icon {
+  border-bottom: 0.2rem solid var(--color-subrayado, #212529);
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 0.15rem 0.08rem;
+}
+
+.color-palette {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: repeat(5, 2rem);
+}
+
+.color-swatch {
+  background-color: var(--swatch-color);
+  border: 1px solid #6c757d;
+  border-radius: 0.25rem;
+  height: 2rem;
   padding: 0;
-  width: 1.5rem;
+  width: 2rem;
+}
+
+.color-swatch:hover {
+  outline: 2px solid #212529;
+  outline-offset: 1px;
+}
+
+.color-swatch:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgb(13 110 253 / 35%);
+  outline: 2px solid #0d6efd;
+  outline-offset: 1px;
 }
 
 @media (max-width: 575.98px) {

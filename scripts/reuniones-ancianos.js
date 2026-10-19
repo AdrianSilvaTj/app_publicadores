@@ -280,8 +280,9 @@ function sanitizarContenidoReunionAncianos(html) {
 async function inicializarEditorReunionAncianos() {
   const formulario = document.getElementById("formReunionAncianos");
   const editor = document.getElementById("editorReunionAncianos");
-  const selectorColor = document.getElementById("colorTextoAncianos");
-  if (!formulario || !editor || !selectorColor) return;
+  const paletaColor = document.getElementById("paletaColorAncianos");
+  const botonAplicarColor = document.getElementById("aplicarUltimoColorAncianos");
+  if (!formulario || !editor || !paletaColor || !botonAplicarColor) return;
 
   const hoy = new Date();
   const fechaLocal = [hoy.getFullYear(), String(hoy.getMonth() + 1).padStart(2, "0"), String(hoy.getDate()).padStart(2, "0")].join("-");
@@ -300,6 +301,16 @@ async function inicializarEditorReunionAncianos() {
       seleccion.addRange(rangoSeleccionEditorAncianos);
     }
   };
+  let ultimoColorTexto = "#212529";
+  let nombreUltimoColorTexto = "Negro";
+  const aplicarColorTexto = (color) => {
+    restaurarRangoSeleccion();
+    document.execCommand("foreColor", false, color);
+    guardarRangoSeleccion();
+  };
+  botonAplicarColor.style.setProperty("--color-subrayado", ultimoColorTexto);
+  botonAplicarColor.addEventListener("mousedown", (evento) => evento.preventDefault());
+  botonAplicarColor.addEventListener("click", () => aplicarColorTexto(ultimoColorTexto));
   ["keyup", "mouseup", "input"].forEach((evento) => editor.addEventListener(evento, guardarRangoSeleccion));
   document.addEventListener("selectionchange", guardarRangoSeleccion);
   document.querySelectorAll("[data-editor-command]").forEach((boton) => {
@@ -310,10 +321,19 @@ async function inicializarEditorReunionAncianos() {
       guardarRangoSeleccion();
     });
   });
-  selectorColor.addEventListener("input", () => {
-    restaurarRangoSeleccion();
-    document.execCommand("foreColor", false, selectorColor.value);
-    guardarRangoSeleccion();
+  paletaColor.querySelectorAll("[data-color-texto]").forEach((boton) => {
+    boton.addEventListener("mousedown", (evento) => evento.preventDefault());
+    boton.addEventListener("click", () => {
+      ultimoColorTexto = boton.dataset.colorTexto;
+      nombreUltimoColorTexto = boton.getAttribute("aria-label") || "seleccionado";
+      botonAplicarColor.style.setProperty("--color-subrayado", ultimoColorTexto);
+      botonAplicarColor.title = `Aplicar el último color seleccionado: ${nombreUltimoColorTexto}`;
+      botonAplicarColor.setAttribute("aria-label", botonAplicarColor.title);
+      aplicarColorTexto(ultimoColorTexto);
+      bootstrap.Dropdown.getOrCreateInstance(
+        document.getElementById("botonPaletaColorAncianos")
+      ).hide();
+    });
   });
   formulario.addEventListener("submit", guardarReunionAncianos);
 

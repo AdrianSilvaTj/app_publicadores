@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icon-192.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="../style.css?v=20261011-layout" rel="stylesheet" />
-  <link href="../styles/reuniones-ancianos.css?v=20261011-layout" rel="stylesheet" />
+  <link href="../styles/reuniones-ancianos.css?v=20261019-word-color-palette" rel="stylesheet" />
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="menu" style="min-height: 56px"></nav>
@@ -45,9 +45,38 @@
           <button class="btn btn-outline-secondary" type="button" data-editor-command="insertUnorderedList" title="Viñetas">• Viñetas</button>
           <button class="btn btn-outline-secondary" type="button" data-editor-command="insertOrderedList" title="Lista numerada">1. Lista</button>
         </div>
-        <label class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2" for="colorTextoAncianos">Color
-          <input id="colorTextoAncianos" type="color" value="#212529" aria-label="Color de texto" />
-        </label>
+        <div class="btn-group btn-group-sm color-palette-control" role="group" aria-label="Color del texto">
+          <button class="btn btn-outline-secondary" id="aplicarUltimoColorAncianos" type="button" aria-label="Aplicar el último color seleccionado" title="Aplicar el último color seleccionado">
+            <span aria-hidden="true" class="color-palette-icon">A</span>
+          </button>
+          <button class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="botonPaletaColorAncianos" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Mostrar paleta de colores" title="Mostrar paleta de colores">
+            <span class="visually-hidden">Mostrar paleta de colores</span>
+          </button>
+          <div class="dropdown-menu p-2" aria-labelledby="botonPaletaColorAncianos">
+            <div id="paletaColorAncianos" class="color-palette" role="group" aria-label="Colores de texto">
+              <button class="color-swatch" type="button" style="--swatch-color:#212529" data-color-texto="#212529" aria-label="Negro" title="Negro"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#6c757d" data-color-texto="#6c757d" aria-label="Gris" title="Gris"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#adb5bd" data-color-texto="#adb5bd" aria-label="Plata" title="Plata"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#ffffff" data-color-texto="#ffffff" aria-label="Blanco" title="Blanco"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#dc3545" data-color-texto="#dc3545" aria-label="Rojo" title="Rojo"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#842029" data-color-texto="#842029" aria-label="Rojo oscuro" title="Rojo oscuro"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#fd7e14" data-color-texto="#fd7e14" aria-label="Naranja" title="Naranja"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#ff7f50" data-color-texto="#ff7f50" aria-label="Coral" title="Coral"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#ffc107" data-color-texto="#ffc107" aria-label="Ámbar" title="Ámbar"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#ffeb3b" data-color-texto="#ffeb3b" aria-label="Amarillo" title="Amarillo"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#198754" data-color-texto="#198754" aria-label="Verde" title="Verde"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#146c43" data-color-texto="#146c43" aria-label="Verde oscuro" title="Verde oscuro"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#84cc16" data-color-texto="#84cc16" aria-label="Lima" title="Lima"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#20c997" data-color-texto="#20c997" aria-label="Turquesa" title="Turquesa"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#0dcaf0" data-color-texto="#0dcaf0" aria-label="Cian" title="Cian"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#0d6efd" data-color-texto="#0d6efd" aria-label="Azul" title="Azul"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#0a58ca" data-color-texto="#0a58ca" aria-label="Azul oscuro" title="Azul oscuro"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#6610f2" data-color-texto="#6610f2" aria-label="Índigo" title="Índigo"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#6f42c1" data-color-texto="#6f42c1" aria-label="Violeta" title="Violeta"></button>
+              <button class="color-swatch" type="button" style="--swatch-color:#d63384" data-color-texto="#d63384" aria-label="Rosa" title="Rosa"></button>
+            </div>
+          </div>
+        </div>
         <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="removeFormat">Quitar formato</button>
       </div>
       <div id="editorReunionAncianos" class="editor-reunion-ancianos form-control" contenteditable="true" role="textbox" aria-labelledby="etiquetaEditorAncianos" aria-multiline="true"></div>
