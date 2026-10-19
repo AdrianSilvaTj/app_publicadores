@@ -40,7 +40,10 @@
 .reunion-ancianos-contenido {
   color: #343a40;
   line-height: 1.6;
-  white-space: normal;
+  max-height: 600px;
+  overflow: auto;
+  tab-size: 4;
+  white-space: pre-wrap;
 }
 
 .reunion-ancianos-contenido > :last-child {
@@ -75,6 +78,10 @@
 }
 
 @media (max-width: 575.98px) {
+  .reunion-ancianos-contenido {
+    max-height: 70vh;
+  }
+
   .editor-reunion-ancianos {
     min-height: 14rem;
   }

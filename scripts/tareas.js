@@ -117,7 +117,7 @@ function renderizarTareas() {
   const desde = document.getElementById("filtroDesdeTarea").value;
   const hasta = document.getElementById("filtroHastaTarea").value;
   const filtradas = tareasActuales.filter((tarea) => {
-    const fecha = tarea.fechaPropuesta || "";
+    const fecha = (tarea.fechaPropuesta || "").slice(0, 10);
     return (!filtroEstado || tarea.estado === filtroEstado) &&
       (!filtroResponsable || (tarea.responsables || []).includes(filtroResponsable)) &&
       (!desde || (fecha && fecha >= desde)) && (!hasta || (fecha && fecha <= hasta));
@@ -183,7 +183,7 @@ function prepararEdicionTarea(id) {
   document.getElementById("responsablesTarea").value = (tarea.responsables || []).join(", ");
   document.getElementById("correosResponsablesTarea").value = (tarea.correosResponsables || []).join(", ");
   document.getElementById("estadoTarea").value = ESTADOS_TAREA.includes(tarea.estado) ? tarea.estado : "pendiente";
-  document.getElementById("fechaPropuestaTarea").value = tarea.fechaPropuesta || "";
+  document.getElementById("fechaPropuestaTarea").value = prepararFechaHoraLocalTarea(tarea.fechaPropuesta);
   document.getElementById("fechaRealizadaTarea").value = tarea.fechaRealizada || "";
   document.getElementById("grupoFechaRealizadaTarea").classList.toggle("d-none", tarea.estado !== "realizada");
   document.getElementById("seccionNotasTarea").classList.remove("d-none");
@@ -487,8 +487,12 @@ function fechaHoyTarea() {
   return `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(ahora.getDate()).padStart(2, "0")}`;
 }
 function formatearFechaTarea(fecha) {
-  const valor = new Date(`${fecha}T00:00:00`);
-  return Number.isNaN(valor.getTime()) ? fecha : new Intl.DateTimeFormat("es-CO", { dateStyle: "long" }).format(valor);
+  const valor = new Date(fecha.length === 10 ? `${fecha}T00:00:00` : fecha);
+  return Number.isNaN(valor.getTime()) ? fecha : new Intl.DateTimeFormat("es-CO", { dateStyle: "long", ...(fecha.length > 10 ? { timeStyle: "short" } : {}) }).format(valor);
+}
+function prepararFechaHoraLocalTarea(fecha) {
+  if (!fecha) return "";
+  return fecha.length === 10 ? `${fecha}T00:00` : fecha.slice(0, 16);
 }
 function formatearFechaHoraTarea(fecha) {
   const valor = new Date(fecha);
