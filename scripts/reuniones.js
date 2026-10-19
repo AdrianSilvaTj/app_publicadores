@@ -626,8 +626,8 @@ async function renderReuniones() {
             "DD-MM-YYYY"
           )}</strong>
           <div>
-            <button class="btn btn-sm btn-outline-primary" onclick="editarReunion('${escaparHtml(reunion.id)}')">✏️ Editar</button>
-            <button class="btn btn-sm btn-outline-danger" onclick="eliminarReunion('${escaparHtml(reunion.id)}')">🗑 Eliminar</button>
+            <button class="btn btn-sm btn-outline-primary" type="button" onclick="editarReunion('${escaparHtml(reunion.id)}')" title="Editar reunión" aria-label="Editar reunión"><span aria-hidden="true">✏️</span><span class="visually-hidden">Editar reunión</span></button>
+            <button class="btn btn-sm btn-outline-danger" type="button" onclick="eliminarReunion('${escaparHtml(reunion.id)}')" title="Eliminar reunión" aria-label="Eliminar reunión"><span aria-hidden="true">🗑</span><span class="visually-hidden">Eliminar reunión</span></button>
           </div>
         </div>
         <div class="card-body p-0">

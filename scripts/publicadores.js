@@ -712,7 +712,7 @@ async function renderPublicadoresPorGrupo(grupos) {
       <div class="card card-shadow">
         <div class="card-header d-flex justify-content-between align-items-center group-header-color">
           <strong>Grupo ${g}</strong>
-          <button class="btn btn-sm btn-outline-secondary" onclick="activarSeleccionGrupo(${g})">🔁Mover publicadores</button>
+          <button class="btn btn-sm btn-outline-secondary" type="button" onclick="activarSeleccionGrupo(${g})" title="Mover publicadores" aria-label="Mover publicadores"><span aria-hidden="true">🔁</span><span class="visually-hidden">Mover publicadores</span></button>
         </div>
         <div class="card-body p-0">
           <table class="table table-hover mb-0" id="${tablaId}">
@@ -750,7 +750,7 @@ async function renderPublicadoresPorGrupo(grupos) {
     <div class="card card-shadow">
       <div class="card-header d-flex justify-content-between align-items-center group-header-color">
         <strong>No publicadores</strong>
-        <button class="btn btn-sm btn-outline-secondary" onclick="activarSeleccionGrupo(0)">🔁Mover publicadores</button>
+        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="activarSeleccionGrupo(0)" title="Mover publicadores" aria-label="Mover publicadores"><span aria-hidden="true">🔁</span><span class="visually-hidden">Mover publicadores</span></button>
       </div>
       <div class="card-body p-0">
         <table class="table table-hover mb-0" id="${tablaId}">

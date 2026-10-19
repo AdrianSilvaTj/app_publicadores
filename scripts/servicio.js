@@ -997,11 +997,11 @@ async function renderPublicadoresPorGrupo(
         <div class="card-header d-flex justify-content-between align-items-center group-header-color">
           <strong>Grupo ${g}</strong>
           <div>
-            <button class="btn btn-sm btn-outline-primary" onclick="guardarServicioGrupo(${g})">
-              💾 Guardar
+            <button class="btn btn-sm btn-outline-primary" type="button" onclick="guardarServicioGrupo(${g})" title="Guardar servicio del grupo ${g}" aria-label="Guardar servicio del grupo ${g}">
+              <span aria-hidden="true">💾</span><span class="visually-hidden">Guardar</span>
             </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="limpiarServicioGrupo(${g})">
-              🧹 Limpiar
+            <button class="btn btn-sm btn-outline-danger" type="button" onclick="limpiarServicioGrupo(${g})" title="Limpiar servicio del grupo ${g}" aria-label="Limpiar servicio del grupo ${g}">
+              <span aria-hidden="true">🧹</span><span class="visually-hidden">Limpiar</span>
             </button>
           </div>
         </div>

@@ -102,9 +102,9 @@ function crearTarjetaReunionAncianos(documento) {
             <time class="small" datetime="${escaparHtmlReunionAncianos(reunion.fecha || "")}">${fecha}</time>
           </div>
           <div class="d-flex flex-wrap gap-1">
-            <button class="btn btn-sm btn-outline-primary" type="button" data-accion-reunion="editar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Editar reunión: ${tema}" title="Editar reunión">&#128393; Editar</button>
-            <button class="btn btn-sm btn-outline-danger" type="button" data-accion-reunion="eliminar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" data-reunion-tema="${tema}" data-reunion-fecha="${escaparHtmlReunionAncianos(reunion.fecha || "")}" aria-label="Eliminar reunión: ${tema}" title="Eliminar reunión">&#128465; Eliminar</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-accion-reunion="pdf" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Descargar PDF: ${tema}" title="Descargar PDF">&#128196; PDF</button>
+            <button class="btn btn-sm btn-outline-primary" type="button" data-accion-reunion="editar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Editar reunión: ${tema}" title="Editar reunión"><span aria-hidden="true">&#128393;</span><span class="visually-hidden">Editar</span></button>
+            <button class="btn btn-sm btn-outline-danger" type="button" data-accion-reunion="eliminar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" data-reunion-tema="${tema}" data-reunion-fecha="${escaparHtmlReunionAncianos(reunion.fecha || "")}" aria-label="Eliminar reunión: ${tema}" title="Eliminar reunión"><span aria-hidden="true">&#128465;</span><span class="visually-hidden">Eliminar</span></button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-accion-reunion="pdf" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Descargar PDF: ${tema}" title="Descargar PDF"><span aria-hidden="true">&#128196;</span><span class="visually-hidden">PDF</span></button>
           </div>
         </div>
         <div class="card-body">

@@ -207,7 +207,7 @@ async function cargarTareasProgramadas() {
     if (snapshot.empty) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="3" class="text-center text-muted">
+          <td colspan="2" class="text-center text-muted">
             No hay tareas programadas.
           </td>
         </tr>
@@ -248,8 +248,9 @@ async function cargarTareasProgramadas() {
         detalleResponsables.textContent = `Responsable(s): ${responsables || "Sin asignar"}`;
         celdaTitulo.append(titulo, detalleResponsables);
 
-        // Fecha propuesta, con hora cuando el registro la contiene.
+        // Fecha propuesta y estado, agrupados en la misma columna.
         const celdaFecha = document.createElement("td");
+        const textoFecha = document.createElement("div");
 
         if (tarea.fechaPropuesta) {
           const valor = String(tarea.fechaPropuesta);
@@ -261,16 +262,15 @@ async function cargarTareasProgramadas() {
             dateStyle: "medium",
             timeStyle: "short",
           });
-          celdaFecha.textContent = Number.isNaN(fecha.getTime())
+          textoFecha.textContent = Number.isNaN(fecha.getTime())
             ? valor
             : formatoFecha.format(fecha);
         } else {
-          celdaFecha.textContent = "Sin fecha";
+          textoFecha.textContent = "Sin fecha";
         }
+        celdaFecha.appendChild(textoFecha);
 
         // Estado
-        const celdaEstado = document.createElement("td");
-
         const estadosValidos = [
           "pendiente",
           "en curso",
@@ -291,12 +291,12 @@ async function cargarTareasProgramadas() {
           realizada: "text-bg-success",
           cancelada: "text-bg-secondary",
         };
-        insignia.className = `badge ${estilosEstado[estado]}`;
+        insignia.className = `badge d-block mt-1 ${estilosEstado[estado]}`;
         insignia.textContent = estado.charAt(0).toUpperCase() + estado.slice(1);
 
-        celdaEstado.appendChild(insignia);
+        celdaFecha.appendChild(insignia);
 
-        fila.append(celdaTitulo, celdaFecha, celdaEstado);
+        fila.append(celdaTitulo, celdaFecha);
 
         return fila;
       }),
@@ -306,7 +306,7 @@ async function cargarTareasProgramadas() {
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="3" class="text-center text-danger">
+        <td colspan="2" class="text-center text-danger">
           No se pudieron cargar las tareas programadas.
         </td>
       </tr>

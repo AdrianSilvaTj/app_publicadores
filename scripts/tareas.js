@@ -185,7 +185,7 @@ function crearTarjetaTarea(tarea) {
   return `<article class="col-12 col-lg-6"><section class="card card-shadow tarea-card">
     <div class="card-header tarea-card-header tarea-card-estado-${estado.replace(" ", "-")} d-flex flex-wrap justify-content-between align-items-center gap-2">
       <div><h2 class="h5 mb-1">${escaparTarea(tarea.titulo || "Sin título")}</h2><span class="badge tarea-estado tarea-estado-${estado.replace(" ", "-")}">${escaparTarea(estado)}</span></div>
-      <div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}">✎ Editar</button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}">🗑 Eliminar</button></div>
+      <div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}" title="Editar tarea" aria-label="Editar tarea"><span aria-hidden="true">✎</span><span class="visually-hidden">Editar tarea</span></button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}" title="Eliminar tarea" aria-label="Eliminar tarea"><span aria-hidden="true">🗑</span><span class="visually-hidden">Eliminar tarea</span></button></div>
     </div>
     <div class="card-body">
       ${tarea.descripcion ? `<p class="tarea-descripcion mb-3">${escaparTarea(tarea.descripcion)}</p>` : ""}
