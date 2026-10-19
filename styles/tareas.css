@@ -3,7 +3,12 @@
 .tareas-header-text p { overflow-wrap: anywhere; }
 #nuevaTarea { flex: 0 0 auto; white-space: nowrap; }
 .tarea-card { height: 100%; overflow-wrap: anywhere; }
-.tarea-card .card-header { background-color: var(--bs-light); }
+.tarea-card .card-header { border-bottom-color: rgb(0 0 0 / 10%); }
+.tarea-card-header.tarea-card-estado-pendiente { color: #664d03; background-color: #fff3cd; }
+.tarea-card-header.tarea-card-estado-en-curso { color: #084298; background-color: #cfe2ff; }
+.tarea-card-header.tarea-card-estado-retrasada { color: #3d1b0f; background-color: #ff7f50; }
+.tarea-card-header.tarea-card-estado-realizada { color: #0f5132; background-color: #d1e7dd; }
+.tarea-card-header.tarea-card-estado-cancelada { color: #41464b; background-color: #e2e3e5; }
 .tarea-card .card-header > div:first-child { flex: 1 1 12rem; min-width: 0; }
 .tarea-card .card-header > div:last-child { flex: 0 1 auto; flex-wrap: wrap; margin-left: auto; }
 .tarea-card .card-header .btn { white-space: nowrap; }
@@ -15,6 +20,7 @@
 .tarea-estado-en-curso { color: #084298; background: #cfe2ff; }
 .tarea-estado-realizada { color: #0f5132; background: #d1e7dd; }
 .tarea-estado-cancelada { color: #41464b; background: #e2e3e5; }
+.tarea-estado-retrasada { color: #3d1b0f; background: #ff7f50; }
 #listaRecordatoriosTarea, #listaNotasTarea { padding-left: 0; }
 #listaNotasTarea li { overflow-wrap: anywhere; }
 @media (max-width: 575.98px) {

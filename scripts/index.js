@@ -207,7 +207,7 @@ async function cargarTareasProgramadas() {
     if (snapshot.empty) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="4" class="text-center text-muted">
+          <td colspan="3" class="text-center text-muted">
             No hay tareas programadas.
           </td>
         </tr>
@@ -230,47 +230,39 @@ async function cargarTareasProgramadas() {
 
     const ultimasTareas = tareas.slice(0, 20);
 
-    const formatoFecha = new Intl.DateTimeFormat("es-CO", {
-      dateStyle: "medium",
-      timeZone: "America/Bogota",
-    });
-
     tbody.replaceChildren(
       ...ultimasTareas.map((tarea) => {
         const fila = document.createElement("tr");
 
-        // Título
+        // Título y responsables en la misma columna.
         const celdaTitulo = document.createElement("td");
-        celdaTitulo.className = "fw-semibold";
-        celdaTitulo.textContent = tarea.titulo || "Sin título";
-
-        // Responsable o responsables
-        const celdaResponsable = document.createElement("td");
+        const titulo = document.createElement("div");
+        titulo.className = "fw-semibold";
+        titulo.textContent = tarea.titulo || "Sin título";
 
         const responsables = Array.isArray(tarea.responsables)
           ? tarea.responsables.filter(Boolean).join(", ")
           : tarea.responsables || "";
+        const detalleResponsables = document.createElement("small");
+        detalleResponsables.className = "d-block text-body-secondary fw-normal";
+        detalleResponsables.textContent = `Responsable(s): ${responsables || "Sin asignar"}`;
+        celdaTitulo.append(titulo, detalleResponsables);
 
-        celdaResponsable.textContent = responsables || "Sin asignar";
-
-        // Fecha propuesta
+        // Fecha propuesta, con hora cuando el registro la contiene.
         const celdaFecha = document.createElement("td");
 
         if (tarea.fechaPropuesta) {
-          const partes = String(tarea.fechaPropuesta).match(
-            /^(\d{4})-(\d{2})-(\d{2})$/,
-          );
-
+          const valor = String(tarea.fechaPropuesta);
+          const partes = valor.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
           const fecha = partes
-            ? new Date(
-              Number(partes[1]),
-              Number(partes[2]) - 1,
-              Number(partes[3]),
-            )
-            : new Date(tarea.fechaPropuesta);
-
+            ? new Date(Number(partes[1]), Number(partes[2]) - 1, Number(partes[3]), Number(partes[4] || 0), Number(partes[5] || 0))
+            : new Date(valor);
+          const formatoFecha = new Intl.DateTimeFormat("es-CO", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          });
           celdaFecha.textContent = Number.isNaN(fecha.getTime())
-            ? tarea.fechaPropuesta
+            ? valor
             : formatoFecha.format(fecha);
         } else {
           celdaFecha.textContent = "Sin fecha";
@@ -282,6 +274,7 @@ async function cargarTareasProgramadas() {
         const estadosValidos = [
           "pendiente",
           "en curso",
+          "retrasada",
           "realizada",
           "cancelada",
         ];
@@ -291,21 +284,19 @@ async function cargarTareasProgramadas() {
           : "pendiente";
 
         const insignia = document.createElement("span");
-        insignia.className = "badge";
-
         const estilosEstado = {
           pendiente: "text-bg-warning",
           "en curso": "text-bg-primary",
+          retrasada: "tarea-estado-retrasada",
           realizada: "text-bg-success",
           cancelada: "text-bg-secondary",
         };
-
-        insignia.classList.add(estilosEstado[estado]);
+        insignia.className = `badge ${estilosEstado[estado]}`;
         insignia.textContent = estado.charAt(0).toUpperCase() + estado.slice(1);
 
         celdaEstado.appendChild(insignia);
 
-        fila.append(celdaTitulo, celdaResponsable, celdaFecha, celdaEstado);
+        fila.append(celdaTitulo, celdaFecha, celdaEstado);
 
         return fila;
       }),
@@ -315,7 +306,7 @@ async function cargarTareasProgramadas() {
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" class="text-center text-danger">
+        <td colspan="3" class="text-center text-danger">
           No se pudieron cargar las tareas programadas.
         </td>
       </tr>

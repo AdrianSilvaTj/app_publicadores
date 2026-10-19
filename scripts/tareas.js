@@ -1,8 +1,9 @@
 const COLECCION_TAREAS = "tareas";
 const CLAVE_RECORDATORIOS_PROCESADOS = "digitCongRecordatoriosProcesados";
-const ESTADOS_TAREA = ["pendiente", "en curso", "realizada", "cancelada"];
+const ESTADOS_TAREA = ["pendiente", "en curso", "retrasada", "realizada", "cancelada"];
 let tareasActuales = [];
 let publicadoresTarea = [];
+let reunionesAncianosTarea = [];
 let recordatoriosBorrador = [];
 let notasTareaActual = [];
 let temporizadorRecordatorios = null;
@@ -29,7 +30,11 @@ async function inicializarTareas() {
   document.getElementById("activarNotificaciones")?.addEventListener("click", activarNotificacionesTarea);
   document.getElementById("modalTarea")?.addEventListener("hidden.bs.modal", limpiarFormularioTarea);
 
-  await Promise.all([cargarTareas(), cargarResponsablesTarea()]);
+  await Promise.all([
+    cargarResponsablesTarea(),
+    cargarReunionesAncianosTarea(),
+  ]);
+  await cargarTareas();
   await actualizarEstadoNotificaciones();
   iniciarComprobacionRecordatorios();
   const tareaEnlace = new URLSearchParams(window.location.search).get("task");
@@ -64,6 +69,29 @@ async function cargarResponsablesTarea() {
     datalist.replaceChildren(...nombres.map((nombre) => new Option(nombre, nombre)));
   } catch (error) {
     console.warn("No se pudo cargar la lista de publicadores para responsables:", error);
+  }
+}
+
+async function cargarReunionesAncianosTarea() {
+  const selector = document.getElementById("reunionRelacionadaTarea");
+  if (!selector) return;
+  try {
+    const snapshot = await db.collection("reuniones_ancianos")
+      .orderBy("fecha", "desc")
+      .get();
+    reunionesAncianosTarea = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    selector.replaceChildren(
+      new Option("Ninguna", ""),
+      ...reunionesAncianosTarea.map((reunion) => new Option(
+        reunion.tema || "Sin título",
+        reunion.id
+      ))
+    );
+  } catch (error) {
+    console.warn("No se pudieron cargar las reuniones de ancianos:", error);
   }
 }
 
@@ -126,6 +154,7 @@ function renderizarTareas() {
   actualizarOpcionesResponsable();
   document.getElementById("resumenPendientes").textContent = `Pendientes: ${tareasActuales.filter((t) => t.estado === "pendiente").length}`;
   document.getElementById("resumenEnCurso").textContent = `En curso: ${tareasActuales.filter((t) => t.estado === "en curso").length}`;
+  document.getElementById("resumenRetrasadas").textContent = `Retrasadas: ${tareasActuales.filter((t) => t.estado === "retrasada").length}`;
   document.getElementById("resumenRealizadas").textContent = `Realizadas: ${tareasActuales.filter((t) => t.estado === "realizada").length}`;
 
   const lista = document.getElementById("listaTareas");
@@ -147,19 +176,21 @@ function actualizarOpcionesResponsable() {
 function crearTarjetaTarea(tarea) {
   const estado = ESTADOS_TAREA.includes(tarea.estado) ? tarea.estado : "pendiente";
   const responsables = (tarea.responsables || []).map(escaparTarea).join(", ") || "Sin asignar";
+  const reunionRelacionada = reunionesAncianosTarea.find((reunion) => reunion.id === tarea.reunionRelacionadaId);
   const fechaPropuesta = tarea.fechaPropuesta ? formatearFechaTarea(tarea.fechaPropuesta) : "Sin fecha propuesta";
   const fechaRealizada = tarea.fechaRealizada ? `<div class="small text-success mt-1">Realizada: ${escaparTarea(formatearFechaTarea(tarea.fechaRealizada))}</div>` : "";
   const recordatorios = (tarea.recordatorios || []).filter((r) => r.fechaHora).map((r) => `<li class="tarea-recordatorio">${escaparTarea(formatearFechaHoraTarea(r.fechaHora))}</li>`).join("");
   const notas = (tarea.notas || []).slice(-3).reverse().map((nota) => `<li class="list-group-item px-0 py-2"><span>${escaparTarea(nota.texto)}</span><div class="small text-muted">${escaparTarea(formatearFechaHoraTarea(nota.fechaHora))}${nota.autor ? ` · ${escaparTarea(nota.autor)}` : ""}</div></li>`).join("");
-  const puedeCompletar = estado === "pendiente" || estado === "en curso";
+  const puedeCompletar = estado === "pendiente" || estado === "en curso" || estado === "retrasada";
   return `<article class="col-12 col-lg-6"><section class="card card-shadow tarea-card">
-    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 group-header-color">
+    <div class="card-header tarea-card-header tarea-card-estado-${estado.replace(" ", "-")} d-flex flex-wrap justify-content-between align-items-center gap-2">
       <div><h2 class="h5 mb-1">${escaparTarea(tarea.titulo || "Sin título")}</h2><span class="badge tarea-estado tarea-estado-${estado.replace(" ", "-")}">${escaparTarea(estado)}</span></div>
       <div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}">✎ Editar</button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}">🗑 Eliminar</button></div>
     </div>
     <div class="card-body">
       ${tarea.descripcion ? `<p class="tarea-descripcion mb-3">${escaparTarea(tarea.descripcion)}</p>` : ""}
       <div class="small"><strong>Responsable(s):</strong> ${responsables}</div><div class="small mt-1"><strong>Fecha propuesta:</strong> ${escaparTarea(fechaPropuesta)}</div>${fechaRealizada}
+      ${tarea.reunionRelacionadaId ? `<div class="small mt-1"><strong>Reunión relacionada:</strong> ${escaparTarea(reunionRelacionada?.tema || "Reunión no disponible")}</div>` : ""}
       ${recordatorios ? `<div class="mt-3"><strong class="small">Recordatorios</strong><ul class="mb-0 ps-3">${recordatorios}</ul></div>` : ""}
       ${notas ? `<details class="mt-3"><summary class="small fw-semibold">Notas recientes</summary><ul class="list-group list-group-flush tarea-notas">${notas}</ul></details>` : ""}
       <div class="d-flex flex-wrap gap-2 mt-3"><button class="btn btn-sm btn-outline-secondary" type="button" data-tarea-accion="nota" data-tarea-id="${escaparTarea(tarea.id)}">＋ Añadir nota</button>${puedeCompletar ? `<button class="btn btn-sm btn-success" type="button" data-tarea-accion="realizada" data-tarea-id="${escaparTarea(tarea.id)}">Marcar realizada</button>` : ""}</div>
@@ -183,6 +214,7 @@ function prepararEdicionTarea(id) {
   document.getElementById("responsablesTarea").value = (tarea.responsables || []).join(", ");
   document.getElementById("correosResponsablesTarea").value = (tarea.correosResponsables || []).join(", ");
   document.getElementById("estadoTarea").value = ESTADOS_TAREA.includes(tarea.estado) ? tarea.estado : "pendiente";
+  document.getElementById("reunionRelacionadaTarea").value = tarea.reunionRelacionadaId || "";
   document.getElementById("fechaPropuestaTarea").value = prepararFechaHoraLocalTarea(tarea.fechaPropuesta);
   document.getElementById("fechaRealizadaTarea").value = tarea.fechaRealizada || "";
   document.getElementById("grupoFechaRealizadaTarea").classList.toggle("d-none", tarea.estado !== "realizada");
@@ -215,6 +247,7 @@ async function guardarTarea(evento) {
     responsables: [...new Set(document.getElementById("responsablesTarea").value.split(",").map((n) => n.trim()).filter(Boolean))],
     correosResponsables,
     estado,
+    reunionRelacionadaId: document.getElementById("reunionRelacionadaTarea").value || null,
     fechaPropuesta: document.getElementById("fechaPropuestaTarea").value || null,
     fechaRealizada: estado === "realizada" ? (fechaRealizadaInput || anterior?.fechaRealizada || fechaHoyTarea()) : (anterior?.fechaRealizada || null),
     recordatorios: recordatoriosBorrador,

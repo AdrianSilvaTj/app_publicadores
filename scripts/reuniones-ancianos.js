@@ -1,6 +1,7 @@
 const COLECCION_REUNIONES_ANCIANOS = "reuniones_ancianos";
 const TAMANO_PAGINA_REUNIONES_ANCIANOS = 6;
 const TIEMPO_LIMITE_CARGA_REUNIONES = 10000;
+const reunionesAncianosCargadas = new Map();
 
 async function inicializarListaReunionesAncianos() {
   const botonVerMas = document.getElementById("verMasReunionesAncianos");
@@ -53,6 +54,7 @@ async function cargarMasReunionesAncianos(reiniciar = false) {
       lista.innerHTML = '<div class="col-12"><div class="alert alert-light border mb-0">Todavía no hay reuniones de ancianos.</div></div>';
     } else {
       resultado.docs.forEach((documento) => {
+        reunionesAncianosCargadas.set(documento.id, documento.data());
         lista.insertAdjacentHTML("beforeend", crearTarjetaReunionAncianos(documento));
       });
     }
@@ -102,6 +104,7 @@ function crearTarjetaReunionAncianos(documento) {
           <div class="d-flex flex-wrap gap-1">
             <button class="btn btn-sm btn-outline-primary" type="button" data-accion-reunion="editar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Editar reunión: ${tema}" title="Editar reunión">&#128393; Editar</button>
             <button class="btn btn-sm btn-outline-danger" type="button" data-accion-reunion="eliminar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" data-reunion-tema="${tema}" data-reunion-fecha="${escaparHtmlReunionAncianos(reunion.fecha || "")}" aria-label="Eliminar reunión: ${tema}" title="Eliminar reunión">&#128465; Eliminar</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-accion-reunion="pdf" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Descargar PDF: ${tema}" title="Descargar PDF">&#128196; PDF</button>
           </div>
         </div>
         <div class="card-body">
@@ -122,8 +125,59 @@ function gestionarAccionesReunionAncianos(evento) {
     return;
   }
 
+  if (boton.dataset.accionReunion === "pdf") {
+    descargarPdfReunionAncianos(id, boton);
+    return;
+  }
+
   if (boton.dataset.accionReunion === "eliminar") {
     eliminarReunionAncianos(id, boton);
+  }
+}
+
+async function descargarPdfReunionAncianos(id, boton) {
+  const reunion = reunionesAncianosCargadas.get(id);
+  if (!reunion) {
+    mostrarBanner("No se encontró la reunión para descargar.", "danger", false, 4000);
+    return;
+  }
+  if (typeof html2pdf !== "function") {
+    mostrarBanner("No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.", "danger", false, 5000);
+    return;
+  }
+
+  boton.disabled = true;
+  mostrarBanner("Preparando el PDF de la reunión...", "info", true);
+  const titulo = reunion.tema || "Sin tema";
+  const contenido = sanitizarContenidoReunionAncianos(reunion.contenido || "");
+  const documentoPdf = document.createElement("div");
+  documentoPdf.style.cssText = "box-sizing:border-box;width:180mm;padding:12mm;background:#fff;color:#212529;font-family:Arial,sans-serif;overflow-wrap:anywhere";
+  documentoPdf.innerHTML = `
+    <h1 style="font-size:20pt;margin:0 0 4mm">${escaparHtmlReunionAncianos(titulo)}</h1>
+    <p style="font-size:11pt;color:#495057;margin:0 0 8mm">${escaparHtmlReunionAncianos(formatearFechaReunionAncianos(reunion.fecha))}</p>
+    <div style="font-size:11pt;line-height:1.55;white-space:pre-wrap;tab-size:4">${contenido || "Sin contenido."}</div>
+  `;
+  document.body.appendChild(documentoPdf);
+  const nombreArchivo = `Reunion-${String(titulo).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "") || "ancianos"}-${reunion.fecha || "sin-fecha"}.pdf`;
+
+  try {
+    await html2pdf().set({
+      margin: 0,
+      filename: nombreArchivo,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"] },
+    }).from(documentoPdf).save();
+    cerrarBanner();
+    mostrarBanner("PDF descargado.", "success", false, 2500);
+  } catch (error) {
+    console.error("Error al generar el PDF de la reunión:", error);
+    cerrarBanner();
+    mostrarBanner("No se pudo generar el PDF. Intenta de nuevo.", "danger", false, 5000);
+  } finally {
+    documentoPdf.remove();
+    boton.disabled = false;
   }
 }
 
@@ -148,6 +202,7 @@ async function eliminarReunionAncianos(id, boton) {
       db.collection(COLECCION_REUNIONES_ANCIANOS).doc(id).delete(),
       TIEMPO_LIMITE_CARGA_REUNIONES
     );
+    reunionesAncianosCargadas.delete(id);
     boton.closest("article")?.remove();
     const lista = document.getElementById("listaReunionesAncianos");
     if (!lista.querySelector("article") && !hayMasReunionesAncianos) {

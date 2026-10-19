@@ -37,7 +37,7 @@
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="form-label" for="filtroEstadoTarea">Estado</label>
           <select class="form-select" id="filtroEstadoTarea">
-            <option value="">Todos</option><option value="pendiente">Pendiente</option><option value="en curso">En curso</option><option value="realizada">Realizada</option><option value="cancelada">Cancelada</option>
+            <option value="">Todos</option><option value="pendiente">Pendiente</option><option value="en curso">En curso</option><option value="retrasada">Retrasada</option><option value="realizada">Realizada</option><option value="cancelada">Cancelada</option>
           </select>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
@@ -59,8 +59,9 @@
     </section>
 
     <div class="d-flex flex-wrap gap-2 mb-3" aria-label="Resumen">
-      <span class="badge text-bg-secondary" id="resumenPendientes">Pendientes: 0</span>
+      <span class="badge text-bg-warning" id="resumenPendientes">Pendientes: 0</span>
       <span class="badge text-bg-primary" id="resumenEnCurso">En curso: 0</span>
+      <span class="badge tarea-estado tarea-estado-retrasada" id="resumenRetrasadas">Retrasadas: 0</span>
       <span class="badge text-bg-success" id="resumenRealizadas">Realizadas: 0</span>
     </div>
     <div id="listaTareas" class="row g-3" aria-live="polite"><div class="col-12"><p class="text-muted">Cargando tareas...</p></div></div>
@@ -102,7 +103,13 @@
               <div class="col-12 col-md-6">
                 <label class="form-label" for="estadoTarea">Estado</label>
                 <select class="form-select" id="estadoTarea" required>
-                  <option value="pendiente">Pendiente</option><option value="en curso">En curso</option><option value="realizada">Realizada</option><option value="cancelada">Cancelada</option>
+                  <option value="pendiente">Pendiente</option><option value="en curso">En curso</option><option value="retrasada">Retrasada</option><option value="realizada">Realizada</option><option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="reunionRelacionadaTarea">Reunión relacionada</label>
+                <select class="form-select" id="reunionRelacionadaTarea">
+                  <option value="">Ninguna</option>
                 </select>
               </div>
               <div class="col-12 col-md-6">
