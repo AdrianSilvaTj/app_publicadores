@@ -134,7 +134,7 @@ async function cargarTotalesPublicadores() {
 }
 
 /**
- * Carga las últimas 20 acciones de los publicadores.
+ * Carga las últimas 30 acciones de los publicadores.
  */
 async function cargarHistorialEstadosPublicadores() {
   const tbody = document.getElementById("historialEstadosPublicadores");
@@ -143,7 +143,7 @@ async function cargarHistorialEstadosPublicadores() {
     const snapshot = await db
       .collection("historialEstadosPublicadores")
       .orderBy("createdAt", "desc")
-      .limit(20)
+      .limit(30)
       .get();
 
     if (snapshot.empty) {
@@ -195,14 +195,18 @@ async function cargarHistorialEstadosPublicadores() {
 }
 
 /**
- * Carga las últimas 20 tareas en la tarjeta principal.
+ * Carga las últimas 30 tareas en la tarjeta principal.
  * Colección de Firestore: tareas.
  */
 async function cargarTareasProgramadas() {
   const tbody = document.getElementById("listaTareasProgramadas");
 
   try {
-    const snapshot = await db.collection("tareas").get();
+    const snapshot = await db
+      .collection("tareas")
+      .orderBy("actualizadoEn", "desc")
+      .limit(30)
+      .get();
 
     if (snapshot.empty) {
       tbody.innerHTML = `
@@ -220,15 +224,7 @@ async function cargarTareasProgramadas() {
       ...documento.data(),
     }));
 
-    // Primero las tareas más recientemente actualizadas o creadas.
-    tareas.sort((a, b) => {
-      const fechaA = a.actualizadoEn || a.creadoEn || "";
-      const fechaB = b.actualizadoEn || b.creadoEn || "";
-
-      return String(fechaB).localeCompare(String(fechaA));
-    });
-
-    const ultimasTareas = tareas.slice(0, 20);
+    const ultimasTareas = tareas;
 
     tbody.replaceChildren(
       ...ultimasTareas.map((tarea) => {
