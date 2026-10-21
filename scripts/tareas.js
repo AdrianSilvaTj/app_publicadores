@@ -7,6 +7,8 @@ let reunionesAncianosTarea = [];
 let recordatoriosBorrador = [];
 let notasTareaActual = [];
 let temporizadorRecordatorios = null;
+let paginaTareasActual = 1;
+let cantidadTareasPorPagina = null;
 
 async function inicializarTareas() {
   document.getElementById("formTarea")?.addEventListener("submit", guardarTarea);
@@ -18,8 +20,24 @@ async function inicializarTareas() {
   document.getElementById("agregarNotaTarea")?.addEventListener("click", agregarNotaTarea);
   document.getElementById("eliminarTarea")?.addEventListener("click", eliminarTareaActual);
   document.getElementById("listaTareas")?.addEventListener("click", gestionarAccionTarjetaTarea);
+  document.getElementById("controlesPaginacionTareas")?.addEventListener("click", (evento) => {
+    const boton = evento.target.closest("[data-pagina-tarea]");
+    if (!boton) return;
+    const pagina = Number(boton.dataset.paginaTarea);
+    if (!Number.isInteger(pagina) || pagina < 1) return;
+    paginaTareasActual = pagina;
+    renderizarTareas();
+    document.getElementById("listaTareas")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   ["filtroEstadoTarea", "filtroResponsableTarea", "filtroDesdeTarea", "filtroHastaTarea"].forEach((id) => {
-    document.getElementById(id)?.addEventListener("change", renderizarTareas);
+    document.getElementById(id)?.addEventListener("change", () => {
+      paginaTareasActual = 1;
+      renderizarTareas();
+    });
+  });
+  window.matchMedia("(max-width: 767.98px)").addEventListener("change", () => {
+    paginaTareasActual = 1;
+    renderizarTareas();
   });
   document.getElementById("limpiarFiltrosTarea")?.addEventListener("click", limpiarFiltrosTarea);
   document.getElementById("estadoTarea")?.addEventListener("change", () => {
@@ -46,11 +64,7 @@ async function cargarTareas() {
   try {
     const snapshot = await db.collection(COLECCION_TAREAS).get();
     tareasActuales = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    tareasActuales.sort((a, b) => {
-      const fechaA = a.fechaPropuesta || "9999-12-31";
-      const fechaB = b.fechaPropuesta || "9999-12-31";
-      return fechaA.localeCompare(fechaB) || String(b.actualizadoEn || "").localeCompare(String(a.actualizadoEn || ""));
-    });
+    tareasActuales.sort(compararTareasPorVencimiento);
     renderizarTareas();
   } catch (error) {
     console.error("Error al cargar tareas:", error);
@@ -158,11 +172,46 @@ function renderizarTareas() {
   document.getElementById("resumenRealizadas").textContent = `Realizadas: ${tareasActuales.filter((t) => t.estado === "realizada").length}`;
 
   const lista = document.getElementById("listaTareas");
+  const navPaginacion = document.getElementById("paginacionTareas");
+  const controlesPaginacion = document.getElementById("controlesPaginacionTareas");
+  const resumenPaginacion = document.getElementById("resumenPaginacionTareas");
   if (!filtradas.length) {
     lista.innerHTML = `<div class="col-12"><div class="alert alert-light border mb-0">${tareasActuales.length ? "No hay tareas que coincidan con los filtros." : "Todavía no hay tareas. Usa Crear tarea para agregar la primera."}</div></div>`;
+    navPaginacion?.classList.add("d-none");
     return;
   }
-  lista.innerHTML = filtradas.map(crearTarjetaTarea).join("");
+  const esMovil = window.matchMedia("(max-width: 767.98px)").matches;
+  const porPagina = esMovil ? 5 : 10;
+  if (cantidadTareasPorPagina !== porPagina) {
+    cantidadTareasPorPagina = porPagina;
+    paginaTareasActual = 1;
+  }
+  const paginas = Math.ceil(filtradas.length / porPagina);
+  paginaTareasActual = Math.min(Math.max(1, paginaTareasActual), paginas);
+  const inicio = (paginaTareasActual - 1) * porPagina;
+  lista.innerHTML = filtradas.slice(inicio, inicio + porPagina).map(crearTarjetaTarea).join("");
+  if (navPaginacion && controlesPaginacion && resumenPaginacion) {
+    navPaginacion.classList.toggle("d-none", paginas <= 1);
+    resumenPaginacion.textContent = `Mostrando ${inicio + 1}–${Math.min(inicio + porPagina, filtradas.length)} de ${filtradas.length} tareas`;
+    controlesPaginacion.innerHTML = [
+      `<li class="page-item${paginaTareasActual === 1 ? " disabled" : ""}"><button class="page-link" type="button" data-pagina-tarea="${paginaTareasActual - 1}" aria-label="Página anterior"${paginaTareasActual === 1 ? " disabled" : ""}>Anterior</button></li>`,
+      ...Array.from({ length: paginas }, (_, indice) => {
+        const pagina = indice + 1;
+        const actual = pagina === paginaTareasActual;
+        return `<li class="page-item${actual ? " active" : ""}"><button class="page-link" type="button" data-pagina-tarea="${pagina}"${actual ? ' aria-current="page"' : ""}>${pagina}</button></li>`;
+      }),
+      `<li class="page-item${paginaTareasActual === paginas ? " disabled" : ""}"><button class="page-link" type="button" data-pagina-tarea="${paginaTareasActual + 1}" aria-label="Página siguiente"${paginaTareasActual === paginas ? " disabled" : ""}>Siguiente</button></li>`,
+    ].join("");
+  }
+}
+
+function compararTareasPorVencimiento(a, b) {
+  const aPendiente = a.estado === "pendiente";
+  const bPendiente = b.estado === "pendiente";
+  if (aPendiente !== bPendiente) return aPendiente ? -1 : 1;
+  const fechaA = a.fechaPropuesta || "9999-12-31";
+  const fechaB = b.fechaPropuesta || "9999-12-31";
+  return fechaA.localeCompare(fechaB) || String(b.actualizadoEn || "").localeCompare(String(a.actualizadoEn || ""));
 }
 
 function actualizarOpcionesResponsable() {
@@ -409,6 +458,7 @@ async function eliminarTarea(tarea) {
 
 async function activarNotificacionesTarea() {
   if (!("Notification" in window)) {
+    document.getElementById("estadoNotificaciones")?.classList.remove("d-none");
     mostrarBanner("Este navegador no admite notificaciones del sistema.", "warning", false, 4500);
     return;
   }
@@ -437,17 +487,17 @@ async function actualizarEstadoNotificaciones() {
   const boton = document.getElementById("activarNotificaciones");
   const texto = document.getElementById("textoEstadoNotificaciones");
   if (!("Notification" in window)) {
+    document.getElementById("estadoNotificaciones")?.classList.remove("d-none");
     texto.textContent = "Este navegador no admite notificaciones del sistema.";
     boton.classList.add("d-none");
     return;
   }
   if (Notification.permission === "granted") {
     await registrarServiceWorkerTareas();
-    texto.textContent = "Notificaciones activas en este dispositivo. Los avisos se muestran mientras la app está abierta.";
-    boton.textContent = "Notificaciones activas";
-    boton.disabled = true;
+    document.getElementById("estadoNotificaciones")?.classList.add("d-none");
     return;
   }
+  document.getElementById("estadoNotificaciones")?.classList.remove("d-none");
   if (Notification.permission === "denied") {
     texto.textContent = "Las notificaciones están bloqueadas en el navegador. Puedes habilitarlas en sus permisos del sitio.";
     boton.textContent = "Permiso bloqueado";
@@ -502,6 +552,7 @@ function guardarRecordatoriosProcesados(procesados) {
 
 function limpiarFiltrosTarea() {
   ["filtroEstadoTarea", "filtroResponsableTarea", "filtroDesdeTarea", "filtroHastaTarea"].forEach((id) => { document.getElementById(id).value = ""; });
+  paginaTareasActual = 1;
   renderizarTareas();
 }
 function limpiarFormularioTarea() {

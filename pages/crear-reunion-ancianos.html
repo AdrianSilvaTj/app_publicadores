@@ -23,6 +23,16 @@
     </div>
     <form id="formReunionAncianos" class="card card-shadow p-3 p-md-4 group-header-color">
       <div id="estadoEditorAncianos" class="alert d-none mb-3" role="alert"></div>
+      <div id="avisoBorradorAncianos" class="alert alert-info d-none mb-3" role="status">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+          <span id="textoAvisoBorradorAncianos"></span>
+          <div class="d-flex gap-2 flex-shrink-0">
+            <button id="restaurarBorradorAncianos" class="btn btn-sm btn-primary" type="button">Restaurar</button>
+            <button id="descartarBorradorAncianos" class="btn btn-sm btn-outline-secondary" type="button">Descartar</button>
+          </div>
+        </div>
+      </div>
+      <div id="estadoBorradorAncianos" class="small text-muted mb-3" aria-live="polite"></div>
       <div class="row g-3 mb-3">
         <div class="col-12 col-md-4">
           <label class="form-label" for="fechaReunionAncianos">Fecha</label>
