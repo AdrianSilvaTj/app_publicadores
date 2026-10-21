@@ -42,6 +42,9 @@
   line-height: 1.6;
   max-height: 600px;
   overflow: auto;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   tab-size: 4;
   white-space: pre-wrap;
 }

@@ -29,6 +29,31 @@ h2, h3 {
 /* Evitar que el contenido quede debajo del navbar */
 body {
   padding-top: 56px;
+  background-color: #f4f6f5;
+  background-image: linear-gradient(rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)), url("assets/fondo-app-congregacion.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.form-control,
+.form-select {
+  background-color: #f8f9fa;
+  border-color: #aebbc6;
+  border-radius: 0.5rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:hover:not(:disabled),
+.form-select:hover:not(:disabled) {
+  border-color: #8fa3b2;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6489a2;
+  box-shadow: 0 0 0 0.2rem rgb(70 112 143 / 18%);
 }
 
 .active {
@@ -128,6 +153,11 @@ body {
 }
 
 @media (max-width: 575.98px) {
+  body {
+    background-attachment: scroll;
+    background-position: center top;
+  }
+
   .tarjetas-principal > .card {
     max-height: min(500px, 70vh);
   }

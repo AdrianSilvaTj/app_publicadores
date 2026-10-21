@@ -3,7 +3,13 @@
 .tareas-header-text p { overflow-wrap: anywhere; }
 #nuevaTarea { flex: 0 0 auto; white-space: nowrap; }
 .tarea-card { height: 100%; overflow-wrap: anywhere; }
-.tarea-card .card-body { max-height: 500px; overflow-y: auto; overscroll-behavior: contain; }
+.tarea-card .card-body {
+  max-height: 500px;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
 .tarea-card .card-header { border-bottom-color: rgb(0 0 0 / 10%); }
 .tarea-card-header.tarea-card-estado-pendiente { color: #664d03; background-color: #fff3cd; }
 .tarea-card-header.tarea-card-estado-en-curso { color: #084298; background-color: #cfe2ff; }
