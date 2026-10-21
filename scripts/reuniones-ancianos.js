@@ -18,6 +18,10 @@ async function inicializarListaReunionesAncianos() {
     "click",
     gestionarAccionesReunionAncianos
   );
+  document.getElementById("editarReunionAncianosModal")?.addEventListener("click", () => {
+    const id = document.getElementById("modalLecturaReunionAncianos")?.dataset.reunionId;
+    if (id) window.location.href = `crear-reunion-ancianos.html?id=${encodeURIComponent(id)}`;
+  });
   document.getElementById("controlesPaginacionReunionesAncianos")?.addEventListener("click", (evento) => {
     const boton = evento.target.closest("[data-pagina-reunion]");
     if (!boton || boton.disabled) return;
@@ -113,6 +117,7 @@ function crearTarjetaReunionAncianos(documento) {
   const fecha = formatearFechaReunionAncianos(reunion.fecha);
   const tema = escaparHtmlReunionAncianos(reunion.tema || "Sin tema");
   const contenido = sanitizarContenidoReunionAncianos(reunion.contenido || "");
+  const vistaPrevia = crearVistaPreviaContenidoReunionAncianos(contenido);
 
   return `
     <article class="col-12 col-lg-6">
@@ -123,13 +128,14 @@ function crearTarjetaReunionAncianos(documento) {
             <time class="small" datetime="${escaparHtmlReunionAncianos(reunion.fecha || "")}">${fecha}</time>
           </div>
           <div class="d-flex flex-wrap gap-1">
-            <button class="btn btn-sm btn-outline-primary" type="button" data-accion-reunion="editar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Editar reunión: ${tema}" title="Editar reunión"><span aria-hidden="true">&#128393;</span><span class="visually-hidden">Editar</span></button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-accion-reunion="ver" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Ver reunión: ${tema}" title="Ver reunión"><span aria-hidden="true">👁</span><span class="visually-hidden">Ver</span></button>
+            <button class="btn btn-sm btn-outline-primary" type="button" data-accion-reunion="editar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Editar reunión: ${tema}" title="Editar reunión"><span aria-hidden="true">✏️</span><span class="visually-hidden">Editar</span></button>
             <button class="btn btn-sm btn-outline-danger" type="button" data-accion-reunion="eliminar" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" data-reunion-tema="${tema}" data-reunion-fecha="${escaparHtmlReunionAncianos(reunion.fecha || "")}" aria-label="Eliminar reunión: ${tema}" title="Eliminar reunión"><span aria-hidden="true">&#128465;</span><span class="visually-hidden">Eliminar</span></button>
             <button class="btn btn-sm btn-outline-secondary" type="button" data-accion-reunion="pdf" data-reunion-id="${escaparHtmlReunionAncianos(documento.id)}" aria-label="Descargar PDF: ${tema}" title="Descargar PDF"><span aria-hidden="true">&#128196;</span><span class="visually-hidden">PDF</span></button>
           </div>
         </div>
         <div class="card-body">
-          <div class="reunion-ancianos-contenido">${contenido || '<p class="text-muted mb-0">Sin contenido.</p>'}</div>
+          <div class="reunion-ancianos-contenido">${vistaPrevia || '<p class="text-muted mb-0">Sin contenido.</p>'}</div>
         </div>
       </section>
     </article>`;
@@ -141,6 +147,10 @@ function gestionarAccionesReunionAncianos(evento) {
 
   const id = boton.dataset.reunionId;
   if (!id) return;
+  if (boton.dataset.accionReunion === "ver") {
+    mostrarModalLecturaReunionAncianos(id);
+    return;
+  }
   if (boton.dataset.accionReunion === "editar") {
     window.location.href = `crear-reunion-ancianos.html?id=${encodeURIComponent(id)}`;
     return;
@@ -154,6 +164,54 @@ function gestionarAccionesReunionAncianos(evento) {
   if (boton.dataset.accionReunion === "eliminar") {
     eliminarReunionAncianos(id, boton);
   }
+}
+
+function mostrarModalLecturaReunionAncianos(id) {
+  const reunion = reunionesAncianosCargadas.get(id);
+  if (!reunion) return;
+  const modal = document.getElementById("modalLecturaReunionAncianos");
+  if (!modal) return;
+  modal.dataset.reunionId = id;
+  document.getElementById("tituloLecturaReunionAncianos").textContent = reunion.tema || "Sin tema";
+  document.getElementById("fechaLecturaReunionAncianos").textContent = formatearFechaReunionAncianos(reunion.fecha);
+  document.getElementById("contenidoLecturaReunionAncianos").innerHTML = sanitizarContenidoReunionAncianos(reunion.contenido || "") || '<p class="text-muted mb-0">Sin contenido.</p>';
+  bootstrap.Modal.getOrCreateInstance(modal).show();
+}
+
+function crearVistaPreviaContenidoReunionAncianos(html, maxCaracteres = 500) {
+  const documento = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+  const origen = documento.body.firstElementChild;
+  const vistaPrevia = documento.createElement("div");
+  let restantes = maxCaracteres - 1;
+  let truncado = false;
+
+  function copiarHastaLimite(nodo, destino) {
+    for (const hijo of nodo.childNodes) {
+      if (truncado) break;
+      if (hijo.nodeType === Node.TEXT_NODE) {
+        const texto = hijo.textContent || "";
+        if (texto.length > restantes) {
+          destino.appendChild(documento.createTextNode(`${texto.slice(0, restantes).trimEnd()}…`));
+          restantes = 0;
+          truncado = true;
+        } else {
+          destino.appendChild(documento.createTextNode(texto));
+          restantes -= texto.length;
+          if (restantes === 0 && nodo.textContent.length > maxCaracteres - 1) {
+            destino.appendChild(documento.createTextNode("…"));
+            truncado = true;
+          }
+        }
+      } else if (hijo.nodeType === Node.ELEMENT_NODE) {
+        const copia = hijo.cloneNode(false);
+        destino.appendChild(copia);
+        copiarHastaLimite(hijo, copia);
+      }
+    }
+  }
+
+  copiarHastaLimite(origen, vistaPrevia);
+  return vistaPrevia.innerHTML;
 }
 
 async function descargarPdfReunionAncianos(id, boton) {
@@ -377,7 +435,7 @@ async function inicializarEditorReunionAncianos() {
   if (idEdicionReunionAncianos) {
     document.title = "Editar reunión de ancianos";
     document.getElementById("tituloEditorReunionAncianos").textContent = "Editar reunión de ancianos";
-    document.getElementById("guardarReunionAncianos").textContent = "💾 Guardar cambios";
+    document.getElementById("guardarReunionAncianos").textContent = "💾 Guardar";
     try {
       const documento = await esperarRespuestaConLimite(
         db.collection(COLECCION_REUNIONES_ANCIANOS).doc(idEdicionReunionAncianos).get(),
@@ -566,10 +624,10 @@ async function guardarReunionAncianos(evento) {
     const escritura = idEdicionReunionAncianos
       ? db.collection(COLECCION_REUNIONES_ANCIANOS).doc(idEdicionReunionAncianos).update(datos)
       : db.collection(COLECCION_REUNIONES_ANCIANOS).add({
-          ...datos,
-          creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
-          creadoPor: auth.currentUser?.uid || null,
-        });
+        ...datos,
+        creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
+        creadoPor: auth.currentUser?.uid || null,
+      });
     await esperarRespuestaConLimite(escritura, TIEMPO_LIMITE_CARGA_REUNIONES);
     clearTimeout(temporizadorBorradorReunionAncianos);
     try {

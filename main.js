@@ -141,13 +141,13 @@ async function cargarMenuYScripts() {
       await cargarScript(`${raiz}scripts/reuniones.js`);
       break;
     case "tareas":
-      await cargarScript(`${raiz}scripts/tareas.js`);
+      await cargarScript(`${raiz}scripts/tareas.js?v=20261021-vista-modal-iconos`);
       break;
     case "reuniones-ancianos":
-      await cargarScript(`${raiz}scripts/reuniones-ancianos.js`);
+      await cargarScript(`${raiz}scripts/reuniones-ancianos.js?v=20261021-vista-modal`);
       break;
     case "crear-reunion-ancianos":
-      await cargarScript(`${raiz}scripts/reuniones-ancianos.js`);
+      await cargarScript(`${raiz}scripts/reuniones-ancianos.js?v=20261021-vista-modal`);
       break;
     case "servicio":
       await cargarScript(`${raiz}scripts/servicio.js`);

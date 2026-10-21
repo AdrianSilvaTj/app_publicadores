@@ -128,18 +128,6 @@ body {
   margin-top: 1rem;
 }
 
-.tarjetas-principal > .card {
-  max-height: 500px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.tarjetas-principal > .card > .card-header {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
 .aviso-item + .aviso-item {
   margin-top: 1rem;
   padding-top: 1rem;
@@ -158,9 +146,6 @@ body {
     background-position: center top;
   }
 
-  .tarjetas-principal > .card {
-    max-height: min(500px, 70vh);
-  }
 }
 
 .banner {

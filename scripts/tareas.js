@@ -9,10 +9,12 @@ let notasTareaActual = [];
 let temporizadorRecordatorios = null;
 let paginaTareasActual = 1;
 let cantidadTareasPorPagina = null;
+let tareaEnModoLectura = false;
 
 async function inicializarTareas() {
   document.getElementById("formTarea")?.addEventListener("submit", guardarTarea);
   document.getElementById("nuevaTarea")?.addEventListener("click", prepararNuevaTarea);
+  document.getElementById("editarTareaModal")?.addEventListener("click", habilitarEdicionTarea);
   document.getElementById("buscarPublicadorTarea")?.addEventListener("click", abrirSelectorPublicadorTarea);
   document.getElementById("buscadorPublicadorTarea")?.addEventListener("input", renderizarSelectorPublicadorTarea);
   document.getElementById("resultadosPublicadoresTarea")?.addEventListener("click", seleccionarPublicadorTarea);
@@ -227,6 +229,8 @@ function crearTarjetaTarea(tarea) {
   const responsables = (tarea.responsables || []).map(escaparTarea).join(", ") || "Sin asignar";
   const reunionRelacionada = reunionesAncianosTarea.find((reunion) => reunion.id === tarea.reunionRelacionadaId);
   const fechaPropuesta = tarea.fechaPropuesta ? formatearFechaTarea(tarea.fechaPropuesta) : "Sin fecha propuesta";
+  const descripcion = String(tarea.descripcion || "");
+  const descripcionVista = descripcion.length > 500 ? `${descripcion.slice(0, 500).trimEnd()}…` : descripcion;
   const fechaRealizada = tarea.fechaRealizada ? `<div class="small text-success mt-1">Realizada: ${escaparTarea(formatearFechaTarea(tarea.fechaRealizada))}</div>` : "";
   const recordatorios = (tarea.recordatorios || []).filter((r) => r.fechaHora).map((r) => `<li class="tarea-recordatorio">${escaparTarea(formatearFechaHoraTarea(r.fechaHora))}</li>`).join("");
   const notas = (tarea.notas || []).slice(-3).reverse().map((nota) => `<li class="list-group-item px-0 py-2"><span>${escaparTarea(nota.texto)}</span><div class="small text-muted">${escaparTarea(formatearFechaHoraTarea(nota.fechaHora))}${nota.autor ? ` · ${escaparTarea(nota.autor)}` : ""}</div></li>`).join("");
@@ -234,10 +238,10 @@ function crearTarjetaTarea(tarea) {
   return `<article class="col-12 col-lg-6"><section class="card card-shadow tarea-card">
     <div class="card-header tarea-card-header tarea-card-estado-${estado.replace(" ", "-")} d-flex flex-wrap justify-content-between align-items-center gap-2">
       <div><h2 class="h5 mb-1">${escaparTarea(tarea.titulo || "Sin título")}</h2><span class="badge tarea-estado tarea-estado-${estado.replace(" ", "-")}">${escaparTarea(estado)}</span></div>
-      <div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}" title="Editar tarea" aria-label="Editar tarea"><span aria-hidden="true">✎</span><span class="visually-hidden">Editar tarea</span></button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}" title="Eliminar tarea" aria-label="Eliminar tarea"><span aria-hidden="true">🗑</span><span class="visually-hidden">Eliminar tarea</span></button></div>
+      <div class="d-flex flex-wrap gap-1"><button class="btn btn-sm btn-outline-secondary" type="button" data-tarea-accion="ver" data-tarea-id="${escaparTarea(tarea.id)}" title="Ver tarea" aria-label="Ver tarea"><span aria-hidden="true">👁</span><span class="visually-hidden">Ver tarea</span></button><button class="btn btn-sm btn-outline-primary" type="button" data-tarea-accion="editar" data-tarea-id="${escaparTarea(tarea.id)}" title="Editar tarea" aria-label="Editar tarea"><span aria-hidden="true">✎</span><span class="visually-hidden">Editar tarea</span></button><button class="btn btn-sm btn-outline-danger" type="button" data-tarea-accion="eliminar" data-tarea-id="${escaparTarea(tarea.id)}" title="Eliminar tarea" aria-label="Eliminar tarea"><span aria-hidden="true">🗑</span><span class="visually-hidden">Eliminar tarea</span></button></div>
     </div>
     <div class="card-body">
-      ${tarea.descripcion ? `<p class="tarea-descripcion mb-3">${escaparTarea(tarea.descripcion)}</p>` : ""}
+      ${descripcion ? `<p class="tarea-descripcion mb-3">${escaparTarea(descripcionVista)}</p>` : ""}
       <div class="small"><strong>Responsable(s):</strong> ${responsables}</div><div class="small mt-1"><strong>Fecha propuesta:</strong> ${escaparTarea(fechaPropuesta)}</div>${fechaRealizada}
       ${tarea.reunionRelacionadaId ? `<div class="small mt-1"><strong>Reunión relacionada:</strong> ${escaparTarea(reunionRelacionada?.tema || "Reunión no disponible")}</div>` : ""}
       ${recordatorios ? `<div class="mt-3"><strong class="small">Recordatorios</strong><ul class="mb-0 ps-3">${recordatorios}</ul></div>` : ""}
@@ -250,13 +254,14 @@ function prepararNuevaTarea() {
   limpiarFormularioTarea();
   document.getElementById("tituloModalTarea").textContent = "Crear tarea";
   document.getElementById("seccionNotasTarea").classList.add("d-none");
+  actualizarModoModalTarea(false, false);
 }
 
-function prepararEdicionTarea(id) {
+function prepararEdicionTarea(id, soloLectura = false) {
   const tarea = tareasActuales.find((item) => item.id === id);
   if (!tarea) return;
   limpiarFormularioTarea();
-  document.getElementById("tituloModalTarea").textContent = "Editar tarea";
+  document.getElementById("tituloModalTarea").textContent = soloLectura ? "Ver tarea" : "Editar tarea";
   document.getElementById("idTarea").value = tarea.id;
   document.getElementById("tituloTarea").value = tarea.titulo || "";
   document.getElementById("descripcionTarea").value = tarea.descripcion || "";
@@ -273,11 +278,32 @@ function prepararEdicionTarea(id) {
   notasTareaActual = Array.isArray(tarea.notas) ? tarea.notas.map((n) => ({ ...n })) : [];
   renderizarRecordatoriosBorrador();
   renderizarNotasFormulario();
+  actualizarModoModalTarea(soloLectura, true);
   bootstrap.Modal.getOrCreateInstance(document.getElementById("modalTarea")).show();
+}
+
+function actualizarModoModalTarea(soloLectura, tareaExistente) {
+  tareaEnModoLectura = soloLectura;
+  document.querySelectorAll("#formTarea .modal-body input, #formTarea .modal-body textarea, #formTarea .modal-body select, #formTarea .modal-body button").forEach((control) => {
+    control.disabled = soloLectura;
+  });
+  const botonEditar = document.getElementById("editarTareaModal");
+  const botonGuardar = document.getElementById("guardarTarea");
+  botonEditar.classList.toggle("d-none", !tareaExistente || !soloLectura);
+  botonEditar.disabled = !soloLectura;
+  botonGuardar.disabled = soloLectura;
+}
+
+function habilitarEdicionTarea() {
+  if (!tareaEnModoLectura) return;
+  actualizarModoModalTarea(false, true);
+  document.getElementById("tituloModalTarea").textContent = "Editar tarea";
+  document.getElementById("tituloTarea").focus();
 }
 
 async function guardarTarea(evento) {
   evento.preventDefault();
+  if (tareaEnModoLectura) return;
   const boton = document.getElementById("guardarTarea");
   const id = document.getElementById("idTarea").value;
   const estado = document.getElementById("estadoTarea").value;
@@ -323,7 +349,7 @@ async function guardarTarea(evento) {
     mostrarBanner("No se pudo guardar la tarea. Intenta de nuevo.", "danger", false, 5000);
   } finally {
     boton.disabled = false;
-    boton.textContent = "Guardar tarea";
+    boton.textContent = "💾 Guardar";
   }
 }
 
@@ -409,6 +435,7 @@ function gestionarAccionTarjetaTarea(evento) {
   const tarea = tareasActuales.find((item) => item.id === boton.dataset.tareaId);
   if (!tarea) return;
   switch (boton.dataset.tareaAccion) {
+    case "ver": prepararEdicionTarea(tarea.id, true); break;
     case "editar": prepararEdicionTarea(tarea.id); break;
     case "eliminar": eliminarTarea(tarea); break;
     case "nota": prepararEdicionTarea(tarea.id); document.getElementById("nuevaNotaTarea").focus(); break;
@@ -565,6 +592,7 @@ function limpiarFormularioTarea() {
   notasTareaActual = [];
   renderizarRecordatoriosBorrador();
   renderizarNotasFormulario();
+  actualizarModoModalTarea(false, false);
 }
 function fechaHoyTarea() {
   const ahora = new Date();

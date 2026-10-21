@@ -134,7 +134,7 @@ async function cargarTotalesPublicadores() {
 }
 
 /**
- * Carga las últimas 30 acciones de los publicadores.
+ * Carga las últimas acciones de los publicadores (5 en móvil y 30 en pantallas mayores).
  */
 async function cargarHistorialEstadosPublicadores() {
   const tbody = document.getElementById("historialEstadosPublicadores");
@@ -163,8 +163,9 @@ async function cargarHistorialEstadosPublicadores() {
       timeZone: "America/Bogota",
     });
 
+    const limiteVisible = window.matchMedia("(max-width: 767.98px)").matches ? 5 : 30;
     tbody.replaceChildren(
-      ...snapshot.docs.map((documento) => {
+      ...snapshot.docs.slice(0, limiteVisible).map((documento) => {
         const registro = documento.data();
         const fila = document.createElement("tr");
 
@@ -195,7 +196,7 @@ async function cargarHistorialEstadosPublicadores() {
 }
 
 /**
- * Carga las últimas 30 tareas en la tarjeta principal.
+ * Carga las últimas tareas en la tarjeta principal (5 en móvil y 30 en pantallas mayores).
  * Colección de Firestore: tareas.
  */
 async function cargarTareasProgramadas() {
@@ -223,8 +224,10 @@ async function cargarTareasProgramadas() {
       id: documento.id,
       ...documento.data(),
     }));
+    tareas.sort(compararTareasPorVencimientoIndex);
 
-    const ultimasTareas = tareas;
+    const limiteVisible = window.matchMedia("(max-width: 767.98px)").matches ? 5 : 30;
+    const ultimasTareas = tareas.slice(0, limiteVisible);
 
     tbody.replaceChildren(
       ...ultimasTareas.map((tarea) => {
@@ -308,4 +311,13 @@ async function cargarTareasProgramadas() {
       </tr>
     `;
   }
+}
+
+function compararTareasPorVencimientoIndex(a, b) {
+  const aPendiente = a.estado === "pendiente";
+  const bPendiente = b.estado === "pendiente";
+  if (aPendiente !== bPendiente) return aPendiente ? -1 : 1;
+  const fechaA = a.fechaPropuesta || "9999-12-31";
+  const fechaB = b.fechaPropuesta || "9999-12-31";
+  return fechaA.localeCompare(fechaB) || String(b.actualizadoEn || "").localeCompare(String(a.actualizadoEn || ""));
 }
