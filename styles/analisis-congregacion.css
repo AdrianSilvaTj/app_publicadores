@@ -1,0 +1,119 @@
+.asistencia-acciones {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.asistencia-semanas-tabla {
+  min-width: 48rem;
+  margin-bottom: 0;
+}
+
+.asistencia-semanas-tabla th:first-child {
+  min-width: 9rem;
+  text-align: left;
+}
+
+.asistencia-semanas-tabla input {
+  min-width: 4.25rem;
+  text-align: center;
+}
+
+.asistencia-editor-tabla {
+  min-width: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.asistencia-editor-tabla th:first-child {
+  width: 38%;
+  min-width: 0;
+}
+
+.asistencia-editor-tabla th:not(:first-child) {
+  width: 31%;
+  text-align: center;
+}
+
+.asistencia-editor-tabla input {
+  width: 100%;
+  min-width: 0;
+}
+
+.asistencia-pdf {
+  box-sizing: border-box;
+  width: 277mm;
+  padding: 10mm;
+  color: #111;
+  background: #fff;
+  font-family: "Times New Roman", serif;
+  margin-inline: auto;
+}
+
+.asistencia-pdf h2 {
+  margin: 0 0 7mm;
+  text-align: center;
+  font-size: 16pt;
+  font-weight: 700;
+}
+
+.asistencia-pdf .nota {
+  margin: 0 0 17mm;
+  font-size: 10pt;
+  font-weight: 700;
+}
+
+.asistencia-pdf .datos {
+  display: flex;
+  justify-content: space-between;
+  gap: 12mm;
+  margin-bottom: 5mm;
+  font-size: 11pt;
+}
+
+.asistencia-pdf table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 9pt;
+}
+
+.asistencia-pdf th,
+.asistencia-pdf td {
+  height: 17mm;
+  padding: 2mm;
+  border: 1px solid #222;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.asistencia-pdf thead th {
+  height: 11mm;
+}
+
+.asistencia-pdf tbody th {
+  width: 35mm;
+  text-align: left;
+}
+
+@media (max-width: 575.98px) {
+  .asistencia-acciones {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-width: 6rem;
+  }
+
+  #listaAsistenciaReuniones td,
+  #listaAsistenciaReuniones th {
+    padding-inline: 0.45rem;
+  }
+
+  #listaAsistenciaReuniones .btn {
+    white-space: nowrap;
+  }
+
+  #modalAsistenciaReuniones .modal-dialog {
+    margin: 0.5rem;
+  }
+}
