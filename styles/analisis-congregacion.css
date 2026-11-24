@@ -1,6 +1,6 @@
 .asistencia-acciones {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   gap: 0.4rem;
 }
@@ -99,18 +99,16 @@
 
 @media (max-width: 575.98px) {
   .asistencia-acciones {
-    display: grid;
-    grid-template-columns: 1fr;
-    min-width: 6rem;
+    gap: 0.2rem;
   }
 
-  #listaAsistenciaReuniones td,
-  #listaAsistenciaReuniones th {
-    padding-inline: 0.45rem;
+  .tabla-asistencia-reuniones th,
+  .tabla-asistencia-reuniones td {
+    padding-inline: 0.3rem;
   }
 
-  #listaAsistenciaReuniones .btn {
-    white-space: nowrap;
+  .tabla-asistencia-reuniones .btn {
+    padding: 0.2rem 0.35rem;
   }
 
   #modalAsistenciaReuniones .modal-dialog {

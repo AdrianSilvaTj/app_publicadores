@@ -10,6 +10,13 @@ const coleccionAsistenciaAnalisis = "asistenciaReuniones";
 let asistenciasAnalisis = [];
 let congregacionNombreAnalisis = "";
 let mesActualModalAsistencia = null;
+let publicadoresAnalisis = [];
+let servicioAnalisis = [];
+const categoriasTotalesAnalisis = {
+  regulares: { titulo: "PRECURSORES REGULARES", tbody: "listaTotalesRegulares", horas: true, incluye: (privilegio) => privilegio === "regular" },
+  auxiliares: { titulo: "PRECURSORES AUXILIARES", tbody: "listaTotalesAuxiliares", horas: true, incluye: (privilegio) => privilegio === "auxiliar" || privilegio === "auxiliar_mes" },
+  publicadores: { titulo: "PUBLICADORES", tbody: "listaTotalesPublicadores", horas: false, incluye: (privilegio) => !privilegio },
+};
 
 async function iniciarAnalisisCongregacion() {
   const tbody = document.getElementById("listaPrecursoresRegulares");
@@ -25,6 +32,8 @@ async function iniciarAnalisisCongregacion() {
     ]);
     asistenciasAnalisis = snapshotAsistencia.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     congregacionNombreAnalisis = configuracion?.nombreCongregacion || "";
+    publicadoresAnalisis = publicadores;
+    servicioAnalisis = servicio;
     localStorage.setItem("firebase_publicadores", JSON.stringify(publicadores));
     selector.replaceChildren();
     const regulares = publicadores
@@ -45,13 +54,7 @@ async function iniciarAnalisisCongregacion() {
     for (let anio = anioMaximo; anio >= anioMinimo; anio--) {
       selector.add(new Option(`${anio} (sep. ${anio - 1} – ago. ${anio})`, String(anio)));
     }
-    const aniosCompletadosConRegistros = aniosServicioRegistrados.filter(
-      (anio) => anio < anioActualServicio,
-    );
-    const anioInicial = aniosCompletadosConRegistros.length
-      ? Math.max(...aniosCompletadosConRegistros)
-      : anioActualServicio;
-    selector.value = String(anioInicial);
+    selector.value = String(anioActualServicio);
     const objetivoAnual = (Number(configuracion?.horasMensualesPrecursoresRegulares) || 0) * 12;
     const umbralAlerta = objetivoAnual * 0.95;
 
@@ -101,10 +104,28 @@ async function iniciarAnalisisCongregacion() {
       document.getElementById("totalHorasRegulares").textContent =
         `Total: ${totalHoras} horas${objetivoAnual > 0 ? ` · Objetivo anual: ${objetivoAnual} h` : ""}`;
       renderizarAsistencias(anioServicio);
+      Object.entries(categoriasTotalesAnalisis).forEach(([categoria, config]) => {
+        const meses = calcularTotalesServicio(anioServicio, categoria);
+        const columnas = config.horas ? 4 : 3;
+        const filas = meses.map((item) => {
+          const fila = document.createElement("tr");
+          fila.innerHTML = `<th scope="row">${item.nombre}</th><td class="text-end">${item.registros ? item.informaron : "—"}</td><td class="text-end">${item.registros ? item.cursos : "—"}</td>${config.horas ? `<td class="text-end">${item.registros ? item.horas : "—"}</td>` : ""}`;
+          return fila;
+        });
+        const total = document.createElement("tr");
+        total.className = "fw-semibold";
+        total.innerHTML = `<th scope="row">Total</th><td></td><td class="text-end">${meses.reduce((suma, item) => suma + item.cursos, 0)}</td>${config.horas ? `<td class="text-end">${meses.reduce((suma, item) => suma + item.horas, 0)}</td>` : ""}`;
+        const tbodyTotales = document.getElementById(config.tbody);
+        if (meses.some((item) => item.registros)) tbodyTotales.replaceChildren(...filas, total);
+        else tbodyTotales.innerHTML = `<tr><td colspan="${columnas}" class="text-center text-muted">No hay informes en este año de servicio.</td></tr>`;
+      });
     };
     selector.addEventListener("change", render);
     document.getElementById("formAsistenciaReuniones").addEventListener("submit", guardarAsistencia);
     tbodyAsistencia.addEventListener("click", gestionarAccionAsistencia);
+    document.querySelectorAll("[data-tarjeta-totales]").forEach((boton) =>
+      boton.addEventListener("click", () => verTarjetaTotales(Number(selector.value), boton.dataset.tarjetaTotales)),
+    );
     document.querySelectorAll(".asistencia-valor").forEach((entrada) => entrada.addEventListener("input", actualizarTotalesAsistencia));
     document.getElementById("modalAsistenciaReuniones").addEventListener("hidden.bs.modal", () => { mesActualModalAsistencia = null; });
     render();
@@ -115,6 +136,74 @@ async function iniciarAnalisisCongregacion() {
     cerrarBanner();
     mostrarBanner("❌ Error al cargar el análisis de la congregación", "danger");
   }
+}
+
+/**
+ * Sums monthly field service reports of a category (regulares, auxiliares or publicadores),
+ * using the same active/privilege rules as the monthly totals of the service page.
+ * Reports of deleted publishers are included: they have no saved privilege, so it is
+ * inferred from the report (auxiliary flag, or hours without it for regular pioneers).
+ */
+function calcularTotalesServicio(anioServicio, categoria) {
+  const config = categoriasTotalesAnalisis[categoria];
+  const publicadorPorId = new Map(publicadoresAnalisis.map((pub) => [String(pub.id), pub]));
+  return mesesServicioAnalisis.map((item) => {
+    const anio = anioServicio + item.anioOffset;
+    const registros = servicioAnalisis.filter((registro) => {
+      if (Number(registro.mes) !== item.mes || Number(registro.anio) !== anio) return false;
+      const publicador = publicadorPorId.get(String(registro.publicadorId));
+      if (publicador) {
+        return Number(publicador.grupo) > 0 && obtenerActivoRegistro(publicador, registro) && config.incluye(obtenerPrivilegioRegistro(publicador, registro, item.mes, anio));
+      }
+      const privilegio = registro.privilegio || (registro.auxiliar ? "auxiliar" : Number(registro.horas) > 0 ? "regular" : null);
+      return Number(registro.grupo) > 0 && registro.activo !== false && config.incluye(privilegio);
+    });
+    return {
+      ...item,
+      registros: registros.length,
+      informaron: registros.filter((registro) => registro.participo).length,
+      cursos: registros.reduce((suma, registro) => suma + (Number(registro.cursos) || 0), 0),
+      horas: config.horas ? registros.reduce((suma, registro) => suma + (Number(registro.horas) || 0), 0) : 0,
+    };
+  });
+}
+
+function verTarjetaTotales(anioServicio, categoria) {
+  const config = categoriasTotalesAnalisis[categoria];
+  const meses = calcularTotalesServicio(anioServicio, categoria);
+  const width = 900;
+  const height = 900;
+  const ventana = window.open("", "tarjetaTotales", `width=${width},height=${height},left=${(screen.width - width) / 2},top=${(screen.height - height) / 2},resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,status=no`);
+  if (!ventana) {
+    alert("Permite las ventanas emergentes para ver la tarjeta");
+    return;
+  }
+  const casilla = '<input type="checkbox">';
+  const nombre = `${config.titulo} CONGREGACIÓN ${congregacionNombreAnalisis}`.toUpperCase();
+  const filas = meses.map((item) => `<tr><td>${item.nombre}</td><td>${casilla}</td><td>${item.registros ? item.cursos : ""}</td><td>${casilla}</td><td>${item.registros && config.horas ? item.horas.toLocaleString("en-US") : ""}</td><td style="text-align:left">${item.registros ? `INFORMARON ${item.informaron}` : ""}</td></tr>`).join("");
+  const totalHoras = config.horas ? meses.reduce((suma, item) => suma + item.horas, 0).toLocaleString("en-US") : "";
+  const nombreArchivo = `Registro ${config.titulo.toLowerCase()} ${anioServicio}.pdf`;
+  ventana.document.open();
+  ventana.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8" /><title>Registro de Publicador</title><link rel="stylesheet" href="../styles/tarjeta.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script></head><body>
+    <div class="acciones"><button class="btn" onclick="descargar()">⬇ Descargar</button> <button class="btn" onclick="window.close()">❌ Cerrar</button></div>
+    <div id="contenidoTarjeta"><div class="tarjeta-servicio">
+      <h3 class="titulo">REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN</h3>
+      <div class="datos-publicador">
+        <div class="fila nombre"><span class="label">Nombre:</span><span class="valor">${escaparHtmlAsistencia(nombre)}</span></div>
+        <div class="fila doble">
+          <div class="col"><div class="linea"><span class="label">Fecha de nacimiento:</span></div><div class="linea"><span class="label">Fecha de bautismo:</span></div></div>
+          <div class="col checks"><div class="grupo-checks"><label>${casilla} Hombre</label> <label>${casilla} Mujer</label></div><div class="grupo-checks"><label>${casilla} Otras ovejas</label> <label>${casilla} Ungido</label></div></div>
+        </div>
+        <div class="fila checks-full"><label>${casilla} Anciano</label><label>${casilla} Siervo ministerial</label><label>${casilla} Precursor regular</label><label>${casilla} Precursor especial</label><label>${casilla} Misionero que sirve<br>en el campo</label></div>
+      </div>
+      <table class="tabla-servicio">
+        <thead><tr><th style="width:170px">Año de servicio<br>${anioServicio}</th><th style="width:70px">Participación<br>en el ministerio</th><th style="width:70px">Cursos<br>bíblicos</th><th style="width:70px">Precursor<br>auxiliar</th><th style="width:110px">Horas<small>Si es precursor o<br>misionero que sirve<br>en el campo</small></th><th style="width:260px">Notas</th></tr></thead>
+        <tbody>${filas}<tr class="total"><td style="border:none"></td><td style="border:none"></td><td style="border:none"></td><td style="text-align:right">Total</td><td>${totalHoras}</td><td></td></tr></tbody>
+      </table>
+    </div></div>
+    <script>function descargar(){html2pdf().set({margin:10,filename:${JSON.stringify(nombreArchivo)},image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"b5",orientation:"landscape"}}).from(document.getElementById("contenidoTarjeta")).save()}</script>
+  </body></html>`);
+  ventana.document.close();
 }
 
 function buscarAsistencia(anioServicio, mes) {
@@ -130,7 +219,7 @@ function renderizarAsistencias(anioServicio) {
       return registrados.length ? (registrados.reduce((total, valor) => total + Number(valor), 0) / registrados.length).toFixed(1).replace(/\.0$/, "") : "—";
     };
     const fila = document.createElement("tr");
-    fila.innerHTML = `<th scope="row">${item.nombre}</th><td class="text-end">${promedio(registro?.entreSemana)}</td><td class="text-end">${promedio(registro?.finSemana)}</td><td class="text-end"><div class="asistencia-acciones"><button class="btn btn-sm btn-outline-primary" type="button" data-accion-asistencia="ver" data-mes="${item.mes}" data-nombre-mes="${item.nombre}">Ver</button><button class="btn btn-sm btn-outline-secondary" type="button" data-accion-asistencia="descargar" data-mes="${item.mes}" data-nombre-mes="${item.nombre}">Descargar</button><button class="btn btn-sm btn-outline-danger" type="button" data-accion-asistencia="eliminar" data-mes="${item.mes}" data-nombre-mes="${item.nombre}"${registro ? "" : " disabled"}>Eliminar</button></div></td>`;
+    fila.innerHTML = `<th scope="row">${item.nombre}</th><td class="text-end">${promedio(registro?.entreSemana)}</td><td class="text-end">${promedio(registro?.finSemana)}</td><td class="text-end"><div class="asistencia-acciones"><button class="btn btn-sm btn-outline-secondary" type="button" data-accion-asistencia="ver" data-mes="${item.mes}" aria-label="Ver asistencia de ${item.nombre}" title="Ver asistencia"><span aria-hidden="true">👁</span><span class="visually-hidden">Ver</span></button><button class="btn btn-sm btn-outline-secondary" type="button" data-accion-asistencia="descargar" data-mes="${item.mes}" aria-label="Descargar PDF de ${item.nombre}" title="Descargar PDF"><span aria-hidden="true">&#128196;</span><span class="visually-hidden">PDF</span></button><button class="btn btn-sm btn-outline-danger" type="button" data-accion-asistencia="eliminar" data-mes="${item.mes}" aria-label="Eliminar asistencia de ${item.nombre}" title="Eliminar asistencia"${registro ? "" : " disabled"}><span aria-hidden="true">&#128465;</span><span class="visually-hidden">Eliminar</span></button></div></td>`;
     return fila;
   }));
 }
