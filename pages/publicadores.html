@@ -67,6 +67,11 @@
                   📊 Listado privilegios
                 </a>
               </li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="event.preventDefault(); descargarDatosContacto()">
+                  📇 Listado Datos de contacto
+                </a>
+              </li>
             </ul>
           </div>
           <button
@@ -190,18 +195,26 @@
                 </div>
 
                 <div class="row g-2 mt-2">
-                  <div class="col-12 col-md-6">
-                    <label for="emailPublicador" class="form-label">Correo electrónico</label>
-                    <input type="email" class="form-control" id="emailPublicador" maxlength="254" autocomplete="email" />
-                    <div class="form-text">Se puede usar para enviar recordatorios de tareas.</div>
-                  </div>
-                  <div class="col-12 col-md-6">
+                  <div class="col-12 col-md-3">
                     <label for="sexo" class="form-label">Sexo <span class="text-danger">*</span></label>
                     <select class="form-select" id="sexo" required>
                       <option value="">Selecciona...</option>
                       <option value="M">Masculino</option>
                       <option value="F">Femenino</option>
                     </select>
+                  </div>
+                  <div class="col-12 col-md-5">
+                    <label for="emailPublicador" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="emailPublicador" maxlength="254" autocomplete="email" />
+                    <div class="form-text">Se puede usar para enviar recordatorios de tareas.</div>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" autocomplete="off" />
+                  </div>
+                  <div class="col-12">
+                    <label for="direccion" class="form-label">Dirección</label>
+                    <input type="text" class="form-control" id="direccion" autocomplete="off" />
                   </div>
                 </div>
                 <div class="row g-2 mt-2">
@@ -492,7 +505,7 @@
                 </div>
                 <div class="row g-2">
                   <div class="col-12">
-                    <label for="nombre" class="form-label"
+                    <label for="notas" class="form-label"
                       >Notas</label
                     >
                     <textarea class="form-control" rows="5"
@@ -520,6 +533,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/docx@9.0.3/build/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="../main.js"></script>
     <script src="../scripts/pwa-install.js" defer></script>
     <script src="../scripts/utils-functions.js"></script>

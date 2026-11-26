@@ -132,7 +132,7 @@ async function cargarMenuYScripts() {
   // ✅ 5. Script por página
   switch (pagina) {
     case "publicadores":
-      await cargarScript(`${raiz}scripts/publicadores.js`);
+      await cargarScript(`${raiz}scripts/publicadores.js?v=20261126`);
       break;
     case "configuracion":
       await cargarScript(`${raiz}scripts/configuracion.js`);

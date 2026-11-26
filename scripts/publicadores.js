@@ -303,6 +303,58 @@ async function descargarListadoPublicadores() {
   link.click();
 }
 
+async function descargarDatosContacto() {
+  if (typeof html2pdf !== "function") {
+    mostrarBanner("❌ No se pudo cargar el generador de PDF", "danger", false, 4000);
+    return;
+  }
+  mostrarBanner("Generando PDF...", "info", true);
+  const raiz = document.createElement("div");
+  try {
+    const snapshot = await db.collection("publicadores").get();
+    const publicadores = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((pub) => Number(pub.grupo) > 0 && pub.nombre !== "No Aplica");
+    const grupos = [...new Set(publicadores.map((pub) => Number(pub.grupo)))].sort((a, b) => a - b);
+    const escapar = (valor) => escaparHtml(String(valor || ""));
+    const secciones = grupos.map((grupo) => {
+      const items = publicadores
+        .filter((pub) => Number(pub.grupo) === grupo)
+        .sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""))
+        .map((pub) => `<div class="contacto"><div class="nombre">${escapar(pub.nombre)}</div><div><i>Teléfono:</i> ${escapar(pub.telefono)}</div><div><i>Dirección:</i> ${escapar(pub.direccion)}</div></div>`)
+        .join("");
+      return `<section><h2>Grupo ${grupo}:</h2>${items}</section>`;
+    }).join("");
+    raiz.style.cssText = "position:fixed;left:-10000px;top:0;width:190mm;background:#fff";
+    raiz.innerHTML = `<div class="datos-contacto"><style>
+      .datos-contacto{font-family:Calibri,Candara,Arial,sans-serif;color:#000;font-size:11pt}
+      .datos-contacto h1{text-align:center;font-size:16pt;font-weight:bold;margin:0 0 6mm}
+      .datos-contacto h2{color:#2e5c9a;font-size:15pt;font-weight:bold;margin:6mm 0 4mm;padding-bottom:1mm;border-bottom:1px solid #555}
+      .datos-contacto .contacto{margin-bottom:4mm;font-size:10pt;line-height:1.3}
+      .datos-contacto .nombre{font-weight:bold;font-size:12pt}
+    </style><h1>Datos de contacto de los publicadores</h1>${secciones}</div>`;
+    document.body.append(raiz);
+    await html2pdf()
+      .set({
+        margin: [12, 10],
+        filename: `Datos_Contacto_Publicadores_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image: { type: "jpeg", quality: 0.85 },
+        html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+        jsPDF: { unit: "mm", format: "letter", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"], avoid: [".contacto", "h2"] },
+      })
+      .from(raiz.querySelector(".datos-contacto"))
+      .save();
+    cerrarBanner();
+  } catch (error) {
+    console.error("Error al generar el listado de contacto:", error);
+    cerrarBanner();
+    mostrarBanner("❌ No se pudo generar el PDF", "danger", false, 4000);
+  } finally {
+    raiz.remove();
+  }
+}
+
 async function descargarPublicadoresPorCampos() {
   let publicadores = await obtenerDataColeccion('publicadores')
   if (!publicadores || !publicadores.length) {
@@ -398,21 +450,13 @@ async function descargarPublicadoresPorCampos() {
 
 async function editarPublicador(id) {
   try {
-    // Obtener el publicador desde localStorage o Firestore
-    let publicadores =
-      JSON.parse(localStorage.getItem("firebase_publicadores")) || [];
-
-    let pub = publicadores.find((p) => p.id === id);
-
-    // Si no está en cache, buscar en Firestore
-    if (!pub) {
-      const doc = await db.collection("publicadores").doc(id).get();
-      if (!doc.exists) {
-        alert("❌ Publicador no encontrado.");
-        return;
-      }
-      pub = { id: doc.id, ...doc.data() };
+    // Read from Firestore, not the localStorage cache: a stale cache would overwrite newer data on save.
+    const doc = await db.collection("publicadores").doc(id).get();
+    if (!doc.exists) {
+      alert("❌ Publicador no encontrado.");
+      return;
     }
+    const pub = { id: doc.id, ...doc.data() };
 
     // Guardar ID de edición
     form.setAttribute("data-edicion-id", id);
@@ -424,6 +468,8 @@ async function editarPublicador(id) {
       pub.fechaNacimiento || "";
     document.getElementById("fechaBautismo").value = pub.fechaBautismo || "";
     document.getElementById("sexo").value = pub.sexo || "";
+    document.getElementById("telefono").value = pub.telefono || "";
+    document.getElementById("direccion").value = pub.direccion || "";
     document.getElementById("notas").value = pub.notas || "";
     document
       .querySelector(`input[name="esperanza"][value="${pub.esperanza}"]`)
@@ -845,6 +891,8 @@ form.addEventListener("submit", async (e) => {
     document.getElementById("fechaNacimiento").value || null;
   const fechaBautismo = document.getElementById("fechaBautismo").value || null;
   const sexo = document.getElementById("sexo").value;
+  const telefono = document.getElementById("telefono").value.trim();
+  const direccion = document.getElementById("direccion").value.trim();
   const notas = document.getElementById("notas").value;
   const esperanza = document.querySelector(
     'input[name="esperanza"]:checked'
@@ -882,6 +930,8 @@ form.addEventListener("submit", async (e) => {
     sexo,
     esperanza,
     grupo,
+    telefono,
+    direccion,
     notas,
     estadoEspiritual,
     privilegiosCongregacion,
