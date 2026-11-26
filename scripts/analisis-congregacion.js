@@ -216,7 +216,7 @@ function renderizarAsistencias(anioServicio) {
     const registro = buscarAsistencia(anioServicio, item.mes);
     const promedio = (valores) => {
       const registrados = (Array.isArray(valores) ? valores : []).filter((valor) => valor !== null && valor !== "" && Number.isFinite(Number(valor)));
-      return registrados.length ? (registrados.reduce((total, valor) => total + Number(valor), 0) / registrados.length).toFixed(1).replace(/\.0$/, "") : "—";
+      return registrados.length ? Math.round(registrados.reduce((total, valor) => total + Number(valor), 0) / registrados.length) : "—";
     };
     const fila = document.createElement("tr");
     fila.innerHTML = `<th scope="row">${item.nombre}</th><td class="text-end">${promedio(registro?.entreSemana)}</td><td class="text-end">${promedio(registro?.finSemana)}</td><td class="text-end"><div class="asistencia-acciones"><button class="btn btn-sm btn-outline-secondary" type="button" data-accion-asistencia="ver" data-mes="${item.mes}" aria-label="Ver asistencia de ${item.nombre}" title="Ver asistencia"><span aria-hidden="true">👁</span><span class="visually-hidden">Ver</span></button><button class="btn btn-sm btn-outline-secondary" type="button" data-accion-asistencia="descargar" data-mes="${item.mes}" aria-label="Descargar PDF de ${item.nombre}" title="Descargar PDF"><span aria-hidden="true">&#128196;</span><span class="visually-hidden">PDF</span></button><button class="btn btn-sm btn-outline-danger" type="button" data-accion-asistencia="eliminar" data-mes="${item.mes}" aria-label="Eliminar asistencia de ${item.nombre}" title="Eliminar asistencia"${registro ? "" : " disabled"}><span aria-hidden="true">&#128465;</span><span class="visually-hidden">Eliminar</span></button></div></td>`;

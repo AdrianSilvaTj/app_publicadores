@@ -154,7 +154,7 @@ async function cargarMenuYScripts() {
       break;
     case "analisis-congregacion":
       await cargarScript(`${raiz}scripts/servicio.js`);
-      await cargarScript(`${raiz}scripts/analisis-congregacion.js?v=5`);
+      await cargarScript(`${raiz}scripts/analisis-congregacion.js?v=6`);
       break;
     case "historial-acciones":
       await cargarScript(`${raiz}scripts/historial-acciones.js`);
